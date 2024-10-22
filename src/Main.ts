@@ -1,17 +1,16 @@
 import * as THREE from 'three';
-//import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 export class Main {
   private readonly scene: THREE.Scene;
   private readonly camera: THREE.PerspectiveCamera;
   private readonly renderer: THREE.WebGLRenderer;
-  //private readonly controls: OrbitControls;
+  private readonly texture: THREE.Texture;
 
   constructor() {
     console.log('Main');
 
     // テクスチャー
-    const texture = new THREE.TextureLoader().load('/texture/3658520_s.jpg');
+    this.texture = new THREE.TextureLoader().load('/texture/3658520_s.jpg');
 
     this.scene = new THREE.Scene();
 
@@ -34,25 +33,21 @@ export class Main {
     // ジオメトリを作成
     const geometry = new THREE.SphereGeometry(50, 32, 32);
     // マテリアルを作成
-    const material = new THREE.MeshBasicMaterial({ map: texture });
-    //const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    const material = new THREE.MeshBasicMaterial({ map: this.texture });
     // メッシュ化
     const mesh = new THREE.Mesh(geometry, material);
     this.scene.add(mesh);
 
-    // 光を追加
-    const light = new THREE.DirectionalLight(0xffffff, 1);
-    light.position.set(1, 1, 1).normalize();
-    this.scene.add(light);
-
-    // マウス操作を有効にする
-    //this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+    // テクスチャ繰り返し設定
+    this.texture.wrapS = this.texture.wrapT = THREE.RepeatWrapping;
 
     // アニメーション開始
     this.animate();
   }
 
   animate = () => {
+    this.texture.offset.x = performance.now() / 1000 / 3.5;
+    this.texture.offset.y = performance.now() / 1000 / 3.5;
     this.renderer.render(this.scene, this.camera);
     requestAnimationFrame(this.animate);
   };
