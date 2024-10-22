@@ -39,7 +39,7 @@ export class Main {
     this.renderer.setClearColor(0x000000, 0);
     this.renderer.setSize(renderWidth, renderHeight);
     this.renderer.setPixelRatio(window.devicePixelRatio);
-    //document.getElementById('canvas')!.appendChild(this.renderer.domElement);
+
     document.body.appendChild(this.renderer.domElement);
 
     // ビデオテクスチャを作成
