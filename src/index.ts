@@ -3,8 +3,6 @@ import { Main } from './Main';
 //const videoElement = document.createElement('video');
 const videoElement = <HTMLVideoElement>document.getElementById('video');
 console.log({ videoElement });
-const canvasElement = <HTMLCanvasElement>document.getElementById('canvas'); // canvas
-const canvasCtx = canvasElement.getContext('2d');
 const width = '600px';
 const height = '400px';
 
