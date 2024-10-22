@@ -31,7 +31,7 @@ export class Main {
     document.getElementById('app')!.appendChild(this.renderer.domElement);
 
     // ジオメトリを作成
-    const geometry = new THREE.SphereGeometry(50, 32, 32);
+    const geometry = new THREE.SphereGeometry(20, 32, 32);
     // マテリアルを作成
     const material = new THREE.MeshBasicMaterial({ map: this.texture });
     // メッシュ化
@@ -49,6 +49,10 @@ export class Main {
     this.texture.offset.x = performance.now() / 1000 / 3.5;
     this.texture.offset.y = performance.now() / 1000 / 3.5;
     this.renderer.render(this.scene, this.camera);
-    requestAnimationFrame(this.animate);
+    const id = requestAnimationFrame(this.animate);
+
+    // 描画をやめる
+    const cancel = document.getElementById('cancel');
+    cancel?.addEventListener('click', () => cancelAnimationFrame(id));
   };
 }
