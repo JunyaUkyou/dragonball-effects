@@ -55,12 +55,20 @@ export class Main {
     // エネルギー弾の球体を作成しシーンに追加
     this.sphere = new Sphere(this.texture);
     // 球体の位置を調整
-    this.sphere.mesh.position.set(60, 20, 20);
+    const spherePositionX = 0;
+    const spherePositionY = 40;
+    const spherePositionZ = 20;
+    this.sphere.mesh.position.set(
+      spherePositionX,
+      spherePositionY,
+      spherePositionZ
+    );
     this.scene.add(this.sphere.mesh);
 
     // SparkEmitter の追加
-    this.sparkEmitter = new SparkEmitter(this.sphere.mesh);
+    this.sparkEmitter = new SparkEmitter(spherePositionX, spherePositionY);
     this.scene.add(this.sparkEmitter);
+    spherePositionX;
     // スパークを作成しシーンに追加
     // this.spark = new Spark(
     //   new THREE.TextureLoader().load('/texture/3658520_s.jpg')

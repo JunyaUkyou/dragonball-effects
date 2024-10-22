@@ -6,7 +6,7 @@ export class SparkEmitter extends THREE.Object3D {
   private _sparkNum: number = 100;
   //private _target: THREE.Vector3;
 
-  constructor(targetMesh: THREE.Mesh) {
+  constructor(positionX: number, positionY: number) {
     super();
 
     //this._target = new THREE.Vector3();
@@ -19,8 +19,8 @@ export class SparkEmitter extends THREE.Object3D {
     for (let i = 0; i < this._sparkNum; i++) {
       const rad = (perAngle * i * Math.PI) / 180;
       const spark = new Spark();
-      spark.position.x = 60;
-      spark.position.y = 20;
+      spark.position.x = positionX;
+      spark.position.y = positionY;
 
       spark.rotation.x = 360 * Math.sin(rad);
       spark.rotation.z = rad;
