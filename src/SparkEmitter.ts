@@ -4,16 +4,9 @@ import { Spark } from './Spark';
 export class SparkEmitter extends THREE.Object3D {
   private _sparkList: Spark[] = [];
   private _sparkNum: number = 100;
-  //private _target: THREE.Vector3;
 
   constructor(positionX: number, positionY: number) {
     super();
-
-    //this._target = new THREE.Vector3();
-    //targetMesh.getWorldPosition(this._target);
-
-    //this._target = targetMesh.getWorldPosition(new THREE.Vector3());
-    //console.log(this._target);
 
     const perAngle = 360 / this._sparkNum;
     for (let i = 0; i < this._sparkNum; i++) {

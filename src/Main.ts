@@ -69,11 +69,6 @@ export class Main {
     this.sparkEmitter = new SparkEmitter(spherePositionX, spherePositionY);
     this.scene.add(this.sparkEmitter);
     spherePositionX;
-    // スパークを作成しシーンに追加
-    // this.spark = new Spark(
-    //   new THREE.TextureLoader().load('/texture/3658520_s.jpg')
-    // );
-    // this.scene.add(this.spark.mesh);
 
     // アニメーション開始
     this.animate();
