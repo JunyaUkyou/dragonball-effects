@@ -4,7 +4,7 @@ export class Sphere {
   public readonly mesh: THREE.Mesh;
   constructor(texture: THREE.Texture) {
     // ジオメトリを作成
-    const geometry = new THREE.SphereGeometry(20, 32, 32);
+    const geometry = new THREE.SphereGeometry(10, 32, 32);
     // マテリアルを作成
     const material = new THREE.MeshBasicMaterial({ map: texture });
     // メッシュ化

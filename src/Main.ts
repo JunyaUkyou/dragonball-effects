@@ -54,12 +54,12 @@ export class Main {
 
     // エネルギー弾の球体を作成しシーンに追加
     this.sphere = new Sphere(this.texture);
-    // 球体の大きさを調整
-    //this.sphere.mesh.position.set(60, 0, 0);
+    // 球体の位置を調整
+    this.sphere.mesh.position.set(60, 20, 20);
     this.scene.add(this.sphere.mesh);
 
     // SparkEmitter の追加
-    this.sparkEmitter = new SparkEmitter();
+    this.sparkEmitter = new SparkEmitter(this.sphere.mesh);
     this.scene.add(this.sparkEmitter);
     // スパークを作成しシーンに追加
     // this.spark = new Spark(
