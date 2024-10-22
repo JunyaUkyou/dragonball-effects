@@ -1,10 +1,12 @@
 import * as THREE from 'three';
+import { Sphere } from './Sphere';
 
 export class Main {
   private readonly scene: THREE.Scene;
   private readonly camera: THREE.PerspectiveCamera;
   private readonly renderer: THREE.WebGLRenderer;
   private readonly texture: THREE.Texture;
+  private readonly sphere: Sphere;
 
   constructor() {
     console.log('Main');
@@ -30,16 +32,9 @@ export class Main {
     this.renderer.setPixelRatio(window.devicePixelRatio);
     document.getElementById('app')!.appendChild(this.renderer.domElement);
 
-    // ジオメトリを作成
-    const geometry = new THREE.SphereGeometry(20, 32, 32);
-    // マテリアルを作成
-    const material = new THREE.MeshBasicMaterial({ map: this.texture });
-    // メッシュ化
-    const mesh = new THREE.Mesh(geometry, material);
-    this.scene.add(mesh);
-
-    // テクスチャ繰り返し設定
-    this.texture.wrapS = this.texture.wrapT = THREE.RepeatWrapping;
+    // エネルギー弾の球体を作成しシーンに追加
+    this.sphere = new Sphere(this.texture);
+    this.scene.add(this.sphere.mesh);
 
     // アニメーション開始
     this.animate();
