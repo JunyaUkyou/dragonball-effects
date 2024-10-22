@@ -10,6 +10,8 @@ export class Main {
   private readonly sphere: Sphere;
   private readonly sparkEmitter: SparkEmitter;
 
+  private renderWidth: number;
+
   // スケール拡大用の係数
   private scaleIncrement: number = 0.05;
 
@@ -34,10 +36,10 @@ export class Main {
     this.renderer = new THREE.WebGLRenderer({ alpha: true });
     // const renderWidth = window.innerWidth;
     // const renderHeight = window.innerHeight;
-    const renderWidth = 600;
+    this.renderWidth = 600;
     const renderHeight = 400;
     this.renderer.setClearColor(0x000000, 0);
-    this.renderer.setSize(renderWidth, renderHeight);
+    this.renderer.setSize(this.renderWidth, renderHeight);
     this.renderer.setPixelRatio(window.devicePixelRatio);
 
     document.body.appendChild(this.renderer.domElement);
@@ -88,6 +90,13 @@ export class Main {
 
     if (this.sphere.mesh.scale.x > 4) {
       this.scaleIncrement = 0; // 拡大を停止
+
+      setTimeout(() => {
+        this.scene.remove(this.sparkEmitter);
+        this.sphere.mesh.position.x -= 15;
+        if (this.sphere.mesh.position.x < (this.renderWidth / 2) * -1)
+          this.scene.remove(this.sphere.mesh);
+      }, 4000);
     }
 
     this.renderer.render(this.scene, this.camera);
