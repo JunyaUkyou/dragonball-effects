@@ -83,19 +83,29 @@ export class Main {
     // SparkEmitter の更新
     this.sparkEmitter.update();
 
-    // 球体の大きさを徐々に大きくする
+    // エネルギー弾を徐々に大きくする
     this.sphere.mesh.scale.x += this.scaleIncrement;
     this.sphere.mesh.scale.y += this.scaleIncrement;
     this.sphere.mesh.scale.z += this.scaleIncrement;
 
+    // エネルギー弾が最大化の場合
     if (this.sphere.mesh.scale.x > 4) {
       this.scaleIncrement = 0; // 拡大を停止
 
+      // エネルギー弾 最大化後、数秒後に処理を開始
       setTimeout(() => {
+        // スパークを削除
         this.scene.remove(this.sparkEmitter);
-        this.sphere.mesh.position.x -= 15;
-        if (this.sphere.mesh.position.x < (this.renderWidth / 2) * -1)
-          this.scene.remove(this.sphere.mesh);
+
+        const moveInterval = setInterval(() => {
+          this.sphere.mesh.position.x -= 2.0;
+
+          // 球体が画面外に出たらエネルギー弾を削除して移動を停止
+          if (this.sphere.mesh.position.x < (this.renderWidth / 2) * -1) {
+            this.scene.remove(this.sphere.mesh);
+            clearInterval(moveInterval); // 移動の停止
+          }
+        }, 16); // 毎フレーム（約60FPSで）移動
       }, 4000);
     }
 
