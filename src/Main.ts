@@ -8,7 +8,7 @@ export class Main {
   private readonly texture: THREE.Texture;
   private readonly sphere: Sphere;
 
-  constructor() {
+  constructor(video: HTMLVideoElement) {
     console.log('Main');
 
     // テクスチャー
@@ -30,7 +30,18 @@ export class Main {
     this.renderer.setClearColor(0x000000, 0);
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setPixelRatio(window.devicePixelRatio);
-    document.getElementById('app')!.appendChild(this.renderer.domElement);
+    //document.getElementById('canvas')!.appendChild(this.renderer.domElement);
+    document.body.appendChild(this.renderer.domElement);
+
+    // ビデオテクスチャを作成
+    const videoTexture = new THREE.VideoTexture(video);
+    const videoMaterial = new THREE.MeshBasicMaterial({ map: videoTexture });
+
+    // カメラ映像を平面として表示
+    const planeGeometry = new THREE.PlaneGeometry(600, 400);
+    const videoPlane = new THREE.Mesh(planeGeometry, videoMaterial);
+    videoPlane.position.z = -1; // 球体の背面に配置
+    this.scene.add(videoPlane);
 
     // エネルギー弾の球体を作成しシーンに追加
     this.sphere = new Sphere(this.texture);
