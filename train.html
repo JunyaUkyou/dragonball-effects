@@ -7,6 +7,38 @@
     <title>Train Page</title>
   </head>
   <body>
+    <video
+      id="video"
+      width="600"
+      height="400"
+      autoplay
+      style="display: none"
+    ></video>
+    <canvas id="canvas"></canvas>
+    <div class="buttons">
+      <div class="left">
+        <p class="button-description">学習したいアクションをクリック！</p>
+        <button id="saveBigBangAttack" class="btn btn-border">
+          ビッグバンアタック
+        </button>
+
+        <button id="saveMakankousappou" class="btn btn-border">
+          魔貫光殺砲
+        </button>
+
+        <button id="nonAction" class="btn btn-border">その他アクション</button>
+      </div>
+      <div class="right">
+        <p class="button-description">
+          学習の停止や学習済みモデルのダウンロード
+        </p>
+        <button id="StopButton" class="btn btn-border">学習を停止</button>
+
+        <button id="downloadModelButton" class="btn btn-border">
+          モデルをダウンロード
+        </button>
+      </div>
+    </div>
     <script type="module" src="/src/train.ts"></script>
   </body>
 </html>

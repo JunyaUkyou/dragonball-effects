@@ -1,0 +1,73 @@
+body {
+  font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN',
+    'Hiragino Sans', Meiryo, sans-serif;
+}
+
+html {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  font-size: 62.5%; /*rem算出をしやすくするために*/
+}
+
+.btn,
+a.btn,
+button.btn {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.5;
+  position: relative;
+  display: inline-block;
+  padding: 1rem 4rem;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+  text-align: center;
+  vertical-align: middle;
+  text-decoration: none;
+  letter-spacing: 0.1em;
+  color: #212529;
+  border-radius: 0.5rem;
+}
+
+button.btn-border {
+  border: 2px solid #000;
+  border-radius: 0;
+  background: #fff;
+}
+
+button.btn-border:hover {
+  color: #fff;
+  background: #000;
+}
+
+.buttons {
+  height: 300px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.button-description {
+  font-size: 1.6rem;
+  font-weight: 800;
+  position: relative;
+  line-height: 1.4;
+  padding: 0.5em 1em;
+  display: inline-block;
+  border-bottom: solid 2px black;
+}
+
+.left {
+  display: flex;
+  flex-flow: column;
+  justify-content: space-between;
+}
+
+.right {
+  display: flex;
+  flex-flow: column;
+  justify-content: space-between;
+}

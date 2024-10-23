@@ -1,3 +1,4 @@
+import './style.scss';
 import { Main } from './bigbanattack/Main';
 
 const videoElement = <HTMLVideoElement>document.getElementById('video');
