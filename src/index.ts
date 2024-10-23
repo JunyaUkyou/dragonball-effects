@@ -1,4 +1,4 @@
-import { Main } from './Main';
+import { Main } from './bigbanattack/Main';
 
 const videoElement = <HTMLVideoElement>document.getElementById('video');
 console.log({ videoElement });
