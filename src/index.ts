@@ -5,8 +5,11 @@ import * as knnClassifier from '@tensorflow-models/knn-classifier';
 import {
   GestureRecognizer,
   GestureRecognizerResult,
+  NormalizedLandmark,
 } from '@mediapipe/tasks-vision';
 import { createGestureRecognizer } from './utils.js';
+const MIDDLE_FINGER_MCP = 9;
+
 let mainInstance: Main;
 
 type KNNModelData = {
@@ -150,7 +153,7 @@ async function predictLandmarks(results: GestureRecognizerResult) {
       3
     );
     if (predictResult.label === '0') {
-      showBigBangAttackEffect(landmark); // エフェクト表示
+      showBigBangAttackEffect(results.landmarks); // エフェクト表示
     }
   } finally {
     input.dispose(); //メモリ解放
@@ -158,10 +161,16 @@ async function predictLandmarks(results: GestureRecognizerResult) {
 }
 
 // エフェクトを表示する関数
-function showBigBangAttackEffect(landmark: number[]) {
+function showBigBangAttackEffect(landmarks: NormalizedLandmark[][]) {
   isEffectActive = true; // エフェクト開始
-  console.log('ビッグバンアタック！！！！', { landmark });
-  mainInstance.run();
+  console.log('ビッグバンアタック！！！！', { landmarks });
+  const middleFingerMcp = landmarks[0][MIDDLE_FINGER_MCP];
+  // Three.jsの座標系に合わせた座標変換
+  const landmarkX = middleFingerMcp.x * 600 - 300; // X: -300〜300
+  const landmarkY = -(middleFingerMcp.y * 400 - 200); // Y: 200〜-200 (上下反転)
+  const landmarkZ = middleFingerMcp.z * 100; // Z座標のスケール調整
+  console.log({ landmarkX, landmarkY, landmarkZ, middleFingerMcp });
+  mainInstance.run(landmarkX, landmarkY, landmarkZ);
 
   // エフェクト終了後にジェスチャー取得を再開
   setTimeout(() => {

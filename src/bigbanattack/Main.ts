@@ -60,20 +60,15 @@ export class Main {
     this.scene.add(videoPlane);
 
     // エネルギー弾の球体を作成しシーンに追加
-    const spherePositionX = -100;
-    const spherePositionY = 40;
-    const spherePositionZ = 20;
+    // const spherePositionX = -100;
+    // const spherePositionY = 40;
+    // const spherePositionZ = 20;
 
     this.sphere = new Sphere(this.texture);
-    this.sphere.mesh.position.set(
-      spherePositionX,
-      spherePositionY,
-      spherePositionZ
-    );
 
     // SparkEmitter の追加
     //const spherePositionZ = 20;
-    this.sparkEmitter = new SparkEmitter(spherePositionX, spherePositionY);
+    this.sparkEmitter = new SparkEmitter(0, 0);
 
     // アニメーション開始
     this.animate();
@@ -84,8 +79,10 @@ export class Main {
     return this.video;
   }
 
-  run() {
+  run(x: number, y: number, z: number) {
+    console.log('run called');
     this.isRun = true;
+    this.sphere.mesh.position.set(x, y, z);
     this.scene.add(this.sphere.mesh); // 球体をシーンに追加
     this.scene.add(this.sparkEmitter); // スパークをシーンに追加
   }
