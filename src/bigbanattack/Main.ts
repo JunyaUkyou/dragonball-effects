@@ -9,6 +9,7 @@ export class Main {
   private readonly texture: THREE.Texture;
   private readonly sphere: Sphere;
   private readonly sparkEmitter: SparkEmitter;
+  private video: HTMLVideoElement;
 
   private renderWidth: number;
 
@@ -17,6 +18,7 @@ export class Main {
 
   constructor(video: HTMLVideoElement) {
     console.log('Main');
+    this.video = video; // ビデオ要素を保存
 
     // テクスチャー
     this.texture = new THREE.TextureLoader().load('/texture/3658520_s.jpg');
@@ -45,7 +47,7 @@ export class Main {
     document.body.appendChild(this.renderer.domElement);
 
     // ビデオテクスチャを作成
-    const videoTexture = new THREE.VideoTexture(video);
+    const videoTexture = new THREE.VideoTexture(this.video);
     const videoMaterial = new THREE.MeshBasicMaterial({ map: videoTexture });
 
     // カメラ映像を平面として表示
@@ -74,6 +76,11 @@ export class Main {
 
     // アニメーション開始
     this.animate();
+  }
+
+  // VideoElementを取得するメソッド
+  getVideoElement(): HTMLVideoElement {
+    return this.video;
   }
 
   animate = () => {
