@@ -49,16 +49,18 @@ export class Main {
 
     // ビデオテクスチャを作成
     const videoTexture = new THREE.VideoTexture(this.video);
+    videoTexture.colorSpace = THREE.SRGBColorSpace;
     const videoMaterial = new THREE.MeshBasicMaterial({ map: videoTexture });
 
     // カメラ映像を平面として表示
     const planeGeometry = new THREE.PlaneGeometry(600, 400);
+    //planeGeometry.scale(0.5, 0.5, 0.5);
     const videoPlane = new THREE.Mesh(planeGeometry, videoMaterial);
     videoPlane.position.z = -1; // 球体の背面に配置
     this.scene.add(videoPlane);
 
     // エネルギー弾の球体を作成しシーンに追加
-    const spherePositionX = 0;
+    const spherePositionX = -100;
     const spherePositionY = 40;
     const spherePositionZ = 20;
 
@@ -118,7 +120,13 @@ export class Main {
   }
 
   animate = () => {
-    if (this.isRun) this.updateSphere();
+    if (this.isRun) {
+      this.updateSphere();
+      this.texture.offset.x = performance.now() / 1000 / 2;
+      this.texture.offset.y = performance.now() / 1000 / 2.5;
+      // SparkEmitter の更新処理
+      this.sparkEmitter.update();
+    }
     this.renderer.render(this.scene, this.camera);
     const id = requestAnimationFrame(this.animate);
 

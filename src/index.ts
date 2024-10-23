@@ -150,7 +150,7 @@ async function predictLandmarks(results: GestureRecognizerResult) {
       3
     );
     if (predictResult.label === '0') {
-      showBigBangAttackEffect(predictResult); // エフェクト表示
+      showBigBangAttackEffect(landmark); // エフェクト表示
     }
   } finally {
     input.dispose(); //メモリ解放
@@ -158,9 +158,9 @@ async function predictLandmarks(results: GestureRecognizerResult) {
 }
 
 // エフェクトを表示する関数
-function showBigBangAttackEffect(predictResult: KNNModelPredictResult) {
+function showBigBangAttackEffect(landmark: number[]) {
   isEffectActive = true; // エフェクト開始
-  console.log('ビッグバンアタック！！！！', { predictResult });
+  console.log('ビッグバンアタック！！！！', { landmark });
   mainInstance.run();
 
   // エフェクト終了後にジェスチャー取得を再開
