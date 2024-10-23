@@ -88,6 +88,7 @@ export class Main {
   }
 
   private updateSphere() {
+    if (this.scaleIncrement === 0) return;
     // 球体のスケールを徐々に拡大
     //console.log(this.sphere.mesh.scale.x);
     this.sphere.mesh.scale.x += this.scaleIncrement;
@@ -108,10 +109,11 @@ export class Main {
       this.sphere.mesh.position.x -= 2.0;
 
       if (this.sphere.mesh.position.x < (this.renderWidth / 2) * -1) {
-        console.log('移動停止');
-        this.scene.remove(this.sphere.mesh);
+        console.log('移動停止', this.sphere.mesh.position.x);
+        //this.scene.remove(this.sphere.mesh);
         clearInterval(moveInterval);
         this.isRun = false; // エフェクト終了
+        this.scaleIncrement = 0.1;
       }
     }, 16); // 約60FPSで更新
   }
