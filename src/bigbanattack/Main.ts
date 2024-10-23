@@ -12,9 +12,10 @@ export class Main {
   private video: HTMLVideoElement;
 
   private renderWidth: number;
+  private isRun: boolean = false;
 
   // スケール拡大用の係数
-  private scaleIncrement: number = 0.05;
+  private scaleIncrement: number = 0.1;
 
   constructor(video: HTMLVideoElement) {
     console.log('Main');
@@ -57,22 +58,20 @@ export class Main {
     this.scene.add(videoPlane);
 
     // エネルギー弾の球体を作成しシーンに追加
-    this.sphere = new Sphere(this.texture);
-    // 球体の位置を調整
     const spherePositionX = 0;
     const spherePositionY = 40;
     const spherePositionZ = 20;
+
+    this.sphere = new Sphere(this.texture);
     this.sphere.mesh.position.set(
       spherePositionX,
       spherePositionY,
       spherePositionZ
     );
-    this.scene.add(this.sphere.mesh);
 
     // SparkEmitter の追加
+    //const spherePositionZ = 20;
     this.sparkEmitter = new SparkEmitter(spherePositionX, spherePositionY);
-    this.scene.add(this.sparkEmitter);
-    spherePositionX;
 
     // アニメーション開始
     this.animate();
@@ -83,39 +82,43 @@ export class Main {
     return this.video;
   }
 
-  animate = () => {
-    this.texture.offset.x = performance.now() / 1000 / 3.5;
-    this.texture.offset.y = performance.now() / 1000 / 3.5;
+  run() {
+    this.isRun = true;
+    this.scene.add(this.sphere.mesh); // 球体をシーンに追加
+    this.scene.add(this.sparkEmitter); // スパークをシーンに追加
+  }
 
-    // SparkEmitter の更新
-    this.sparkEmitter.update();
-
-    // エネルギー弾を徐々に大きくする
+  private updateSphere() {
+    // 球体のスケールを徐々に拡大
+    //console.log(this.sphere.mesh.scale.x);
     this.sphere.mesh.scale.x += this.scaleIncrement;
     this.sphere.mesh.scale.y += this.scaleIncrement;
     this.sphere.mesh.scale.z += this.scaleIncrement;
 
-    // エネルギー弾が最大化の場合
     if (this.sphere.mesh.scale.x > 4) {
-      this.scaleIncrement = 0; // 拡大を停止
-
-      // エネルギー弾 最大化後、数秒後に処理を開始
+      this.scaleIncrement = 0;
       setTimeout(() => {
-        // スパークを削除
-        this.scene.remove(this.sparkEmitter);
-
-        const moveInterval = setInterval(() => {
-          this.sphere.mesh.position.x -= 2.0;
-
-          // 球体が画面外に出たらエネルギー弾を削除して移動を停止
-          if (this.sphere.mesh.position.x < (this.renderWidth / 2) * -1) {
-            this.scene.remove(this.sphere.mesh);
-            clearInterval(moveInterval); // 移動の停止
-          }
-        }, 16); // 毎フレーム（約60FPSで）移動
-      }, 4000);
+        this.scene.remove(this.sparkEmitter); //スパーク削除
+        this.startMovingSphere(); // 球体の移動を開始
+      }, 4000); // 4秒後に移動開始
     }
+  }
 
+  private startMovingSphere() {
+    const moveInterval = setInterval(() => {
+      this.sphere.mesh.position.x -= 2.0;
+
+      if (this.sphere.mesh.position.x < (this.renderWidth / 2) * -1) {
+        console.log('移動停止');
+        this.scene.remove(this.sphere.mesh);
+        clearInterval(moveInterval);
+        this.isRun = false; // エフェクト終了
+      }
+    }, 16); // 約60FPSで更新
+  }
+
+  animate = () => {
+    if (this.isRun) this.updateSphere();
     this.renderer.render(this.scene, this.camera);
     const id = requestAnimationFrame(this.animate);
 

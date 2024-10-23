@@ -105,7 +105,7 @@ async function setupVideoStream() {
 }
 
 async function predictGesture() {
-  console.log('predictGestureが呼ばれました。');
+  //console.log('predictGestureが呼ばれました。');
   // // リアルタイム映像を描写
   // canvasCtx!.drawImage(
   //   videoElement,
@@ -150,7 +150,7 @@ async function predictLandmarks(results: GestureRecognizerResult) {
       3
     );
     if (predictResult.label === '0') {
-      showBigBangAttackEffect(); // エフェクト表示
+      showBigBangAttackEffect(predictResult); // エフェクト表示
     }
   } finally {
     input.dispose(); //メモリ解放
@@ -158,15 +158,15 @@ async function predictLandmarks(results: GestureRecognizerResult) {
 }
 
 // エフェクトを表示する関数
-function showBigBangAttackEffect() {
+function showBigBangAttackEffect(predictResult: KNNModelPredictResult) {
   isEffectActive = true; // エフェクト開始
-  console.log('ビッグバンアタック！！！！');
-  new Main(video);
+  console.log('ビッグバンアタック！！！！', { predictResult });
+  mainInstance.run();
 
   // エフェクト終了後にジェスチャー取得を再開
   setTimeout(() => {
     isEffectActive = false; // エフェクト終了
-  }, 3000); // 3秒間エフェクトを表示する想定
+  }, 8000); // 8秒間エフェクトを表示する想定
 }
 
 init();
