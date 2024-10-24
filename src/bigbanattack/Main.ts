@@ -36,11 +36,11 @@ export class Main {
     this.camera.position.set(0, 0, 300);
 
     // レンダラーを追加
-    this.renderer = new THREE.WebGLRenderer({ alpha: true });
-    // const renderWidth = window.innerWidth;
-    // const renderHeight = window.innerHeight;
-    this.renderWidth = 600;
-    const renderHeight = 400;
+    this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    //const renderWidth = window.innerWidth;
+    //const renderHeight = window.innerHeight;
+    this.renderWidth = 1300;
+    const renderHeight = 600;
     this.renderer.setClearColor(0x000000, 0);
     this.renderer.setSize(this.renderWidth, renderHeight);
     this.renderer.setPixelRatio(window.devicePixelRatio);
@@ -49,11 +49,16 @@ export class Main {
 
     // ビデオテクスチャを作成
     const videoTexture = new THREE.VideoTexture(this.video);
+    videoTexture.minFilter = THREE.LinearFilter;
     videoTexture.colorSpace = THREE.SRGBColorSpace;
+    videoTexture.generateMipmaps = false;
     const videoMaterial = new THREE.MeshBasicMaterial({ map: videoTexture });
 
     // カメラ映像を平面として表示
-    const planeGeometry = new THREE.PlaneGeometry(600, 400);
+    const planeGeometry = new THREE.PlaneGeometry(
+      this.renderWidth,
+      renderHeight
+    );
     //planeGeometry.scale(0.5, 0.5, 0.5);
     const videoPlane = new THREE.Mesh(planeGeometry, videoMaterial);
     videoPlane.position.z = -1; // 球体の背面に配置
@@ -84,7 +89,7 @@ export class Main {
     this.isRun = true;
     this.sphere.mesh.position.set(x, y, z);
     this.scene.add(this.sphere.mesh); // 球体をシーンに追加
-    this.scene.add(this.sparkEmitter); // スパークをシーンに追加
+    //this.scene.add(this.sparkEmitter); // スパークをシーンに追加
   }
 
   private updateSphere() {
@@ -98,7 +103,7 @@ export class Main {
     if (this.sphere.mesh.scale.x > 4) {
       this.scaleIncrement = 0;
       setTimeout(() => {
-        this.scene.remove(this.sparkEmitter); //スパーク削除
+        //this.scene.remove(this.sparkEmitter); //スパーク削除
         this.startMovingSphere(); // 球体の移動を開始
       }, 4000); // 4秒後に移動開始
     }
@@ -106,7 +111,7 @@ export class Main {
 
   private startMovingSphere() {
     const moveInterval = setInterval(() => {
-      this.sphere.mesh.position.x -= 2.0;
+      this.sphere.mesh.position.x -= 100.0;
 
       if (this.sphere.mesh.position.x < (this.renderWidth / 2) * -1) {
         console.log('移動停止', this.sphere.mesh.position.x);
