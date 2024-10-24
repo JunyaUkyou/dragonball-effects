@@ -3,7 +3,7 @@ import { Spark } from './Spark';
 
 export class SparkEmitter extends THREE.Object3D {
   private _sparkList: Spark[] = [];
-  private _sparkNum: number = 100;
+  private _sparkNum: number = 300;
 
   constructor() {
     super();
