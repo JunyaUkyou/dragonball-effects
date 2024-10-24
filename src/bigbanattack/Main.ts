@@ -77,6 +77,7 @@ export class Main {
     // SparkEmitter の追加
     //const spherePositionZ = 20;
     this.sparkEmitter = new SparkEmitter();
+    this.scene.add(this.sparkEmitter); // スパークをシーンに追加
 
     // アニメーション開始
     this.animate();
@@ -97,8 +98,9 @@ export class Main {
     this.isRun = true;
 
     //this.scene.add(this.sphere.mesh); // 球体をシーンに追加
-    this.sparkEmitter.create(x, y);
-    this.scene.add(this.sparkEmitter); // スパークをシーンに追加
+    // スパークを画面表示位置に移動する
+    this.sparkEmitter.positionChange(x, y);
+    //this.scene.add(this.sparkEmitter); // スパークをシーンに追加
   }
 
   private updateSphere() {
@@ -130,8 +132,10 @@ export class Main {
       this.updateSphere();
 
       if (this.sphere.mesh.scale.x > 4) {
-        this.scene.remove(this.sparkEmitter);
-        this.sparkEmitter.clearAll();
+        // スパークを画面表示外に移動する
+        this.sparkEmitter.positionChange(0, -10000);
+        //this.scene.remove(this.sparkEmitter);
+        //this.sparkEmitter.clearAll();
 
         this.scaleIncrement = 0;
         // エネルギー弾の移動
