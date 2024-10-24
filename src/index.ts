@@ -92,7 +92,14 @@ function setVideoDimensions() {
 // **カメラ映像の取得**
 async function setupVideoStream() {
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    const constraints = {
+      video: {
+        width: { ideal: 1920 }, // フルHD解像度を指定
+        height: { ideal: 1080 },
+        //facingMode: 'user', // iPhoneのフロントカメラを指定
+      },
+    };
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
     video = document.createElement('video');
     console.log({ stream });
     video.srcObject = stream;
@@ -108,16 +115,6 @@ async function setupVideoStream() {
 }
 
 async function predictGesture() {
-  //console.log('predictGestureが呼ばれました。');
-  // // リアルタイム映像を描写
-  // canvasCtx!.drawImage(
-  //   videoElement,
-  //   0,
-  //   0,
-  //   canvasElement.width,
-  //   canvasElement.height
-  // );
-
   // エフェクトがアクティブな場合、次のフレームへ移行
   if (isEffectActive) {
     window.requestAnimationFrame(predictGesture);
