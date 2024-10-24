@@ -95,9 +95,7 @@ export class Main {
   run(x: number, y: number, z: number) {
     console.log('run called');
     // エネルギー弾の大きさ初期値
-    this.sphere.mesh.scale.x = 1;
-    this.sphere.mesh.scale.y = 1;
-    this.sphere.mesh.scale.z = 1;
+    this.sphere.mesh.scale.set(1, 1, 1);
     // エネルギー弾のポジション初期値
     this.sphere.mesh.position.set(x, y, z);
     this.isRun = true;
