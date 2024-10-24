@@ -10,6 +10,11 @@ import {
 import { createGestureRecognizer } from './utils.js';
 const MIDDLE_FINGER_MCP = 9;
 
+const debag = document.getElementById('aaaaaaaaaaaa');
+debag?.addEventListener('click', () => {
+  mainInstance.run(0, 0, 0);
+});
+
 let mainInstance: Main;
 
 type KNNModelData = {
