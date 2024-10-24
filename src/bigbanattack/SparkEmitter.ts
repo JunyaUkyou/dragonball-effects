@@ -5,9 +5,11 @@ export class SparkEmitter extends THREE.Object3D {
   private _sparkList: Spark[] = [];
   private _sparkNum: number = 100;
 
-  constructor(positionX: number, positionY: number) {
+  constructor() {
     super();
+  }
 
+  public create(positionX: number, positionY: number) {
     const perAngle = 360 / this._sparkNum;
     for (let i = 0; i < this._sparkNum; i++) {
       const rad = (perAngle * i * Math.PI) / 180;
@@ -24,5 +26,9 @@ export class SparkEmitter extends THREE.Object3D {
 
   public update() {
     this._sparkList.forEach((spark) => spark.update());
+  }
+
+  public clearAll() {
+    this.clear();
   }
 }
