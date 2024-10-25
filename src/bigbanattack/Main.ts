@@ -121,6 +121,7 @@ export class Main {
     this.sphere.mesh.scale.x += this.scaleIncrement;
     this.sphere.mesh.scale.y += this.scaleIncrement;
     this.sphere.mesh.scale.z += this.scaleIncrement;
+    // this.sphere.mesh.position.x -= this.scaleIncrement;
   }
 
   private startMovingSphere() {
@@ -133,15 +134,26 @@ export class Main {
     }
   }
 
-  rotate = (second = 1000, offset = 2) => {
+  updateRotate = (second = 1000, offset = 2) => {
     this.texture.offset.x = performance.now() / second / offset;
     this.texture.offset.y = performance.now() / second / offset;
+  };
+
+  updateColor = (scaleX: number) => {
+    const color = new THREE.Color().setHSL(scaleX / 10, 1, 0.5);
+    (this.sphere.mesh.material as THREE.MeshBasicMaterial).color = color;
+  };
+
+  updateOpacity = (scaleX: number) => {
+    const opacity = Math.max(0, Math.min(1, 1 - scaleX / 10));
+    (this.sphere.mesh.material as THREE.MeshBasicMaterial).opacity = opacity;
+    (this.sphere.mesh.material as THREE.MeshBasicMaterial).transparent = true;
   };
 
   animate = () => {
     if (this.isRun) {
       // エネルギー弾の回転
-      this.rotate();
+      this.updateRotate();
       // エネルギー弾の大きさ
       this.updateSphere();
       // SparkEmitter の更新処理
@@ -154,27 +166,33 @@ export class Main {
       const statusMessageElement = document.getElementById(
         'current-status-message'
       );
-
-      if (scaleX > 4 && scaleX < 8) {
-        const color = new THREE.Color().setHSL(scaleX / 10, 1, 0.5);
-        (this.sphere.mesh.material as THREE.MeshBasicMaterial).color = color;
-        this.scaleIncrement = 0.03;
-        this.rotate(1000, 1);
-
+      if (scaleX > 4) {
+        // 色の変更
+        this.updateColor(scaleX);
         // 球体の透明度を調整（スケールが大きくなると透明度が増す）
-        const opacity = Math.max(0, Math.min(1, 1 - scaleX / 10));
-        (this.sphere.mesh.material as THREE.MeshBasicMaterial).opacity =
-          opacity;
-        (this.sphere.mesh.material as THREE.MeshBasicMaterial).transparent =
-          true;
+        this.updateOpacity(scaleX);
+      }
+
+      if (scaleX > 4 && scaleX < 6) {
+        this.scaleIncrement = 0.03;
+        this.updateRotate(1000, 1);
 
         console.log('aaaa');
+      } else if (scaleX > 6 && scaleX < 8) {
+        this.scaleIncrement = 0.03;
+        this.updateRotate(1000, 1);
+
+        console.log('bbbb');
         statusMessageElement!.textContent = '天さん！僕の超能力が効かない！';
       } else if (scaleX > 8 && scaleX < 10) {
+        console.log('色かわらない');
         statusMessageElement!.textContent = '地球もろとも消すつもりか!!!!';
-      } else if (scaleX > 10) {
+      } else if (scaleX > 10 && scaleX < 11) {
+        console.log('色かわらない2');
+        statusMessageElement!.textContent = 'うわぁぁぁぁ!!!!';
+      } else if (scaleX > 11) {
         statusMessageElement!.textContent = 'さよなら天さん、、';
-        console.log('bbbb');
+        console.log('ccccc');
         // スパークを画面表示外に移動する
         this.sparkEmitter.positionChange(0, -10000);
         //this.scene.remove(this.sparkEmitter);

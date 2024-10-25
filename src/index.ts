@@ -187,7 +187,7 @@ function showBigBangAttackEffect(landmarks: NormalizedLandmark[][]) {
   // Z座標は負の値の場合は0にする
   const landmarkZ = Math.max(0, middleFingerMcp.z * 100);
   console.log({ landmarkX, landmarkY, landmarkZ, middleFingerMcp });
-  state.mainInstance!.run(landmarkX, landmarkY, landmarkZ);
+  state.mainInstance!.run(landmarkX - 100, landmarkY, landmarkZ);
 
   // エフェクト終了後にジェスチャー取得を再開
   setTimeout(() => {
