@@ -159,6 +159,7 @@ async function saveClassifier() {
 function startSaving(labelValue: string) {
   console.log({ labelValue });
   isSave = true;
+  labelAction = Number(labelValue);
 
   let string;
   switch (labelValue) {
