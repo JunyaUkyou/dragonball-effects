@@ -5,36 +5,72 @@ import {
   GestureRecognizer,
   DrawingUtils,
   GestureRecognizerResult,
+  PoseLandmarker,
+  PoseLandmarkerResult,
 } from '@mediapipe/tasks-vision';
-import { createGestureRecognizer } from './utils';
+import { getRecognizer, getLandmarkerResult } from './models/landmarker';
+import { MEDIA_CONSTRAINTS, RENDERING_SIZE, LABELS } from './config/constants';
 
-console.log('tain', createGestureRecognizer);
-const saveMax = 100; // 特徴量数
 const classifier = knnClassifier.create(); // KNN分類器
 const videoElement = <HTMLVideoElement>document.getElementById('video'); // カメラ映像
 const canvasElement = <HTMLCanvasElement>document.getElementById('canvas'); // canvas
-const canvasCtx = canvasElement.getContext('2d');
+const canvasCtx = canvasElement.getContext('2d', { willReadFrequently: true });
+
+// 現在のステータス
+const statusElement = document.getElementById('status');
+// ビックバンアタック
 const saveBigBangAttack = document.getElementById('saveBigBangAttack'); // 学習ボタン
-const saveMakankousappou = document.getElementById('saveMakankousappou'); // 学習ボタン
-const nonAction = document.getElementById('nonAction'); // 学習ボタン
+// 魔貫光殺砲
+const saveMakankousappou_pose = document.getElementById(
+  'saveMakankousappou_pose'
+);
+const saveMakankousappou_send = document.getElementById(
+  'saveMakankousappou_send'
+);
+// かめはめ波
+const saveKamehameha_pose = document.getElementById('saveKamehameha_pose');
+const saveKamehameha_send = document.getElementById('saveKamehameha_send');
+
+// 気円斬構え
+const kienzan_pose = document.getElementById('kienzan_pose');
+
+// 直立
+const upright = document.getElementById('upright');
+// 正座
+const seiza = document.getElementById('seiza');
+
+// その他アクション
+const nonAction = document.getElementById('nonAction');
+
 const StopElement = document.getElementById('StopButton'); // 出力ボタン
 const downloadModelElement = document.getElementById('downloadModelButton'); // 出力ボタン
 
 let isSave = false; // 記録フラグ
-let gestureRecognizer: GestureRecognizer;
 let labelAction = 0;
+let isPose = true;
+let recognizer: GestureRecognizer | PoseLandmarker;
+const predictionInterval = 1000; // 1秒ごとに姿勢推定
+let lastPoseResult: any = null; // 最後の推論結果を保持
+
+const MAX_SAMPLES_PER_LABEL = 50; // 各ラベルの上限
 
 // 初期処理
 async function init() {
-  gestureRecognizer = await createGestureRecognizer(); // ジャスチャー認識ツール作成
-  initializeDrawArea(); // 映像描画エリア初期化
-  addEventListeners(); // イベント処理
+  recognizer = await getRecognizer(isPose);
+  // 映像描画エリア初期化
+  initializeDrawArea();
+  // イベント処理
+  addEventListeners();
+  // 定期的に姿勢推定
+  // 推論を毎フレーム行うと画面フリーズする現象が発生した
+  // リアルタイムの推論を必要とするアプリでないため毎フレームではなく一定間隔の起動とした
+  setInterval(registerGesture, predictionInterval);
 }
 
 // 映像描画エリア初期化
 function initializeDrawArea() {
-  const width = '600px';
-  const height = '400px';
+  const width = `${RENDERING_SIZE.width}px`;
+  const height = `${RENDERING_SIZE.height}px`;
   setElementDimensions(videoElement, width, height);
   setElementDimensions(canvasElement, width, height);
 }
@@ -49,9 +85,8 @@ function setElementDimensions(
   element!.style.height = height;
 }
 
-// 取得したジェスチャーをモデルに登録する
-async function registerGesture() {
-  // リアルタイム映像を描写
+// 毎フレームの描画処理
+function renderFrame() {
   canvasCtx!.drawImage(
     videoElement,
     0,
@@ -59,40 +94,91 @@ async function registerGesture() {
     canvasElement.width,
     canvasElement.height
   );
+  // 推論結果がある場合は描画する
+  if (lastPoseResult) {
+    visualize(lastPoseResult, recognizer);
+  }
+
+  window.requestAnimationFrame(renderFrame);
+}
+
+// 取得したジェスチャーをモデルに登録する
+async function registerGesture() {
   let lastVideoTime = -1;
-  let nowInMs = Date.now();
-  //let results = null;
+  const startTimeMs = performance.now();
   if (videoElement.currentTime !== lastVideoTime) {
     lastVideoTime = videoElement.currentTime;
     // ジェスチャー取得
-    const results = gestureRecognizer.recognizeForVideo(videoElement, nowInMs);
+    const results = await getLandmarkerResult(
+      videoElement,
+      recognizer,
+      startTimeMs
+    );
+
     if (results.landmarks.length > 0) {
-      visualizeGesture(results);
+      //console.log('推論結果あり', results);
+      // 推論結果を保存する
+      // この処理は毎フレーム呼ばれないため、推論の可視化処理を行っても次フレームで消えてしまう
+      // 毎フレーム動作するrenderFrame()でランドマークの推論の可視化処理を行う
+      lastPoseResult = results;
       if (isSave) saveLandmarks(results);
+    } else {
+      lastPoseResult = null;
     }
   }
-
-  window.requestAnimationFrame(registerGesture);
 }
 
 // ジャスチャーを可視化する
-function visualizeGesture(results: GestureRecognizerResult) {
+function visualize(
+  results: any,
+  recognizer: PoseLandmarker | GestureRecognizer
+) {
   if (!canvasCtx) return;
+
   const drawingUtils = new DrawingUtils(canvasCtx);
 
-  for (const landmarks of results.landmarks) {
-    drawingUtils.drawConnectors(landmarks, GestureRecognizer.HAND_CONNECTIONS, {
-      color: '#00FF00',
-      lineWidth: 3,
-    });
-    drawingUtils.drawLandmarks(landmarks, {
-      color: '#FF0000',
-      lineWidth: 1,
-    });
+  if (recognizer instanceof PoseLandmarker) {
+    // ポーズのランドマークを描画
+    for (const landmarks of results.landmarks) {
+      drawingUtils.drawLandmarks(landmarks, {
+        radius: (data) => DrawingUtils.lerp(data.from!.z, -0.15, 0.1, 5, 1),
+      });
+      drawingUtils.drawConnectors(landmarks, PoseLandmarker.POSE_CONNECTIONS);
+    }
+  } else if (recognizer instanceof GestureRecognizer) {
+    // ジェスチャーのランドマークを描画
+    for (const landmarks of results.landmarks) {
+      drawingUtils.drawConnectors(
+        landmarks,
+        GestureRecognizer.HAND_CONNECTIONS,
+        {
+          color: '#00FF00',
+          lineWidth: 3,
+        }
+      );
+      drawingUtils.drawLandmarks(landmarks, {
+        color: '#FF0000',
+        lineWidth: 1,
+      });
+    }
   }
+
+  canvasCtx.restore();
 }
 
-function saveLandmarks(results: GestureRecognizerResult) {
+function saveLandmarks(
+  results: GestureRecognizerResult | PoseLandmarkerResult
+) {
+  // 現在のラベルの登録数を取得
+  const classCounts = classifier.getClassExampleCount();
+  const currentLabelCount = classCounts[labelAction] || 0;
+
+  // 上限に達していない場合のみ登録
+  if (currentLabelCount > MAX_SAMPLES_PER_LABEL) {
+    console.log(`Max samples reached for label ${labelAction}.`);
+    return;
+  }
+
   const landmark = results.landmarks[0].flatMap(({ x, y, z }) => [x, y, z]);
   classifier.addExample(tf.tensor(landmark), labelAction);
   console.log('KNN class added:', landmark);
@@ -116,6 +202,7 @@ async function downloadModel() {
   downloadLink.click(); // ダウンロードリンクをクリック
   document.body.removeChild(downloadLink); // ダウンロードリンクを削除
   URL.revokeObjectURL(url); // 作成したURLを解放
+  statusElement!.textContent = '';
 }
 
 // ダウンロードリンクを作成する関数
@@ -140,27 +227,97 @@ async function saveClassifier() {
   return JSON.stringify(parsedDataset);
 }
 
-function startSaving(labelValue: number) {
+function startSaving(labelValue: string) {
   console.log({ labelValue });
-  labelAction = labelValue;
   isSave = true;
+  labelAction = Number(labelValue);
+
+  let string;
+  switch (labelValue) {
+    case LABELS.BIGBANG_ATTACK:
+      string = 'ビッグバンアタック';
+      break;
+    case LABELS.MAKANKOUSAPPOU_POSE:
+      string = '魔貫光殺砲構え';
+      break;
+    case LABELS.MAKANKOUSAPPOU_SEND:
+      string = '魔貫光殺砲実行';
+      break;
+    case LABELS.KAMEHAMEHA_POSE:
+      string = 'かめはめ波構え';
+      break;
+    case LABELS.KAMEHAMEHA_SEND:
+      string = 'かめはめ波実行';
+      break;
+    case LABELS.KAMEHAMEHA_SEND:
+      string = 'かめはめ波実行';
+      break;
+    case LABELS.KIENZAN_POSE:
+      string = '気円斬構え';
+      break;
+    case LABELS.UPRIGHT:
+      string = '直立';
+      break;
+    case LABELS.SEIZA:
+      string = '正座';
+      break;
+    case LABELS.NONACTION:
+      string = 'その他アクション';
+      break;
+  }
+
+  statusElement!.textContent = string += '学習中';
 }
 
 function stopSaving() {
   isSave = false;
+  statusElement!.textContent = '学習終了 未ダウンロード';
 }
 
 function addEventListeners() {
   // カメラ有効後、映像の推論処理を行う
-  navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
+  const constraints = {
+    video: {
+      width: { ideal: MEDIA_CONSTRAINTS.width },
+      height: { ideal: MEDIA_CONSTRAINTS.height },
+    },
+  };
+  navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
     videoElement.srcObject = stream;
-    videoElement.addEventListener('loadeddata', registerGesture);
+    videoElement.addEventListener('loadeddata', renderFrame);
   });
-  saveBigBangAttack!.addEventListener('click', () => startSaving(0)); // ビックバンアタック学習ボタンクリック
-  saveMakankousappou!.addEventListener('click', () => startSaving(1)); // 魔貫光殺砲学習ボタンクリック
-  nonAction!.addEventListener('click', () => startSaving(2)); // その他アクション学習ボタンクリック
-  StopElement!.addEventListener('click', stopSaving); // 学習停止ボタンクリック
-  downloadModelElement!.addEventListener('click', downloadModel); // ダウンロードボタンクリック
+  // ビックバンアタック学習ボタンクリック
+  saveBigBangAttack!.addEventListener('click', () =>
+    startSaving(LABELS.BIGBANG_ATTACK)
+  );
+  // 魔貫光殺砲学習ボタンクリック
+  saveMakankousappou_pose!.addEventListener('click', () =>
+    startSaving(LABELS.MAKANKOUSAPPOU_POSE)
+  );
+  saveMakankousappou_send!.addEventListener('click', () =>
+    startSaving(LABELS.MAKANKOUSAPPOU_SEND)
+  );
+  // かめはめ波学習ボタンクリック
+  saveKamehameha_pose!.addEventListener('click', () =>
+    startSaving(LABELS.KAMEHAMEHA_POSE)
+  );
+  saveKamehameha_send!.addEventListener('click', () =>
+    startSaving(LABELS.KAMEHAMEHA_SEND)
+  );
+  // 気円斬構え
+  kienzan_pose!.addEventListener('click', () =>
+    startSaving(LABELS.KIENZAN_POSE)
+  );
+  // 直立（正面、右向き、左向き、手は横）
+  upright!.addEventListener('click', () => startSaving(LABELS.UPRIGHT));
+  // 正座（中腰含む）
+  seiza!.addEventListener('click', () => startSaving(LABELS.SEIZA));
+  // その他学習ボタンクリック（PC操作など）
+  nonAction!.addEventListener('click', () => startSaving(LABELS.NONACTION));
+  // 学習停止ボタンクリック
+  StopElement!.addEventListener('click', stopSaving);
+  // ダウンロードボタンクリック
+  downloadModelElement!.addEventListener('click', downloadModel);
 }
 
 init();
