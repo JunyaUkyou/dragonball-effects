@@ -19,32 +19,41 @@ import {
 
 const MIDDLE_FINGER_MCP = 9;
 
-const debag = document.getElementById('aaaaaaaaaaaa');
-debag?.addEventListener('click', () => {
-  mainInstance.run(0, 0, 0);
-});
-
-let mainInstance: Main;
-let video: HTMLVideoElement;
-let classifier: knnClassifier.KNNClassifier;
-let gestureRecognizer: GestureRecognizer;
-let isEffectActive = false;
-let isPoseDetection = false;
-
-const poseElement = document.getElementById('pose');
-poseElement?.addEventListener('click', () => {
-  isPoseDetection = !isPoseDetection;
-  console.log({ isPoseDetection });
-});
+// グローバル変数管理用オブジェクト
+const state = {
+  mainInstance: null as Main | null,
+  video: null as HTMLVideoElement | null,
+  classifier: null as knnClassifier.KNNClassifier | null,
+  gestureRecognizer: null as GestureRecognizer | null,
+  isEffectActive: false,
+  isPoseDetection: false,
+};
 
 console.log('こんにちは!!!!');
+
+function setupEventListeners() {
+  // ポーズ認識開始
+  document.getElementById('pose')?.addEventListener('click', () => {
+    state.isPoseDetection = !state.isPoseDetection;
+    console.log('state.isPoseDetection', state.isPoseDetection);
+  });
+  // ボタンリクック
+  document.getElementById('aaaaaaaaaaaa')?.addEventListener('click', () => {
+    state.mainInstance?.run(0, 0, 0);
+  });
+}
 
 // 初期処理
 async function init() {
   try {
-    classifier = await loadKNNModel();
-    gestureRecognizer = await createGestureRecognizer();
-    await setupVideoStream(); // カメラ映像を取得
+    // 推論に使用するモデル取得
+    const { classifier, gestureRecognizer } = await initializeModels();
+    state.classifier = classifier;
+    state.gestureRecognizer = gestureRecognizer;
+
+    // カメラ映像を取得
+    state.video = await setupVideoStream();
+    state.mainInstance = new Main(state.video);
 
     console.log('初期化完了！ジェスチャー認識を開始します...');
     predictGesture(); // ジェスチャー認識の開始
@@ -53,54 +62,47 @@ async function init() {
   }
 }
 
+async function initializeModels() {
+  const classifier = await loadKNNModel();
+  const gestureRecognizer = await createGestureRecognizer();
+  return { classifier, gestureRecognizer };
+}
+
 // **カメラ映像の取得**
 async function setupVideoStream() {
-  try {
-    const constraints = {
-      video: {
-        width: { ideal: MEDIA_CONSTRAINTS.width },
-        height: { ideal: MEDIA_CONSTRAINTS.height },
-      },
-    };
-    const stream = await navigator.mediaDevices.getUserMedia(constraints);
-    video = document.createElement('video');
-    console.log({ stream });
-    video.srcObject = stream;
-    await video.play(); // 映像の再生を強制
-    // Main.ts で three.js のエフェクトを初期化し、video を渡す
-    mainInstance = new Main(video);
-
-    console.log('カメラ映像の取得に成功しました。');
-  } catch (error) {
-    console.error('カメラ映像の取得に失敗しました:', error);
-    throw error;
-  }
+  const constraints = {
+    video: {
+      width: { ideal: MEDIA_CONSTRAINTS.width },
+      height: { ideal: MEDIA_CONSTRAINTS.height },
+    },
+  };
+  const stream = await navigator.mediaDevices.getUserMedia(constraints);
+  const videoElement = document.createElement('video');
+  videoElement.srcObject = stream;
+  await videoElement.play(); // 映像の再生を強制
+  return videoElement;
 }
 
 async function predictGesture() {
-  // エフェクトがアクティブな場合、次のフレームへ移行
-  if (isEffectActive) {
+  // エフェクトがアクティブな場合、ポーズ検出無効の場合、次のフレームへ移行
+  if (state.isEffectActive || !state.isPoseDetection) {
     window.requestAnimationFrame(predictGesture);
     return;
   }
 
-  if (!isPoseDetection) {
-    window.requestAnimationFrame(predictGesture);
-    return;
-  }
-  let nowInMs = Date.now();
+  const { gestureRecognizer, mainInstance, classifier } = state;
 
   // ジェスチャー取得
-  const results = gestureRecognizer.recognizeForVideo(
-    mainInstance.getVideoElement(),
-    nowInMs
+  const results = gestureRecognizer!.recognizeForVideo(
+    mainInstance!.getVideoElement(),
+    Date.now()
   );
   if (
     results.landmarks.length > 0 &&
     results.gestures[0][0].categoryName == 'None'
   ) {
     const predictResult: KNNModelPredictResult = await predictLandmarks(
-      classifier,
+      classifier!,
       results
     );
     if (predictResult.label === LABELS.BIGBANG_ATTACK) {
@@ -113,7 +115,7 @@ async function predictGesture() {
 
 // エフェクトを表示する関数
 function showBigBangAttackEffect(landmarks: NormalizedLandmark[][]) {
-  isEffectActive = true; // エフェクト開始
+  state.isEffectActive = true; // エフェクト開始
   console.log('ビッグバンアタック！！！！', { landmarks });
   const middleFingerMcp = landmarks[0][MIDDLE_FINGER_MCP];
   // Three.jsの座標系に合わせた座標変換
@@ -125,12 +127,13 @@ function showBigBangAttackEffect(landmarks: NormalizedLandmark[][]) {
   ); // Y: 200〜-200 (上下反転)
   const landmarkZ = middleFingerMcp.z * 100; // Z座標のスケール調整
   console.log({ landmarkX, landmarkY, landmarkZ, middleFingerMcp });
-  mainInstance.run(landmarkX, landmarkY, landmarkZ);
+  state.mainInstance!.run(landmarkX, landmarkY, landmarkZ);
 
   // エフェクト終了後にジェスチャー取得を再開
   setTimeout(() => {
-    isEffectActive = false; // エフェクト終了
+    state.isEffectActive = false; // エフェクト終了
   }, EFFECT_DISPLAY_MILLISECOND); // 8秒間エフェクトを表示する想定
 }
 
+setupEventListeners();
 init();
