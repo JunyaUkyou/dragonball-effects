@@ -9,23 +9,35 @@
   <body>
     <video
       id="video"
-      width="600"
-      height="400"
+      width="1300"
+      height="600"
       autoplay
       style="display: none"
     ></video>
     <canvas id="canvas"></canvas>
     <div class="buttons">
+      <div>
+        <p class="button-description">現在のステータス</p>
+        <p id="status"></p>
+      </div>
       <div class="left">
         <p class="button-description">学習したいアクションをクリック！</p>
         <button id="saveBigBangAttack" class="btn btn-border">
           ビッグバンアタック
         </button>
 
-        <button id="saveMakankousappou" class="btn btn-border">
-          魔貫光殺砲
+        <button id="saveMakankousappou_pose" class="btn btn-border">
+          魔貫光殺砲構え
         </button>
-
+        <button id="saveMakankousappou_send" class="btn btn-border">
+          魔貫光殺砲実行
+        </button>
+        <button id="saveKamehameha_pose" class="btn btn-border">
+          かめはめ波構え
+        </button>
+        <button id="saveKamehameha_send" class="btn btn-border">
+          かめはめ波実行
+        </button>
         <button id="nonAction" class="btn btn-border">その他アクション</button>
       </div>
       <div class="right">

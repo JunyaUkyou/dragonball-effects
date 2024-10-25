@@ -7,6 +7,7 @@ import {
   GestureRecognizerResult,
 } from '@mediapipe/tasks-vision';
 import { createGestureRecognizer } from './utils';
+import { MEDIA_CONSTRAINTS, RENDERING_SIZE, LABELS } from './config/constants';
 
 console.log('tain', createGestureRecognizer);
 const saveMax = 100; // 特徴量数
@@ -14,8 +15,22 @@ const classifier = knnClassifier.create(); // KNN分類器
 const videoElement = <HTMLVideoElement>document.getElementById('video'); // カメラ映像
 const canvasElement = <HTMLCanvasElement>document.getElementById('canvas'); // canvas
 const canvasCtx = canvasElement.getContext('2d');
+
+// 現在のステータス
+const statusElement = document.getElementById('status');
+// ビックバンアタック
 const saveBigBangAttack = document.getElementById('saveBigBangAttack'); // 学習ボタン
-const saveMakankousappou = document.getElementById('saveMakankousappou'); // 学習ボタン
+// 魔貫光殺砲
+const saveMakankousappou_pose = document.getElementById(
+  'saveMakankousappou_pose'
+);
+const saveMakankousappou_send = document.getElementById(
+  'saveMakankousappou_send'
+);
+// かめはめ波
+const saveKamehameha_pose = document.getElementById('saveKamehameha_pose');
+const saveKamehameha_send = document.getElementById('saveKamehameha_send');
+
 const nonAction = document.getElementById('nonAction'); // 学習ボタン
 const StopElement = document.getElementById('StopButton'); // 出力ボタン
 const downloadModelElement = document.getElementById('downloadModelButton'); // 出力ボタン
@@ -33,8 +48,8 @@ async function init() {
 
 // 映像描画エリア初期化
 function initializeDrawArea() {
-  const width = '600px';
-  const height = '400px';
+  const width = `${RENDERING_SIZE.width}px`;
+  const height = `${RENDERING_SIZE.height}px`;
   setElementDimensions(videoElement, width, height);
   setElementDimensions(canvasElement, width, height);
 }
@@ -116,6 +131,7 @@ async function downloadModel() {
   downloadLink.click(); // ダウンロードリンクをクリック
   document.body.removeChild(downloadLink); // ダウンロードリンクを削除
   URL.revokeObjectURL(url); // 作成したURLを解放
+  statusElement!.textContent = '';
 }
 
 // ダウンロードリンクを作成する関数
@@ -140,27 +156,76 @@ async function saveClassifier() {
   return JSON.stringify(parsedDataset);
 }
 
-function startSaving(labelValue: number) {
+function startSaving(labelValue: string) {
   console.log({ labelValue });
-  labelAction = labelValue;
   isSave = true;
+
+  let string;
+  switch (labelValue) {
+    case LABELS.BIGBANG_ATTACK:
+      string = 'ビッグバンアタック';
+      break;
+    case LABELS.MAKANKOUSAPPOU_POSE:
+      string = '魔貫光殺砲構え';
+      break;
+    case LABELS.MAKANKOUSAPPOU_SEND:
+      string = '魔貫光殺砲実行';
+      break;
+    case LABELS.KAMEHAMEHA_POSE:
+      string = 'かめはめ波構え';
+      break;
+    case LABELS.KAMEHAMEHA_SEND:
+      string = 'かめはめ波実行';
+      break;
+    case LABELS.NONACTION:
+      string = 'その他アクション';
+      break;
+  }
+
+  statusElement!.textContent = string += '学習中';
 }
 
 function stopSaving() {
   isSave = false;
+  statusElement!.textContent = '学習終了 未ダウンロード';
 }
 
 function addEventListeners() {
   // カメラ有効後、映像の推論処理を行う
-  navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
+  const constraints = {
+    video: {
+      width: { ideal: MEDIA_CONSTRAINTS.width },
+      height: { ideal: MEDIA_CONSTRAINTS.height },
+    },
+  };
+  navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
     videoElement.srcObject = stream;
     videoElement.addEventListener('loadeddata', registerGesture);
   });
-  saveBigBangAttack!.addEventListener('click', () => startSaving(0)); // ビックバンアタック学習ボタンクリック
-  saveMakankousappou!.addEventListener('click', () => startSaving(1)); // 魔貫光殺砲学習ボタンクリック
-  nonAction!.addEventListener('click', () => startSaving(2)); // その他アクション学習ボタンクリック
-  StopElement!.addEventListener('click', stopSaving); // 学習停止ボタンクリック
-  downloadModelElement!.addEventListener('click', downloadModel); // ダウンロードボタンクリック
+  // ビックバンアタック学習ボタンクリック
+  saveBigBangAttack!.addEventListener('click', () =>
+    startSaving(LABELS.BIGBANG_ATTACK)
+  );
+  // 魔貫光殺砲学習ボタンクリック
+  saveMakankousappou_pose!.addEventListener('click', () =>
+    startSaving(LABELS.MAKANKOUSAPPOU_POSE)
+  );
+  saveMakankousappou_send!.addEventListener('click', () =>
+    startSaving(LABELS.MAKANKOUSAPPOU_SEND)
+  );
+  // かめはめ波学習ボタンクリック
+  saveKamehameha_pose!.addEventListener('click', () =>
+    startSaving(LABELS.KAMEHAMEHA_POSE)
+  );
+  saveKamehameha_send!.addEventListener('click', () =>
+    startSaving(LABELS.KAMEHAMEHA_SEND)
+  );
+  // その他学習ボタンクリック
+  nonAction!.addEventListener('click', () => startSaving(LABELS.NONACTION));
+  // 学習停止ボタンクリック
+  StopElement!.addEventListener('click', stopSaving);
+  // ダウンロードボタンクリック
+  downloadModelElement!.addEventListener('click', downloadModel);
 }
 
 init();
