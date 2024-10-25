@@ -1,7 +1,10 @@
 import { TRAINING_DATA_PATH } from '../config/constants';
 import * as knnClassifier from '@tensorflow-models/knn-classifier';
 import * as tf from '@tensorflow/tfjs';
-import { GestureRecognizerResult } from '@mediapipe/tasks-vision';
+import {
+  GestureRecognizerResult,
+  PoseLandmarkerResult,
+} from '@mediapipe/tasks-vision';
 
 type KNNModelData = {
   label: string;
@@ -38,7 +41,7 @@ export async function loadKNNModel() {
 
 export async function predictLandmarks(
   classifier: knnClassifier.KNNClassifier,
-  results: GestureRecognizerResult
+  results: GestureRecognizerResult | PoseLandmarkerResult
 ) {
   const landmark = results.landmarks[0].flatMap(({ x, y, z }) => [x, y, z]);
   const input = tf.tensor(landmark);

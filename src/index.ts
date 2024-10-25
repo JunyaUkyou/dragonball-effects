@@ -1,8 +1,12 @@
 import './style.scss';
 import { Main } from './bigbanattack/Main';
 import * as knnClassifier from '@tensorflow-models/knn-classifier';
-import { GestureRecognizer, NormalizedLandmark } from '@mediapipe/tasks-vision';
-import { createGestureRecognizer } from './models/landmarker';
+import {
+  GestureRecognizer,
+  NormalizedLandmark,
+  PoseLandmarker,
+} from '@mediapipe/tasks-vision';
+import { getRecognizer, getLandmarkerResult } from './models/landmarker';
 
 import {
   loadKNNModel,
@@ -17,14 +21,15 @@ import {
   EFFECT_DISPLAY_MILLISECOND,
 } from './config/constants';
 
-const MIDDLE_FINGER_MCP = 9;
+const MIDDLE_FINGER_MCP = 20;
+const isPose = true;
 
 // グローバル変数管理用オブジェクト
 const state = {
   mainInstance: null as Main | null,
   video: null as HTMLVideoElement | null,
   classifier: null as knnClassifier.KNNClassifier | null,
-  gestureRecognizer: null as GestureRecognizer | null,
+  recognizer: null as GestureRecognizer | PoseLandmarker | null,
   isEffectActive: false,
   isPoseDetection: false,
 };
@@ -49,7 +54,7 @@ async function init() {
     // 推論に使用するモデル取得
     const { classifier, gestureRecognizer } = await initializeModels();
     state.classifier = classifier;
-    state.gestureRecognizer = gestureRecognizer;
+    state.recognizer = gestureRecognizer;
 
     // カメラ映像を取得
     state.video = await setupVideoStream();
@@ -64,7 +69,7 @@ async function init() {
 
 async function initializeModels() {
   const classifier = await loadKNNModel();
-  const gestureRecognizer = await createGestureRecognizer();
+  const gestureRecognizer = await getRecognizer(isPose);
   return { classifier, gestureRecognizer };
 }
 
@@ -90,21 +95,25 @@ async function predictGesture() {
     return;
   }
 
-  const { gestureRecognizer, mainInstance, classifier } = state;
+  const { recognizer, mainInstance, classifier } = state;
 
   // ジェスチャー取得
-  const results = gestureRecognizer!.recognizeForVideo(
+  const startTimeMs = performance.now();
+  const results = await getLandmarkerResult(
     mainInstance!.getVideoElement(),
-    Date.now()
+    recognizer!,
+    startTimeMs
   );
+
   if (
-    results.landmarks.length > 0 &&
-    results.gestures[0][0].categoryName == 'None'
+    results.landmarks.length > 0
+    //&& results.gestures[0][0].categoryName == 'None'
   ) {
     const predictResult: KNNModelPredictResult = await predictLandmarks(
       classifier!,
       results
     );
+    //console.log({ predictResult, results });
     if (predictResult.label === LABELS.BIGBANG_ATTACK) {
       showBigBangAttackEffect(results.landmarks); // エフェクト表示
     }
