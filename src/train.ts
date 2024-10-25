@@ -31,17 +31,28 @@ const saveMakankousappou_send = document.getElementById(
 const saveKamehameha_pose = document.getElementById('saveKamehameha_pose');
 const saveKamehameha_send = document.getElementById('saveKamehameha_send');
 
-const nonAction = document.getElementById('nonAction'); // 学習ボタン
+// 気円斬構え
+const kienzan_pose = document.getElementById('kienzan_pose');
+
+// 直立
+const upright = document.getElementById('upright');
+// 正座
+const seiza = document.getElementById('seiza');
+
+// その他アクション
+const nonAction = document.getElementById('nonAction');
+
 const StopElement = document.getElementById('StopButton'); // 出力ボタン
 const downloadModelElement = document.getElementById('downloadModelButton'); // 出力ボタン
 
-let isSave = true; // 記録フラグ
+let isSave = false; // 記録フラグ
 let labelAction = 0;
 let isPose = true;
 let recognizer: GestureRecognizer | PoseLandmarker;
-let lastPredictionTime = 0; // 最後に推論を行った時間
 const predictionInterval = 1000; // 1秒ごとに姿勢推定
 let lastPoseResult: any = null; // 最後の推論結果を保持
+
+const MAX_SAMPLES_PER_LABEL = 50; // 各ラベルの上限
 
 // 初期処理
 async function init() {
@@ -50,7 +61,9 @@ async function init() {
   initializeDrawArea();
   // イベント処理
   addEventListeners();
-  //定期的に姿勢推定
+  // 定期的に姿勢推定
+  // 推論を毎フレーム行うと画面フリーズする現象が発生した
+  // リアルタイムの推論を必要とするアプリでないため毎フレームではなく一定間隔の起動とした
   setInterval(registerGesture, predictionInterval);
 }
 
@@ -103,7 +116,7 @@ async function registerGesture() {
     );
 
     if (results.landmarks.length > 0) {
-      console.log('推論結果あり', results);
+      //console.log('推論結果あり', results);
       // 推論結果を保存する
       // この処理は毎フレーム呼ばれないため、推論の可視化処理を行っても次フレームで消えてしまう
       // 毎フレーム動作するrenderFrame()でランドマークの推論の可視化処理を行う
@@ -156,6 +169,16 @@ function visualize(
 function saveLandmarks(
   results: GestureRecognizerResult | PoseLandmarkerResult
 ) {
+  // 現在のラベルの登録数を取得
+  const classCounts = classifier.getClassExampleCount();
+  const currentLabelCount = classCounts[labelAction] || 0;
+
+  // 上限に達していない場合のみ登録
+  if (currentLabelCount > MAX_SAMPLES_PER_LABEL) {
+    console.log(`Max samples reached for label ${labelAction}.`);
+    return;
+  }
+
   const landmark = results.landmarks[0].flatMap(({ x, y, z }) => [x, y, z]);
   classifier.addExample(tf.tensor(landmark), labelAction);
   console.log('KNN class added:', landmark);
@@ -226,6 +249,18 @@ function startSaving(labelValue: string) {
     case LABELS.KAMEHAMEHA_SEND:
       string = 'かめはめ波実行';
       break;
+    case LABELS.KAMEHAMEHA_SEND:
+      string = 'かめはめ波実行';
+      break;
+    case LABELS.KIENZAN_POSE:
+      string = '気円斬構え';
+      break;
+    case LABELS.UPRIGHT:
+      string = '直立';
+      break;
+    case LABELS.SEIZA:
+      string = '正座';
+      break;
     case LABELS.NONACTION:
       string = 'その他アクション';
       break;
@@ -269,7 +304,15 @@ function addEventListeners() {
   saveKamehameha_send!.addEventListener('click', () =>
     startSaving(LABELS.KAMEHAMEHA_SEND)
   );
-  // その他学習ボタンクリック
+  // 気円斬構え
+  kienzan_pose!.addEventListener('click', () =>
+    startSaving(LABELS.KIENZAN_POSE)
+  );
+  // 直立（正面、右向き、左向き、手は横）
+  upright!.addEventListener('click', () => startSaving(LABELS.UPRIGHT));
+  // 正座（中腰含む）
+  seiza!.addEventListener('click', () => startSaving(LABELS.SEIZA));
+  // その他学習ボタンクリック（PC操作など）
   nonAction!.addEventListener('click', () => startSaving(LABELS.NONACTION));
   // 学習停止ボタンクリック
   StopElement!.addEventListener('click', stopSaving);

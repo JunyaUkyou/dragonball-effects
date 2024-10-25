@@ -15,5 +15,8 @@ export const LABELS = {
   MAKANKOUSAPPOU_SEND: '2',
   KAMEHAMEHA_POSE: '3',
   KAMEHAMEHA_SEND: '4',
-  NONACTION: '5',
+  KIENZAN_POSE: '5',
+  UPRIGHT: '6',
+  SEIZA: '7',
+  NONACTION: '8',
 };
