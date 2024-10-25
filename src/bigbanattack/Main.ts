@@ -46,7 +46,11 @@ export class Main {
     this.renderer.setSize(this.renderWidth, renderHeight);
     this.renderer.setPixelRatio(window.devicePixelRatio);
 
-    document.body.appendChild(this.renderer.domElement);
+    const container = document.getElementById('container');
+    container!.appendChild(this.renderer.domElement);
+
+    // const targetElement = document.querySelector('#container');
+    // document.body.insertBefore(this.renderer.domElement, targetElement);
 
     // ビデオテクスチャを作成
     const videoTexture = new THREE.VideoTexture(this.video);
@@ -92,6 +96,11 @@ export class Main {
 
   run(x: number, y: number, z: number) {
     console.log('run called');
+    // 元の色に戻す (白色)
+    const initialColor = new THREE.Color(1, 1, 1); // 白色 (RGB: 1, 1, 1)
+    (this.sphere.mesh.material as THREE.MeshBasicMaterial).color = initialColor;
+    // 透明度を戻す (完全不透明)
+    (this.sphere.mesh.material as THREE.MeshBasicMaterial).opacity = 1;
     // エネルギー弾の大きさ初期値
     this.sphere.mesh.scale.set(1, 1, 1);
     // エネルギー弾のポジション初期値
@@ -124,15 +133,48 @@ export class Main {
     }
   }
 
+  rotate = (second = 1000, offset = 2) => {
+    this.texture.offset.x = performance.now() / second / offset;
+    this.texture.offset.y = performance.now() / second / offset;
+  };
+
   animate = () => {
     if (this.isRun) {
       // エネルギー弾の回転
-      this.texture.offset.x = performance.now() / 1000 / 2;
-      this.texture.offset.y = performance.now() / 1000 / 2.5;
+      this.rotate();
       // エネルギー弾の大きさ
       this.updateSphere();
+      // SparkEmitter の更新処理
+      this.sparkEmitter.update();
 
-      if (this.sphere.mesh.scale.x > 4) {
+      // エネルギー弾の大きさに応じて色や透明度を調整
+      const scaleX = this.sphere.mesh.scale.x;
+
+      // 現在のステータス
+      const statusMessageElement = document.getElementById(
+        'current-status-message'
+      );
+
+      if (scaleX > 4 && scaleX < 8) {
+        const color = new THREE.Color().setHSL(scaleX / 10, 1, 0.5);
+        (this.sphere.mesh.material as THREE.MeshBasicMaterial).color = color;
+        this.scaleIncrement = 0.03;
+        this.rotate(1000, 1);
+
+        // 球体の透明度を調整（スケールが大きくなると透明度が増す）
+        const opacity = Math.max(0, Math.min(1, 1 - scaleX / 10));
+        (this.sphere.mesh.material as THREE.MeshBasicMaterial).opacity =
+          opacity;
+        (this.sphere.mesh.material as THREE.MeshBasicMaterial).transparent =
+          true;
+
+        console.log('aaaa');
+        statusMessageElement!.textContent = '天さん！僕の超能力が効かない！';
+      } else if (scaleX > 8 && scaleX < 10) {
+        statusMessageElement!.textContent = '地球もろとも消すつもりか!!!!';
+      } else if (scaleX > 10) {
+        statusMessageElement!.textContent = 'さよなら天さん、、';
+        console.log('bbbb');
         // スパークを画面表示外に移動する
         this.sparkEmitter.positionChange(0, -10000);
         //this.scene.remove(this.sparkEmitter);
@@ -145,9 +187,6 @@ export class Main {
         //   //this.scene.remove(this.sparkEmitter); //スパーク削除
         //   this.startMovingSphere(); // 球体の移動を開始
         // }, 4000); // 4秒後に移動開始
-      } else {
-        // SparkEmitter の更新処理
-        this.sparkEmitter.update();
       }
     }
     this.renderer.render(this.scene, this.camera);

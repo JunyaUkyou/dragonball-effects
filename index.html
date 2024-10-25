@@ -7,9 +7,36 @@
     <title>Vite + TS</title>
   </head>
   <body>
-    <button id="cancel">キャンセル</button>
-    <button id="pose">ポーズ検出を開始する</button>
-    <button id="aaaaaaaaaaaa">実行する</button>
+    <div id="container"></div>
+    <div class="prediction-menu">
+      <button id="cancel">キャンセル</button>
+      <button id="pose">ポーズ検出</button>
+      <button id="aaaaaaaaaaaa">テスト実行</button>
+    </div>
+    <div class="current-status">
+      <div class="chaozu">
+        <div class="cap"></div>
+        <div class="face">
+          <div class="hair"></div>
+          <div class="eyebrow left"></div>
+          <!-- 左眉毛 -->
+          <div class="eyebrow right"></div>
+          <!-- 右眉毛 -->
+          <div class="eye left">
+            <div class="pupil"></div>
+          </div>
+          <div class="eye right">
+            <div class="pupil"></div>
+          </div>
+          <div class="cheek left"></div>
+          <div class="cheek right"></div>
+          <div class="mouth"></div>
+        </div>
+      </div>
+      <div class="balloon1-left">
+        <p id="current-status-message">ポーズ検出を開始してください</p>
+      </div>
+    </div>
     <script type="module" src="/src/index.ts"></script>
   </body>
 </html>

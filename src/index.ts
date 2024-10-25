@@ -19,6 +19,8 @@ import {
   RENDERING_SIZE,
   LABELS,
   EFFECT_DISPLAY_MILLISECOND,
+  PREDICTION_INTERVAL,
+  REQUIRED_DETECTIONS,
 } from './config/constants';
 
 const MIDDLE_FINGER_MCP = 20;
@@ -34,6 +36,14 @@ const state = {
   isPoseDetection: false,
 };
 
+// 現在のステータス
+const statusMessageElement = document.getElementById('current-status-message');
+
+// ポーズの検出回数を追跡
+const detectionCount: { [key: string]: number } = {
+  [LABELS.BIGBANG_ATTACK]: 0,
+};
+
 console.log('こんにちは!!!!');
 
 function setupEventListeners() {
@@ -41,6 +51,10 @@ function setupEventListeners() {
   document.getElementById('pose')?.addEventListener('click', () => {
     state.isPoseDetection = !state.isPoseDetection;
     console.log('state.isPoseDetection', state.isPoseDetection);
+
+    statusMessageElement!.textContent = state.isPoseDetection
+      ? 'ポーズ検出中'
+      : 'ポーズ検出を開始してください';
   });
   // ボタンリクック
   document.getElementById('aaaaaaaaaaaa')?.addEventListener('click', () => {
@@ -61,7 +75,8 @@ async function init() {
     state.mainInstance = new Main(state.video);
 
     console.log('初期化完了！ジェスチャー認識を開始します...');
-    predictGesture(); // ジェスチャー認識の開始
+    renderFrame();
+    setInterval(predictGesture, PREDICTION_INTERVAL);
   } catch (error) {
     console.error('初期化中にエラーが発生しました:', error);
   }
@@ -88,10 +103,14 @@ async function setupVideoStream() {
   return videoElement;
 }
 
+function renderFrame() {
+  window.requestAnimationFrame(renderFrame);
+}
+
 async function predictGesture() {
   // エフェクトがアクティブな場合、ポーズ検出無効の場合、次のフレームへ移行
   if (state.isEffectActive || !state.isPoseDetection) {
-    window.requestAnimationFrame(predictGesture);
+    // window.requestAnimationFrame(predictGesture);
     return;
   }
 
@@ -113,13 +132,44 @@ async function predictGesture() {
       classifier!,
       results
     );
-    //console.log({ predictResult, results });
-    if (predictResult.label === LABELS.BIGBANG_ATTACK) {
-      showBigBangAttackEffect(results.landmarks); // エフェクト表示
+
+    // 同じラベルの検出回数をカウント
+    const label = predictResult.label;
+    if (detectionCount[label] !== undefined) {
+      detectionCount[label] += 1;
     }
+
+    if (label === LABELS.BIGBANG_ATTACK) {
+      if (detectionCount[label] === 1) {
+        statusMessageElement!.textContent = 'どこからか気を感じる';
+      } else {
+        statusMessageElement!.textContent = '気が強くなってきた！！';
+      }
+    }
+
+    // 同じポーズが続けて検出
+    // ビッグバンアタックのみエフェクト表示
+    if (
+      detectionCount[label] >= REQUIRED_DETECTIONS &&
+      label === LABELS.BIGBANG_ATTACK
+    ) {
+      statusMessageElement!.textContent = 'ビッグバンアタックだ！！！';
+      showBigBangAttackEffect(results.landmarks); // エフェクト表示
+      resetDetectionCounts(); // カウントをリセット
+    }
+  } else {
+    resetDetectionCounts(); // カウントをリセット
+    statusMessageElement!.textContent = 'ポーズ検出中';
   }
 
-  window.requestAnimationFrame(predictGesture);
+  // window.requestAnimationFrame(predictGesture);
+}
+
+// カウントをリセットする関数
+function resetDetectionCounts() {
+  for (const key in detectionCount) {
+    detectionCount[key] = 0;
+  }
 }
 
 // エフェクトを表示する関数
@@ -134,7 +184,8 @@ function showBigBangAttackEffect(landmarks: NormalizedLandmark[][]) {
     middleFingerMcp.y * RENDERING_SIZE.height -
     RENDERING_SIZE.height / 2
   ); // Y: 200〜-200 (上下反転)
-  const landmarkZ = middleFingerMcp.z * 100; // Z座標のスケール調整
+  // Z座標は負の値の場合は0にする
+  const landmarkZ = Math.max(0, middleFingerMcp.z * 100);
   console.log({ landmarkX, landmarkY, landmarkZ, middleFingerMcp });
   state.mainInstance!.run(landmarkX, landmarkY, landmarkZ);
 
