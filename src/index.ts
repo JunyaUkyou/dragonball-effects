@@ -2,7 +2,7 @@ import './style.scss';
 import { Main } from './bigbanattack/Main';
 import * as knnClassifier from '@tensorflow-models/knn-classifier';
 import { GestureRecognizer, NormalizedLandmark } from '@mediapipe/tasks-vision';
-import { createGestureRecognizer } from './utils.js';
+import { createGestureRecognizer } from './models/landmarker';
 
 import {
   loadKNNModel,

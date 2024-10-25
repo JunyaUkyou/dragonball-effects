@@ -5,16 +5,16 @@ import {
   GestureRecognizer,
   DrawingUtils,
   GestureRecognizerResult,
+  PoseLandmarker,
+  PoseLandmarkerResult,
 } from '@mediapipe/tasks-vision';
-import { createGestureRecognizer } from './utils';
+import { getRecognizer, getLandmarkerResult } from './models/landmarker';
 import { MEDIA_CONSTRAINTS, RENDERING_SIZE, LABELS } from './config/constants';
 
-console.log('tain', createGestureRecognizer);
-const saveMax = 100; // 特徴量数
 const classifier = knnClassifier.create(); // KNN分類器
 const videoElement = <HTMLVideoElement>document.getElementById('video'); // カメラ映像
 const canvasElement = <HTMLCanvasElement>document.getElementById('canvas'); // canvas
-const canvasCtx = canvasElement.getContext('2d');
+const canvasCtx = canvasElement.getContext('2d', { willReadFrequently: true });
 
 // 現在のステータス
 const statusElement = document.getElementById('status');
@@ -35,15 +35,23 @@ const nonAction = document.getElementById('nonAction'); // 学習ボタン
 const StopElement = document.getElementById('StopButton'); // 出力ボタン
 const downloadModelElement = document.getElementById('downloadModelButton'); // 出力ボタン
 
-let isSave = false; // 記録フラグ
-let gestureRecognizer: GestureRecognizer;
+let isSave = true; // 記録フラグ
 let labelAction = 0;
+let isPose = true;
+let recognizer: GestureRecognizer | PoseLandmarker;
+let lastPredictionTime = 0; // 最後に推論を行った時間
+const predictionInterval = 1000; // 1秒ごとに姿勢推定
+let lastPoseResult: any = null; // 最後の推論結果を保持
 
 // 初期処理
 async function init() {
-  gestureRecognizer = await createGestureRecognizer(); // ジャスチャー認識ツール作成
-  initializeDrawArea(); // 映像描画エリア初期化
-  addEventListeners(); // イベント処理
+  recognizer = await getRecognizer(isPose);
+  // 映像描画エリア初期化
+  initializeDrawArea();
+  // イベント処理
+  addEventListeners();
+  //定期的に姿勢推定
+  setInterval(registerGesture, predictionInterval);
 }
 
 // 映像描画エリア初期化
@@ -64,9 +72,8 @@ function setElementDimensions(
   element!.style.height = height;
 }
 
-// 取得したジェスチャーをモデルに登録する
-async function registerGesture() {
-  // リアルタイム映像を描写
+// 毎フレームの描画処理
+function renderFrame() {
   canvasCtx!.drawImage(
     videoElement,
     0,
@@ -74,40 +81,81 @@ async function registerGesture() {
     canvasElement.width,
     canvasElement.height
   );
+  // 推論結果がある場合は描画する
+  if (lastPoseResult) {
+    visualize(lastPoseResult, recognizer);
+  }
+
+  window.requestAnimationFrame(renderFrame);
+}
+
+// 取得したジェスチャーをモデルに登録する
+async function registerGesture() {
   let lastVideoTime = -1;
-  let nowInMs = Date.now();
-  //let results = null;
+  const startTimeMs = performance.now();
   if (videoElement.currentTime !== lastVideoTime) {
     lastVideoTime = videoElement.currentTime;
     // ジェスチャー取得
-    const results = gestureRecognizer.recognizeForVideo(videoElement, nowInMs);
+    const results = await getLandmarkerResult(
+      videoElement,
+      recognizer,
+      startTimeMs
+    );
+
     if (results.landmarks.length > 0) {
-      visualizeGesture(results);
+      console.log('推論結果あり', results);
+      // 推論結果を保存する
+      // この処理は毎フレーム呼ばれないため、推論の可視化処理を行っても次フレームで消えてしまう
+      // 毎フレーム動作するrenderFrame()でランドマークの推論の可視化処理を行う
+      lastPoseResult = results;
       if (isSave) saveLandmarks(results);
+    } else {
+      lastPoseResult = null;
     }
   }
-
-  window.requestAnimationFrame(registerGesture);
 }
 
 // ジャスチャーを可視化する
-function visualizeGesture(results: GestureRecognizerResult) {
+function visualize(
+  results: any,
+  recognizer: PoseLandmarker | GestureRecognizer
+) {
   if (!canvasCtx) return;
+
   const drawingUtils = new DrawingUtils(canvasCtx);
 
-  for (const landmarks of results.landmarks) {
-    drawingUtils.drawConnectors(landmarks, GestureRecognizer.HAND_CONNECTIONS, {
-      color: '#00FF00',
-      lineWidth: 3,
-    });
-    drawingUtils.drawLandmarks(landmarks, {
-      color: '#FF0000',
-      lineWidth: 1,
-    });
+  if (recognizer instanceof PoseLandmarker) {
+    // ポーズのランドマークを描画
+    for (const landmarks of results.landmarks) {
+      drawingUtils.drawLandmarks(landmarks, {
+        radius: (data) => DrawingUtils.lerp(data.from!.z, -0.15, 0.1, 5, 1),
+      });
+      drawingUtils.drawConnectors(landmarks, PoseLandmarker.POSE_CONNECTIONS);
+    }
+  } else if (recognizer instanceof GestureRecognizer) {
+    // ジェスチャーのランドマークを描画
+    for (const landmarks of results.landmarks) {
+      drawingUtils.drawConnectors(
+        landmarks,
+        GestureRecognizer.HAND_CONNECTIONS,
+        {
+          color: '#00FF00',
+          lineWidth: 3,
+        }
+      );
+      drawingUtils.drawLandmarks(landmarks, {
+        color: '#FF0000',
+        lineWidth: 1,
+      });
+    }
   }
+
+  canvasCtx.restore();
 }
 
-function saveLandmarks(results: GestureRecognizerResult) {
+function saveLandmarks(
+  results: GestureRecognizerResult | PoseLandmarkerResult
+) {
   const landmark = results.landmarks[0].flatMap(({ x, y, z }) => [x, y, z]);
   classifier.addExample(tf.tensor(landmark), labelAction);
   console.log('KNN class added:', landmark);
@@ -201,7 +249,7 @@ function addEventListeners() {
   };
   navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
     videoElement.srcObject = stream;
-    videoElement.addEventListener('loadeddata', registerGesture);
+    videoElement.addEventListener('loadeddata', renderFrame);
   });
   // ビックバンアタック学習ボタンクリック
   saveBigBangAttack!.addEventListener('click', () =>
