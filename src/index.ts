@@ -1,16 +1,16 @@
 import './style.scss';
-import * as tf from '@tensorflow/tfjs';
 import { Main } from './bigbanattack/Main';
 import * as knnClassifier from '@tensorflow-models/knn-classifier';
-import {
-  GestureRecognizer,
-  GestureRecognizerResult,
-  NormalizedLandmark,
-} from '@mediapipe/tasks-vision';
+import { GestureRecognizer, NormalizedLandmark } from '@mediapipe/tasks-vision';
 import { createGestureRecognizer } from './utils.js';
 
 import {
-  TRAINING_DATA_PATH,
+  loadKNNModel,
+  predictLandmarks,
+  KNNModelPredictResult,
+} from './models/classifier';
+
+import {
   MEDIA_CONSTRAINTS,
   RENDERING_SIZE,
   LABELS,
@@ -25,21 +25,6 @@ debag?.addEventListener('click', () => {
 });
 
 let mainInstance: Main;
-
-type KNNModelData = {
-  label: string;
-  values: number[];
-  shape: [number, number];
-};
-
-type KNNModelPredictResult = {
-  label: string;
-  classIndex: number;
-  confidences: {
-    [label: string]: number;
-  };
-};
-
 let video: HTMLVideoElement;
 let classifier: knnClassifier.KNNClassifier;
 let gestureRecognizer: GestureRecognizer;
@@ -59,25 +44,6 @@ async function init() {
   } catch (error) {
     console.error('初期化中にエラーが発生しました:', error);
   }
-}
-
-async function loadKNNModel() {
-  const response = await fetch(TRAINING_DATA_PATH);
-  const txt = await response.text();
-  const newClassifier = knnClassifier.create(); // TensorFlow.jsのKNN分類器を作成
-  const parsedData: KNNModelData[] = JSON.parse(txt);
-
-  console.log(parsedData[0]);
-
-  newClassifier.setClassifierDataset(
-    Object.fromEntries(
-      parsedData.map(({ label, values, shape }) => [
-        label, // ラベル（クラス名）
-        tf.tensor2d(values, shape),
-      ])
-    )
-  );
-  return newClassifier;
 }
 
 // **カメラ映像の取得**
@@ -111,7 +77,6 @@ async function predictGesture() {
     return;
   }
 
-  //let lastVideoTime = -1;
   let nowInMs = Date.now();
   let results = null;
 
@@ -124,27 +89,16 @@ async function predictGesture() {
     results.landmarks.length > 0 &&
     results.gestures[0][0].categoryName == 'None'
   ) {
-    predictLandmarks(results);
-  }
-
-  window.requestAnimationFrame(predictGesture);
-}
-
-async function predictLandmarks(results: GestureRecognizerResult) {
-  const landmark = results.landmarks[0].flatMap(({ x, y, z }) => [x, y, z]);
-  const input = tf.tensor(landmark);
-
-  try {
-    const predictResult: KNNModelPredictResult = await classifier.predictClass(
-      input,
-      3
+    const predictResult: KNNModelPredictResult = await predictLandmarks(
+      classifier,
+      results
     );
     if (predictResult.label === LABELS.BIGBANG_ATTACK) {
       showBigBangAttackEffect(results.landmarks); // エフェクト表示
     }
-  } finally {
-    input.dispose(); //メモリ解放
   }
+
+  window.requestAnimationFrame(predictGesture);
 }
 
 // エフェクトを表示する関数
