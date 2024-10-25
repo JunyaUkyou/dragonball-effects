@@ -29,6 +29,13 @@ let video: HTMLVideoElement;
 let classifier: knnClassifier.KNNClassifier;
 let gestureRecognizer: GestureRecognizer;
 let isEffectActive = false;
+let isPoseDetection = false;
+
+const poseElement = document.getElementById('pose');
+poseElement?.addEventListener('click', () => {
+  isPoseDetection = !isPoseDetection;
+  console.log({ isPoseDetection });
+});
 
 console.log('こんにちは!!!!');
 
@@ -77,11 +84,14 @@ async function predictGesture() {
     return;
   }
 
+  if (!isPoseDetection) {
+    window.requestAnimationFrame(predictGesture);
+    return;
+  }
   let nowInMs = Date.now();
-  let results = null;
 
   // ジェスチャー取得
-  results = gestureRecognizer.recognizeForVideo(
+  const results = gestureRecognizer.recognizeForVideo(
     mainInstance.getVideoElement(),
     nowInMs
   );
