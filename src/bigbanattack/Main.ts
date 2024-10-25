@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { Sphere } from './Sphere';
 import { SparkEmitter } from './SparkEmitter';
+import { RENDERING_SIZE } from '../config/constants';
 
 export class Main {
   private readonly scene: THREE.Scene;
@@ -27,7 +28,8 @@ export class Main {
     this.scene = new THREE.Scene();
 
     // カメラを追加
-    this.camera = new THREE.PerspectiveCamera(75, 1300 / 600, 1, 1000);
+    const aspectRatio = RENDERING_SIZE.width / RENDERING_SIZE.height;
+    this.camera = new THREE.PerspectiveCamera(75, aspectRatio, 1, 1000);
     this.camera.position.set(0, 0, 300);
 
     // レンダラーを追加
@@ -38,8 +40,8 @@ export class Main {
     });
     //const renderWidth = window.innerWidth;
     //const renderHeight = window.innerHeight;
-    this.renderWidth = 1300;
-    const renderHeight = 600;
+    this.renderWidth = RENDERING_SIZE.width;
+    const renderHeight = RENDERING_SIZE.height;
     this.renderer.setClearColor(0x000000, 0);
     this.renderer.setSize(this.renderWidth, renderHeight);
     this.renderer.setPixelRatio(window.devicePixelRatio);
@@ -124,7 +126,6 @@ export class Main {
 
   animate = () => {
     if (this.isRun) {
-      console.log('sssss', this.sphere.mesh.scale.x);
       // エネルギー弾の回転
       this.texture.offset.x = performance.now() / 1000 / 2;
       this.texture.offset.y = performance.now() / 1000 / 2.5;

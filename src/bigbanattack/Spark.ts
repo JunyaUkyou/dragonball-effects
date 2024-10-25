@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { RENDERING_SIZE } from '../config/constants';
 
 export class Spark extends THREE.Object3D {
   private readonly _mesh: THREE.Mesh;
@@ -23,15 +24,12 @@ export class Spark extends THREE.Object3D {
     });
 
     this._mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 50), material);
-    // this._mesh.position.y = (Math.random() - 0.5) * 1300;
-    // this._mesh.rotation.y = Math.random() * 2;
-    //this._mesh.position.y = (Math.random() - 0.5) * 600; // -650 ~ +650の範囲
     this._mesh.position.y = this.randomPosition();
     this.add(this._mesh);
   }
 
   private randomPosition() {
-    return (Math.random() - 0.5) * 1300;
+    return (Math.random() - 0.5) * RENDERING_SIZE.width;
   }
 
   public update() {

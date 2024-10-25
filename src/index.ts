@@ -8,6 +8,15 @@ import {
   NormalizedLandmark,
 } from '@mediapipe/tasks-vision';
 import { createGestureRecognizer } from './utils.js';
+
+import {
+  TRAINING_DATA_PATH,
+  MEDIA_CONSTRAINTS,
+  RENDERING_SIZE,
+  LABELS,
+  EFFECT_DISPLAY_MILLISECOND,
+} from './config/constants';
+
 const MIDDLE_FINGER_MCP = 9;
 
 const debag = document.getElementById('aaaaaaaaaaaa');
@@ -31,7 +40,6 @@ type KNNModelPredictResult = {
   };
 };
 
-//const videoElement = <HTMLVideoElement>document.getElementById('video');
 let video: HTMLVideoElement;
 let classifier: knnClassifier.KNNClassifier;
 let gestureRecognizer: GestureRecognizer;
@@ -39,27 +47,11 @@ let isEffectActive = false;
 
 console.log('こんにちは!!!!');
 
-// navigator.mediaDevices
-//   .getUserMedia({ video: true })
-//   .then((stream) => {
-//     videoElement.srcObject = stream;
-//     videoElement.autoplay = true;
-
-//     videoElement.addEventListener('loadeddata', () => {
-//       //new Main(videoElement); // Main クラスに video を渡す
-//       init();
-//     });
-//   })
-//   .catch((error) => {
-//     console.error('カメラ映像の取得に失敗しました:', error);
-//   });
-
 // 初期処理
 async function init() {
   try {
     classifier = await loadKNNModel();
     gestureRecognizer = await createGestureRecognizer();
-    //setVideoDimensions(); // 映像エリアの設定
     await setupVideoStream(); // カメラ映像を取得
 
     console.log('初期化完了！ジェスチャー認識を開始します...');
@@ -70,7 +62,7 @@ async function init() {
 }
 
 async function loadKNNModel() {
-  const response = await fetch('/src/models/knn-classifier-model.text');
+  const response = await fetch(TRAINING_DATA_PATH);
   const txt = await response.text();
   const newClassifier = knnClassifier.create(); // TensorFlow.jsのKNN分類器を作成
   const parsedData: KNNModelData[] = JSON.parse(txt);
@@ -88,20 +80,13 @@ async function loadKNNModel() {
   return newClassifier;
 }
 
-// 映像エリアの設定
-function setVideoDimensions() {
-  videoElement.width = 600;
-  videoElement.height = 400;
-}
-
 // **カメラ映像の取得**
 async function setupVideoStream() {
   try {
     const constraints = {
       video: {
-        width: { ideal: 1920 }, // フルHD解像度を指定
-        height: { ideal: 1080 },
-        //facingMode: 'user', // iPhoneのフロントカメラを指定
+        width: { ideal: MEDIA_CONSTRAINTS.width },
+        height: { ideal: MEDIA_CONSTRAINTS.height },
       },
     };
     const stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -154,7 +139,7 @@ async function predictLandmarks(results: GestureRecognizerResult) {
       input,
       3
     );
-    if (predictResult.label === '0') {
+    if (predictResult.label === LABELS.BIGBANG_ATTACK) {
       showBigBangAttackEffect(results.landmarks); // エフェクト表示
     }
   } finally {
@@ -168,8 +153,12 @@ function showBigBangAttackEffect(landmarks: NormalizedLandmark[][]) {
   console.log('ビッグバンアタック！！！！', { landmarks });
   const middleFingerMcp = landmarks[0][MIDDLE_FINGER_MCP];
   // Three.jsの座標系に合わせた座標変換
-  const landmarkX = middleFingerMcp.x * 600 - 300; // X: -300〜300
-  const landmarkY = -(middleFingerMcp.y * 400 - 200); // Y: 200〜-200 (上下反転)
+  const landmarkX =
+    middleFingerMcp.x * RENDERING_SIZE.width - RENDERING_SIZE.width / 2; // X: -300〜300
+  const landmarkY = -(
+    middleFingerMcp.y * RENDERING_SIZE.height -
+    RENDERING_SIZE.height / 2
+  ); // Y: 200〜-200 (上下反転)
   const landmarkZ = middleFingerMcp.z * 100; // Z座標のスケール調整
   console.log({ landmarkX, landmarkY, landmarkZ, middleFingerMcp });
   mainInstance.run(landmarkX, landmarkY, landmarkZ);
@@ -177,7 +166,7 @@ function showBigBangAttackEffect(landmarks: NormalizedLandmark[][]) {
   // エフェクト終了後にジェスチャー取得を再開
   setTimeout(() => {
     isEffectActive = false; // エフェクト終了
-  }, 8000); // 8秒間エフェクトを表示する想定
+  }, EFFECT_DISPLAY_MILLISECOND); // 8秒間エフェクトを表示する想定
 }
 
 init();
