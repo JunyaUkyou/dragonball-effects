@@ -66,13 +66,13 @@ http://localhost:5173/train
 │ │ └── Sphere.ts
 │ ├── config
 │ │ └── constants.ts
-│ ├── index.ts
+│ ├── index.ts                     # メイン処理、ここで姿勢推定、検出したポーズの分類を行う
 │ ├── models                       # 分類モデルと姿勢推定処理
 │ │ ├── classifier.ts
 │ │ ├── knn-classifier-model.text
 │ │ └── landmarker.ts
 │ ├── style.scss
-│ ├── train.ts
+│ ├── train.ts                     # ポーズ学習のメイン処理、学習した重みをダウンロードする
 │ ├── typescript.svg
 │ └── vite-env.d.ts
 ├── train.html                     # ポーズ学習画面HTML
