@@ -61,6 +61,12 @@ function setupEventListeners() {
   document.getElementById('aaaaaaaaaaaa')?.addEventListener('click', () => {
     state.mainInstance?.run(0, 0, 0);
   });
+  // ボタンリクック
+  document
+    .getElementById('test_supersaiyajin')
+    ?.addEventListener('click', () => {
+      console.log('スーパーサイヤ人 テスト実行 クリック');
+    });
 }
 
 // 初期処理
