@@ -101,62 +101,64 @@ export class BigBangAttack {
   };
 
   animate = () => {
-    if (this.isRun) {
-      // エネルギー弾の回転
-      this.updateRotate();
-      // エネルギー弾の大きさ
-      this.updateSphere();
-      // SparkEmitter の更新処理
-      // this.sparkEmitter.update();
-
-      // エネルギー弾の大きさに応じて色や透明度を調整
-      const scaleX = this.sphere.mesh.scale.x;
-
-      // 現在のステータス
-      const statusMessageElement = document.getElementById(
-        'current-status-message'
-      );
-      if (scaleX > 4) {
-        // 色の変更
-        this.updateColor(scaleX);
-        // 球体の透明度を調整（スケールが大きくなると透明度が増す）
-        this.updateOpacity(scaleX);
-      }
-
-      if (scaleX > 4 && scaleX < 6) {
-        this.scaleIncrement = 0.03;
-        this.updateRotate(1000, 1);
-
-        console.log('aaaa');
-      } else if (scaleX > 6 && scaleX < 8) {
-        this.scaleIncrement = 0.03;
-        this.updateRotate(1000, 1);
-
-        console.log('bbbb');
-        statusMessageElement!.textContent = '天さん！僕の超能力が効かない！';
-      } else if (scaleX > 8 && scaleX < 10) {
-        console.log('色かわらない');
-        statusMessageElement!.textContent = '地球もろとも消すつもりか!!!!';
-      } else if (scaleX > 10 && scaleX < 11) {
-        console.log('色かわらない2');
-        statusMessageElement!.textContent = 'うわぁぁぁぁ!!!!';
-      } else if (scaleX > 11) {
-        statusMessageElement!.textContent = 'さよなら天さん、、';
-        console.log('ccccc');
-        // スパークを画面表示外に移動する
-        // this.sparkEmitter.positionChange(0, -10000);
-        //this.scene.remove(this.sparkEmitter);
-        //this.sparkEmitter.clearAll();
-
-        this.scaleIncrement = 0;
-        // エネルギー弾の移動
-        this.startMovingSphere();
-        // setTimeout(() => {
-        //   //this.scene.remove(this.sparkEmitter); //スパーク削除
-        //   this.startMovingSphere(); // 球体の移動を開始
-        // }, 4000); // 4秒後に移動開始
-      }
+    if (!this.isRun) {
+      return;
     }
+    // エネルギー弾の回転
+    this.updateRotate();
+    // エネルギー弾の大きさ
+    this.updateSphere();
+    // SparkEmitter の更新処理
+    // this.sparkEmitter.update();
+
+    // エネルギー弾の大きさに応じて色や透明度を調整
+    const scaleX = this.sphere.mesh.scale.x;
+
+    // 現在のステータス
+    const statusMessageElement = document.getElementById(
+      'current-status-message'
+    );
+    if (scaleX > 4) {
+      // 色の変更
+      this.updateColor(scaleX);
+      // 球体の透明度を調整（スケールが大きくなると透明度が増す）
+      this.updateOpacity(scaleX);
+    }
+
+    if (scaleX > 4 && scaleX < 6) {
+      this.scaleIncrement = 0.03;
+      this.updateRotate(1000, 1);
+
+      console.log('aaaa');
+    } else if (scaleX > 6 && scaleX < 8) {
+      this.scaleIncrement = 0.03;
+      this.updateRotate(1000, 1);
+
+      console.log('bbbb');
+      statusMessageElement!.textContent = '天さん！僕の超能力が効かない！';
+    } else if (scaleX > 8 && scaleX < 10) {
+      console.log('色かわらない');
+      statusMessageElement!.textContent = '地球もろとも消すつもりか!!!!';
+    } else if (scaleX > 10 && scaleX < 11) {
+      console.log('色かわらない2');
+      statusMessageElement!.textContent = 'うわぁぁぁぁ!!!!';
+    } else if (scaleX > 11) {
+      statusMessageElement!.textContent = 'さよなら天さん、、';
+      console.log('ccccc');
+      // スパークを画面表示外に移動する
+      // this.sparkEmitter.positionChange(0, -10000);
+      //this.scene.remove(this.sparkEmitter);
+      //this.sparkEmitter.clearAll();
+
+      this.scaleIncrement = 0;
+      // エネルギー弾の移動
+      this.startMovingSphere();
+      // setTimeout(() => {
+      //   //this.scene.remove(this.sparkEmitter); //スパーク削除
+      //   this.startMovingSphere(); // 球体の移動を開始
+      // }, 4000); // 4秒後に移動開始
+    }
+
     // this.renderer.render(this.scene, this.camera);
     // const id = requestAnimationFrame(this.animate);
 
