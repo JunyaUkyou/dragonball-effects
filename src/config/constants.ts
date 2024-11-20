@@ -19,6 +19,7 @@ export const LABELS = {
   UPRIGHT: '6',
   SEIZA: '7',
   NONACTION: '8',
+  SUPERSAIYAJIN: '9',
 };
 export const REQUIRED_DETECTIONS = 3;
 export const PREDICTION_INTERVAL = 1000;

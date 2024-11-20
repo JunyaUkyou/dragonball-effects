@@ -42,6 +42,7 @@ const statusMessageElement = document.getElementById('current-status-message');
 // ポーズの検出回数を追跡
 const detectionCount: { [key: string]: number } = {
   [LABELS.BIGBANG_ATTACK]: 0,
+  [LABELS.SUPERSAIYAJIN]: 9,
 };
 
 console.log('こんにちは!!!!');
@@ -135,11 +136,12 @@ async function predictGesture() {
 
     // 同じラベルの検出回数をカウント
     const label = predictResult.label;
+    console.log({ label });
     if (detectionCount[label] !== undefined) {
       detectionCount[label] += 1;
     }
 
-    if (label === LABELS.BIGBANG_ATTACK) {
+    if (label === LABELS.BIGBANG_ATTACK || label === LABELS.SUPERSAIYAJIN) {
       if (detectionCount[label] === 1) {
         statusMessageElement!.textContent = 'どこからか気を感じる';
       } else {
@@ -155,6 +157,14 @@ async function predictGesture() {
     ) {
       statusMessageElement!.textContent = 'ビッグバンアタックだ！！！';
       showBigBangAttackEffect(results.landmarks); // エフェクト表示
+      resetDetectionCounts(); // カウントをリセット
+    } else if (
+      detectionCount[label] >= REQUIRED_DETECTIONS &&
+      label === LABELS.SUPERSAIYAJIN
+    ) {
+      console.log('スーパーサイヤ人');
+      statusMessageElement!.textContent = 'スーパーサイヤ人だ！！！';
+      //showBigBangAttackEffect(results.landmarks); // エフェクト表示
       resetDetectionCounts(); // カウントをリセット
     }
   } else {

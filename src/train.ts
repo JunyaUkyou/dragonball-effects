@@ -42,6 +42,9 @@ const seiza = document.getElementById('seiza');
 // その他アクション
 const nonAction = document.getElementById('nonAction');
 
+// その他アクション
+const supersaiyajin = document.getElementById('supersaiyajin');
+
 const StopElement = document.getElementById('StopButton'); // 出力ボタン
 const downloadModelElement = document.getElementById('downloadModelButton'); // 出力ボタン
 
@@ -264,6 +267,9 @@ function startSaving(labelValue: string) {
     case LABELS.NONACTION:
       string = 'その他アクション';
       break;
+    case LABELS.SUPERSAIYAJIN:
+      string = 'スーパーサイヤ人';
+      break;
   }
 
   statusElement!.textContent = string += '学習中';
@@ -314,6 +320,11 @@ function addEventListeners() {
   seiza!.addEventListener('click', () => startSaving(LABELS.SEIZA));
   // その他学習ボタンクリック（PC操作など）
   nonAction!.addEventListener('click', () => startSaving(LABELS.NONACTION));
+  // スーパーサイヤ人
+  supersaiyajin!.addEventListener('click', () =>
+    startSaving(LABELS.SUPERSAIYAJIN)
+  );
+
   // 学習停止ボタンクリック
   StopElement!.addEventListener('click', stopSaving);
   // ダウンロードボタンクリック
