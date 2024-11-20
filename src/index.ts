@@ -60,7 +60,7 @@ function setupEventListeners() {
   });
   // ボタンリクック
   document.getElementById('aaaaaaaaaaaa')?.addEventListener('click', () => {
-    state.mainInstance?.run(0, 0, 0);
+    state.mainInstance?.runBigBangAttack(0, 0, 0);
   });
   // ボタンリクック
   document
@@ -200,7 +200,7 @@ function showBigBangAttackEffect(landmarks: NormalizedLandmark[][]) {
   // Z座標は負の値の場合は0にする
   const landmarkZ = Math.max(0, middleFingerMcp.z * 100);
   console.log({ landmarkX, landmarkY, landmarkZ, middleFingerMcp });
-  state.mainInstance!.run(landmarkX - 100, landmarkY, landmarkZ);
+  state.mainInstance!.runBigBangAttack(landmarkX - 100, landmarkY, landmarkZ);
 
   // エフェクト終了後にジェスチャー取得を再開
   setTimeout(() => {
