@@ -9,7 +9,7 @@ import {
   PoseLandmarkerResult,
 } from '@mediapipe/tasks-vision';
 import { getRecognizer, getLandmarkerResult } from './models/landmarker';
-import { MEDIA_CONSTRAINTS, RENDERING_SIZE, LABELS } from './config/constants';
+import { MEDIA_CONSTRAINTS, RENDERING_SIZE, LABELS } from './core/constants';
 
 const classifier = knnClassifier.create(); // KNN分類器
 const videoElement = <HTMLVideoElement>document.getElementById('video'); // カメラ映像

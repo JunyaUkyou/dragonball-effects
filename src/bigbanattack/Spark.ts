@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { RENDERING_SIZE } from '../config/constants';
+import { RENDERING_SIZE } from '../core/constants';
 
 export class Spark extends THREE.Object3D {
   private readonly _mesh: THREE.Mesh;

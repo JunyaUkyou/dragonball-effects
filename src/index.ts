@@ -21,7 +21,7 @@ import {
   EFFECT_DISPLAY_MILLISECOND,
   PREDICTION_INTERVAL,
   REQUIRED_DETECTIONS,
-} from './config/constants';
+} from './core/constants';
 
 const MIDDLE_FINGER_MCP = 20;
 const isPose = true;

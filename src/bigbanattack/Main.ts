@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { Sphere } from './Sphere';
 import { SparkEmitter } from './SparkEmitter';
-import { RENDERING_SIZE } from '../config/constants';
+import { RENDERING_SIZE } from '../core/constants';
 
 export class Main {
   private readonly scene: THREE.Scene;

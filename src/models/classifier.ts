@@ -1,4 +1,4 @@
-import { TRAINING_DATA_PATH } from '../config/constants';
+import { TRAINING_DATA_PATH } from '../core/constants';
 import * as knnClassifier from '@tensorflow-models/knn-classifier';
 import * as tf from '@tensorflow/tfjs';
 import {
