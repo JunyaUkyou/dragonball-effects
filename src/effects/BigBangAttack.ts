@@ -41,7 +41,7 @@ export class BigBangAttack {
     // this.scene.add(this.sparkEmitter); // スパークをシーンに追加
 
     // アニメーション開始
-    this.animate();
+    //this.animate();
   }
 
   run(x: number, y: number, z: number) {
