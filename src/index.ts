@@ -1,5 +1,6 @@
 import './style.scss';
-import { Main } from './bigbanattack/Main';
+// import { Main } from './bigbanattack/Main';
+import { Main } from './core/Main';
 import * as knnClassifier from '@tensorflow-models/knn-classifier';
 import {
   GestureRecognizer,
@@ -121,15 +122,11 @@ async function predictGesture() {
     return;
   }
 
-  const { recognizer, mainInstance, classifier } = state;
+  const { recognizer, video, classifier } = state;
 
   // ジェスチャー取得
   const startTimeMs = performance.now();
-  const results = await getLandmarkerResult(
-    mainInstance!.getVideoElement(),
-    recognizer!,
-    startTimeMs
-  );
+  const results = await getLandmarkerResult(video!, recognizer!, startTimeMs);
 
   if (
     results.landmarks.length > 0
