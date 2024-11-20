@@ -1,12 +1,12 @@
 import * as THREE from 'three';
 import { Sphere } from './Sphere';
-// import { SparkEmitter } from './SparkEmitter';
+import { SparkEmitter } from './SparkEmitter';
 import { RENDERING_SIZE } from '../core/constants';
 
 export class BigBangAttack {
   private readonly texture: THREE.Texture;
   private readonly sphere: Sphere;
-  // private readonly sparkEmitter: SparkEmitter;
+  private readonly sparkEmitter: SparkEmitter;
 
   private isRun: boolean = false;
 
@@ -37,8 +37,8 @@ export class BigBangAttack {
 
     // SparkEmitter の追加
     //const spherePositionZ = 20;
-    // this.sparkEmitter = new SparkEmitter();
-    // this.scene.add(this.sparkEmitter); // スパークをシーンに追加
+    this.sparkEmitter = new SparkEmitter();
+    scene.add(this.sparkEmitter); // スパークをシーンに追加
 
     // アニメーション開始
     //this.animate();
@@ -60,7 +60,7 @@ export class BigBangAttack {
 
     //this.scene.add(this.sphere.mesh); // 球体をシーンに追加
     // スパークを画面表示位置に移動する
-    // this.sparkEmitter.positionChange(x, y);
+    this.sparkEmitter.positionChange(x, y);
     //this.scene.add(this.sparkEmitter); // スパークをシーンに追加
   }
 
@@ -109,7 +109,7 @@ export class BigBangAttack {
     // エネルギー弾の大きさ
     this.updateSphere();
     // SparkEmitter の更新処理
-    // this.sparkEmitter.update();
+    this.sparkEmitter.update();
 
     // エネルギー弾の大きさに応じて色や透明度を調整
     const scaleX = this.sphere.mesh.scale.x;
@@ -146,7 +146,7 @@ export class BigBangAttack {
       statusMessageElement!.textContent = 'さよなら天さん、、';
       console.log('ccccc');
       // スパークを画面表示外に移動する
-      // this.sparkEmitter.positionChange(0, -10000);
+      this.sparkEmitter.positionChange(0, -10000);
       //this.scene.remove(this.sparkEmitter);
       //this.sparkEmitter.clearAll();
 
