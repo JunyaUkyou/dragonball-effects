@@ -1,12 +1,14 @@
 import * as THREE from 'three';
 import { Sphere } from './Sphere';
 import { SparkEmitter } from './SparkEmitter';
+//import { SparkEmitter2 } from './SparkEmitter2';
 import { RENDERING_SIZE } from '../core/constants';
 
 export class BigBangAttack {
   private readonly texture: THREE.Texture;
   private readonly sphere: Sphere;
   private readonly sparkEmitter: SparkEmitter;
+  //private readonly sparkEmitter: SparkEmitter2;
 
   private isRun: boolean = false;
 
@@ -38,6 +40,7 @@ export class BigBangAttack {
     // SparkEmitter の追加
     //const spherePositionZ = 20;
     this.sparkEmitter = new SparkEmitter();
+    //this.sparkEmitter = new SparkEmitter2();
     scene.add(this.sparkEmitter); // スパークをシーンに追加
 
     // アニメーション開始
