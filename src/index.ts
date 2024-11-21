@@ -67,6 +67,27 @@ function setupEventListeners() {
     .getElementById('test_supersaiyajin')
     ?.addEventListener('click', () => {
       console.log('スーパーサイヤ人 テスト実行 クリック');
+      const landmark = {
+        x: 0,
+        y: 0,
+        z: 0,
+        visibility: 0,
+      };
+      const landmarks = Array.from({ length: 33 }, () => ({ ...landmark }));
+      // 左目
+      landmarks[2].x = 141.52050018310547;
+      landmarks[2].y = 80.18914461135864;
+      // 右目
+      landmarks[5].x = 112.71413564682007;
+      landmarks[5].y = 81.5801739692688;
+      // 左耳
+      landmarks[7].x = 147.20340371131897;
+      landmarks[7].y = 73.08939099311829;
+      // 右耳
+      landmarks[8].x = 89.23144936561584;
+      landmarks[8].y = 77.24753022193909;
+
+      state.mainInstance?.runSuperSaiyajin(landmarks, true);
     });
 }
 
@@ -167,7 +188,7 @@ async function predictGesture() {
     ) {
       console.log('スーパーサイヤ人');
       statusMessageElement!.textContent = 'スーパーサイヤ人だ！！！';
-      //showBigBangAttackEffect(results.landmarks); // エフェクト表示
+      showSuperSaiyajinEffect(results.landmarks); // エフェクト表示
       resetDetectionCounts(); // カウントをリセット
     }
   } else {
@@ -201,6 +222,22 @@ function showBigBangAttackEffect(landmarks: NormalizedLandmark[][]) {
   const landmarkZ = Math.max(0, middleFingerMcp.z * 100);
   console.log({ landmarkX, landmarkY, landmarkZ, middleFingerMcp });
   state.mainInstance!.runBigBangAttack(landmarkX - 100, landmarkY, landmarkZ);
+
+  // エフェクト終了後にジェスチャー取得を再開
+  setTimeout(() => {
+    state.isEffectActive = false; // エフェクト終了
+  }, EFFECT_DISPLAY_MILLISECOND); // 8秒間エフェクトを表示する想定
+}
+
+function showSuperSaiyajinEffect(landmarks: NormalizedLandmark[][]) {
+  state.isEffectActive = true; // エフェクト開始
+  console.log('スーパーサイヤ人！！！！', { landmarks });
+  state.mainInstance!.runSuperSaiyajin(landmarks[0]);
+
+  // const leftEye = landmarks[0][LEFT_EYE];
+  // const rightEye = landmarks[0][RIGHT_EYE];
+  // const leftEar = landmarks[0][LEFT_EAR];
+  // const rightEar = landmarks[0][RIGHT_EAR];
 
   // エフェクト終了後にジェスチャー取得を再開
   setTimeout(() => {

@@ -1,19 +1,20 @@
 import { VideoRenderer } from './VideoRenderer';
 import { BigBangAttack } from '../effects/BigBangAttack';
 // import { BigBangAttack } from './BigBangAttack';
-// import { SuperSaiyajin } from './SuperSaiyajin';
+import { SuperSaiyajin } from '../effects/SuperSaiyajin';
+import { NormalizedLandmark } from '@mediapipe/tasks-vision';
 
 export class Main {
   private videoRenderer: VideoRenderer;
   private bigBangAttack: BigBangAttack;
-  // private superSaiyajin: SuperSaiyajin;
+  private superSaiyajin: SuperSaiyajin;
 
   constructor(video: HTMLVideoElement) {
     this.videoRenderer = new VideoRenderer(video);
 
     const scene = this.videoRenderer.getScene();
     this.bigBangAttack = new BigBangAttack(scene);
-    // this.superSaiyajin = new SuperSaiyajin(scene);
+    this.superSaiyajin = new SuperSaiyajin(scene);
 
     this.animate();
   }
@@ -22,9 +23,10 @@ export class Main {
     this.bigBangAttack.run(x, y, z);
   }
 
-  // runSuperSaiyajin(x: number, y: number) {
-  //   this.superSaiyajin.run(x, y);
-  // }
+  runSuperSaiyajin(landmark: NormalizedLandmark[], isTest = false) {
+    console.log('runSuperSaiyajin', { landmark });
+    this.superSaiyajin.run(landmark, isTest);
+  }
 
   // run(x: number, y: number, z: number) {
   //   console.log('core/Main.ts run ', { x, y, z });
