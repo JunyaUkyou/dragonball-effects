@@ -33,9 +33,11 @@ export class Main {
   // }
 
   animate = () => {
-    this.bigBangAttack.animate();
     // this.superSaiyajin.update();
     this.videoRenderer.render();
+    if (this.bigBangAttack.getIsRun()) {
+      this.bigBangAttack.animate();
+    }
     requestAnimationFrame(this.animate);
   };
 }

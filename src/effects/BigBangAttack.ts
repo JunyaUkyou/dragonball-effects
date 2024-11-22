@@ -103,6 +103,10 @@ export class BigBangAttack {
     (this.sphere.mesh.material as THREE.MeshBasicMaterial).transparent = true;
   };
 
+  getIsRun() {
+    return this.isRun;
+  }
+
   animate = () => {
     if (!this.isRun) {
       return;

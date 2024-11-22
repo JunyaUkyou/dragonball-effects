@@ -103,7 +103,7 @@ async function init() {
     state.mainInstance = new Main(state.video);
 
     console.log('初期化完了！ジェスチャー認識を開始します...');
-    renderFrame();
+    //renderFrame();
     setInterval(predictGesture, PREDICTION_INTERVAL);
   } catch (error) {
     console.error('初期化中にエラーが発生しました:', error);
