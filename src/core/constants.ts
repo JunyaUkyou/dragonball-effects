@@ -23,3 +23,36 @@ export const LABELS = {
 };
 export const REQUIRED_DETECTIONS = 3;
 export const PREDICTION_INTERVAL = 1000;
+
+export const TRAIN_ACTIONS = [
+  { id: 'wark', label: '歩く', key: 'WARK' },
+  { id: 'upright', label: '直立', key: 'UPRIGHT' },
+  { id: 'genkidama', label: '元気玉', key: 'GENKIDAMA' },
+  { id: 'ryoute-sayu', label: '両手を左右に伸ばす', key: 'RYOUTE_SAYU' },
+  { id: 'kiennzan-right', label: '気円斬（右）', key: 'KIENNZAN_RIGHT' },
+  { id: 'kiennzan-left', label: '気円斬（左）', key: 'KIENNZAN_LEFT' },
+  {
+    id: 'bigbanattak-left',
+    label: 'ビッグバンアタック（左）',
+    key: 'BIGBANG_ATTACK',
+  },
+  {
+    id: 'saveKamehameha_pose',
+    label: 'かめはめ波構え',
+    key: 'KAMEHAMEHA_POSE',
+  },
+  {
+    id: 'saveKamehameha_send',
+    label: 'かめはめ波実行',
+    key: 'KAMEHAMEHA_SEND',
+  },
+  {
+    id: 'saveBigBangAttack',
+    label: 'ビッグバンアタック',
+    key: 'BIGBANG_ATTACK',
+  },
+  { id: 'syunkanidou', label: '瞬間移動', key: 'SYUNKANIDOU' },
+  { id: 'supersaiyajin', label: 'スーパーサイヤ人', key: 'SUPERSAIYAJIN' },
+  // { id: 'StopButton', label: '学習を停止', key: 'STOP' },
+  // { id: 'downloadModelButton', label: 'モデルをダウンロード', key: 'DOWNLOAD' },
+];

@@ -7,58 +7,109 @@
     <title>Train Page</title>
   </head>
   <body>
-    <video
-      id="video"
-      width="1300"
-      height="600"
-      autoplay
-      style="display: none"
-    ></video>
-    <canvas id="canvas"></canvas>
-    <div class="buttons">
+    <div id="train-container">
       <div>
-        <p class="button-description">現在のステータス</p>
-        <p id="status"></p>
-      </div>
-      <div class="left">
-        <p class="button-description">学習したいアクションをクリック！</p>
-        <button id="saveBigBangAttack" class="btn btn-border">
-          ビッグバンアタック
-        </button>
-
-        <button id="saveMakankousappou_pose" class="btn btn-border">
-          魔貫光殺砲構え
-        </button>
-        <button id="saveMakankousappou_send" class="btn btn-border">
-          魔貫光殺砲実行
-        </button>
-        <button id="saveKamehameha_pose" class="btn btn-border">
-          かめはめ波構え
-        </button>
-        <button id="saveKamehameha_send" class="btn btn-border">
-          かめはめ波実行
-        </button>
-        <button id="kienzan_pose" class="btn btn-border">気円斬構え</button>
-        <button id="upright" class="btn btn-border">
-          直立（正面、右向き、左向き、手は横）
-        </button>
-        <button id="seiza" class="btn btn-border">正座（中腰含む）</button>
-        <button id="nonAction" class="btn btn-border">
-          その他アクション（PC操作など）
-        </button>
-        <button id="supersaiyajin" class="btn btn-border">
-          スーパーサイヤ人
-        </button>
-      </div>
-      <div class="right">
         <p class="button-description">
-          学習の停止や学習済みモデルのダウンロード
+          現在のステータス：<span id="status"></span>
         </p>
-        <button id="StopButton" class="btn btn-border">学習を停止</button>
+      </div>
+      <video
+        id="video"
+        width="1300"
+        height="600"
+        autoplay
+        style="display: none"
+      ></video>
+      <canvas id="canvas"></canvas>
 
-        <button id="downloadModelButton" class="btn btn-border">
-          モデルをダウンロード
-        </button>
+      <div class="buttons">
+        <div class="train-actions">
+          <p class="button-description">
+            学習したいアクションをクリック！エフェクトなし1
+          </p>
+          <button id="wark" class="btn btn-border">
+            歩く（正面、右向き、左向き、後向き、手は横）
+          </button>
+          <button id="upright" class="btn btn-border">
+            直立（正面、右向き、左向き、後向き、手は横）
+          </button>
+          <button id="genkidama" class="btn btn-border">
+            両手を上にあげる（元気玉っぽい感じ）
+          </button>
+          <button id="ryoute-sayu" class="btn btn-border">
+            両手を左右に伸ばす
+          </button>
+          <button id="kiennzan-right" class="btn btn-border">
+            右手を開いて上に伸ばす（気円斬風）
+          </button>
+          <button id="kiennzan-left" class="btn btn-border">
+            左手を開いて上に伸ばす（気円斬風）
+          </button>
+          <button id="bigbanattak-left" class="btn btn-border">
+            左手でビッグバンアタック
+          </button>
+          <!-- <button id="seiza" class="btn btn-border">正座（中腰含む）</button> -->
+          <!-- <button id="nonAction" class="btn btn-border">
+            その他アクション（PC操作など）
+          </button> -->
+        </div>
+        <div class="train-actions">
+          <p class="button-description">
+            学習したいアクションをクリック！エフェクトなし2
+          </p>
+          <button id="face-only" class="btn btn-border">
+            顔だけ（正面、右向き、左向き、後向き）
+          </button>
+          <button id="kiennzan-right" class="btn btn-border">
+            右手を開いて前に伸ばす（ビッグバンアタックの前版）
+          </button>
+          <button id="kiennzan-right" class="btn btn-border">
+            左手を開いて前に伸ばす（ビッグバンアタックの前版）
+          </button>
+          <button id="saveKamehameha_pose" class="btn btn-border">
+            かめはめ波構え
+          </button>
+          <button id="saveKamehameha_send" class="btn btn-border">
+            かめはめ波実行
+          </button>
+          <!-- <button id="seiza" class="btn btn-border">正座（中腰含む）</button> -->
+          <!-- <button id="nonAction" class="btn btn-border">
+            その他アクション（PC操作など）
+          </button> -->
+        </div>
+        <div class="train-actions">
+          <p class="button-description">
+            学習したいアクションをクリック！（エフェクトあり）
+          </p>
+          <button id="saveBigBangAttack" class="btn btn-border">
+            ビッグバンアタック
+          </button>
+
+          <!-- <button id="saveMakankousappou_pose" class="btn btn-border">
+            魔貫光殺砲構え
+          </button>
+          <button id="saveMakankousappou_send" class="btn btn-border">
+            魔貫光殺砲実行
+          </button>
+
+          <button id="kienzan_pose" class="btn btn-border">気円斬構え</button> -->
+
+          <button id="syunkanidou" class="btn btn-border">瞬間移動</button>
+
+          <button id="supersaiyajin" class="btn btn-border">
+            スーパーサイヤ人
+          </button>
+        </div>
+        <div class="train-actions">
+          <p class="button-description">
+            学習の停止や学習済みモデルのダウンロード
+          </p>
+          <button id="StopButton" class="btn btn-border">学習を停止</button>
+
+          <button id="downloadModelButton" class="btn btn-border">
+            モデルをダウンロード
+          </button>
+        </div>
       </div>
     </div>
     <script type="module" src="/src/train.ts"></script>

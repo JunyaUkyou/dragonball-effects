@@ -20,27 +20,19 @@ const canvasCtx = canvasElement.getContext('2d', { willReadFrequently: true });
 const statusElement = document.getElementById('status');
 // ビックバンアタック
 const saveBigBangAttack = document.getElementById('saveBigBangAttack'); // 学習ボタン
-// 魔貫光殺砲
-const saveMakankousappou_pose = document.getElementById(
-  'saveMakankousappou_pose'
-);
-const saveMakankousappou_send = document.getElementById(
-  'saveMakankousappou_send'
-);
+// // 魔貫光殺砲
+// const saveMakankousappou_pose = document.getElementById(
+//   'saveMakankousappou_pose'
+// );
+// const saveMakankousappou_send = document.getElementById(
+//   'saveMakankousappou_send'
+// );
 // かめはめ波
 const saveKamehameha_pose = document.getElementById('saveKamehameha_pose');
 const saveKamehameha_send = document.getElementById('saveKamehameha_send');
 
-// 気円斬構え
-const kienzan_pose = document.getElementById('kienzan_pose');
-
 // 直立
 const upright = document.getElementById('upright');
-// 正座
-const seiza = document.getElementById('seiza');
-
-// その他アクション
-const nonAction = document.getElementById('nonAction');
 
 // その他アクション
 const supersaiyajin = document.getElementById('supersaiyajin');
@@ -296,13 +288,13 @@ function addEventListeners() {
   saveBigBangAttack!.addEventListener('click', () =>
     startSaving(LABELS.BIGBANG_ATTACK)
   );
-  // 魔貫光殺砲学習ボタンクリック
-  saveMakankousappou_pose!.addEventListener('click', () =>
-    startSaving(LABELS.MAKANKOUSAPPOU_POSE)
-  );
-  saveMakankousappou_send!.addEventListener('click', () =>
-    startSaving(LABELS.MAKANKOUSAPPOU_SEND)
-  );
+  // // 魔貫光殺砲学習ボタンクリック
+  // saveMakankousappou_pose!.addEventListener('click', () =>
+  //   startSaving(LABELS.MAKANKOUSAPPOU_POSE)
+  // );
+  // saveMakankousappou_send!.addEventListener('click', () =>
+  //   startSaving(LABELS.MAKANKOUSAPPOU_SEND)
+  // );
   // かめはめ波学習ボタンクリック
   saveKamehameha_pose!.addEventListener('click', () =>
     startSaving(LABELS.KAMEHAMEHA_POSE)
@@ -310,16 +302,16 @@ function addEventListeners() {
   saveKamehameha_send!.addEventListener('click', () =>
     startSaving(LABELS.KAMEHAMEHA_SEND)
   );
-  // 気円斬構え
-  kienzan_pose!.addEventListener('click', () =>
-    startSaving(LABELS.KIENZAN_POSE)
-  );
+  // // 気円斬構え
+  // kienzan_pose!.addEventListener('click', () =>
+  //   startSaving(LABELS.KIENZAN_POSE)
+  // );
   // 直立（正面、右向き、左向き、手は横）
   upright!.addEventListener('click', () => startSaving(LABELS.UPRIGHT));
-  // 正座（中腰含む）
-  seiza!.addEventListener('click', () => startSaving(LABELS.SEIZA));
-  // その他学習ボタンクリック（PC操作など）
-  nonAction!.addEventListener('click', () => startSaving(LABELS.NONACTION));
+  // // 正座（中腰含む）
+  // seiza!.addEventListener('click', () => startSaving(LABELS.SEIZA));
+  // // その他学習ボタンクリック（PC操作など）
+  // nonAction!.addEventListener('click', () => startSaving(LABELS.NONACTION));
   // スーパーサイヤ人
   supersaiyajin!.addEventListener('click', () =>
     startSaving(LABELS.SUPERSAIYAJIN)

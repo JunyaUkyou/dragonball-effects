@@ -44,34 +44,39 @@ button.btn-border:hover {
   background: #000;
 }
 
-.buttons {
-  height: 600px;
-  display: flex;
-  justify-content: space-around;
-}
+#train-container {
+  .buttons {
+    height: 600px;
+    display: flex;
+    justify-content: space-around;
+  }
 
-.button-description {
-  font-size: 1.6rem;
-  font-weight: 800;
-  position: relative;
-  line-height: 1.4;
-  padding: 0.5em 1em;
-  display: inline-block;
-  border-bottom: solid 2px black;
-}
+  .button-description {
+    font-size: 1.6rem;
+    font-weight: 800;
+    position: relative;
+    line-height: 1.4;
+    padding: 0.5em 1em;
+    display: inline-block;
+    border-bottom: solid 2px black;
+  }
 
-.left {
-  display: flex;
-  flex-flow: column;
-  justify-content: space-between;
-}
+  .train-actions {
+    display: flex;
+    flex-flow: column;
+  }
+  .left {
+    display: flex;
+    flex-flow: column;
+    justify-content: space-between;
+  }
 
-.right {
-  display: flex;
-  flex-flow: column;
-  justify-content: space-between;
+  .right {
+    display: flex;
+    flex-flow: column;
+    justify-content: space-between;
+  }
 }
-
 /*推論*/
 .prediction-menu {
   margin: 20px 0;
