@@ -23,9 +23,13 @@ export class Main {
     this.bigBangAttack.run(x, y, z);
   }
 
-  runSuperSaiyajin(landmark: NormalizedLandmark[], isTest = false) {
-    console.log('runSuperSaiyajin', { landmark });
-    this.superSaiyajin.run(landmark, isTest);
+  runSuperSaiyajin(isTest = false) {
+    console.log('runSuperSaiyajin', { isTest });
+    this.superSaiyajin.run(isTest);
+  }
+
+  updateSuperSaiyajinLandmarks(landmarks: NormalizedLandmark[]) {
+    this.superSaiyajin.setLandmarks(landmarks);
   }
 
   // run(x: number, y: number, z: number) {
@@ -35,6 +39,9 @@ export class Main {
   animate = () => {
     // this.superSaiyajin.update();
     this.videoRenderer.render();
+    if (this.superSaiyajin.getIsRun()) {
+      this.superSaiyajin.animate();
+    }
     if (this.bigBangAttack.getIsRun()) {
       this.bigBangAttack.animate();
     }

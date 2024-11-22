@@ -86,7 +86,8 @@ function setupEventListeners() {
       landmarks[8].x = 89.23144936561584;
       landmarks[8].y = 77.24753022193909;
 
-      state.mainInstance?.runSuperSaiyajin(landmarks, true);
+      state.mainInstance?.updateSuperSaiyajinLandmarks(landmarks);
+      state.mainInstance?.runSuperSaiyajin(true);
     });
 }
 
@@ -136,8 +137,8 @@ function renderFrame() {
 }
 
 async function predictGesture() {
-  // エフェクトがアクティブな場合、ポーズ検出無効の場合、次のフレームへ移行
-  if (state.isEffectActive || !state.isPoseDetection) {
+  // ポーズ検出無効の場合、次のフレームへ移行
+  if (!state.isPoseDetection) {
     // window.requestAnimationFrame(predictGesture);
     return;
   }
@@ -152,6 +153,8 @@ async function predictGesture() {
     results.landmarks.length > 0
     //&& results.gestures[0][0].categoryName == 'None'
   ) {
+    state.mainInstance?.updateSuperSaiyajinLandmarks(results.landmarks[0]);
+
     const predictResult: KNNModelPredictResult = await predictLandmarks(
       classifier!,
       results

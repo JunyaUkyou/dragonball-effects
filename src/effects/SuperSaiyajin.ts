@@ -11,13 +11,37 @@ const NOSE = 0;
 
 export class SuperSaiyajin {
   private readonly scene: THREE.Scene;
+  private readonly texture: THREE.Texture;
+  private readonly hairMesh: THREE.Sprite;
+  private isRun: boolean = false;
+  private landmarks: NormalizedLandmark[] | null = null;
 
   constructor(scene: THREE.Scene) {
     this.scene = scene;
+    // テクスチャー
+    this.texture = new THREE.TextureLoader().load(
+      '/texture/supersaiyajin_hair.png'
+    );
+
+    // スプライトマテリアルを作成
+    const spriteMaterial = new THREE.SpriteMaterial({
+      map: this.texture,
+      transparent: true,
+    });
+    // スプライト作成
+    this.hairMesh = new THREE.Sprite(spriteMaterial);
     console.log('SuperSaiyajin constructor');
   }
 
-  run(landmark: NormalizedLandmark[], isTest = false) {
+  setLandmarks(landmarks: NormalizedLandmark[]) {
+    this.landmarks = landmarks;
+  }
+
+  run(isTest = false) {
+    if (!this.landmarks) {
+      return;
+    }
+    const landmark = this.landmarks;
     const leftEye = isTest
       ? landmark[LEFT_EYE]
       : convertThreejsPosition(landmark[LEFT_EYE]);
@@ -36,30 +60,19 @@ export class SuperSaiyajin {
 
     console.log({ leftEye, rightEye, nose, leftEar, rightEar });
 
-    // 髪型テクスチャをロード
-    const hairTexture = new THREE.TextureLoader().load(
-      '/texture/supersaiyajin_hair.png'
-    );
     // const hairMaterial = new THREE.MeshBasicMaterial({
     //   map: hairTexture,
     //   transparent: true,
     // }); // 透明度対応
     // const hairGeometry = new THREE.PlaneGeometry(150, 100); // 髪型のサイズを設定
 
-    // スプライトマテリアルを作成
-    const spriteMaterial = new THREE.SpriteMaterial({
-      map: hairTexture,
-      transparent: true,
-    });
-
     const width = (leftEar.x - rightEar.x) * 3;
     // const hight = width * 2.5;
     const hight = width;
     console.log({ width, hight });
 
-    // スプライトを作成
-    const hairMesh = new THREE.Sprite(spriteMaterial);
-    hairMesh.scale.set(width, hight, 1);
+    // スプライトの大きさを設定
+    this.hairMesh.scale.set(width, hight, 1);
 
     // const hairMesh = new THREE.Mesh(hairGeometry, hairMaterial);
     // テストで中心にだす
@@ -79,7 +92,7 @@ export class SuperSaiyajin {
     // console.log({ headCenterX, headCenterY, headCenterZ });
     // hairMesh.position.set(headCenterX, headCenterY + 0.2, headCenterZ * 0.1);
 
-    hairMesh.position.set(headCenterX, headCenterY, 0);
+    this.hairMesh.position.set(headCenterX, headCenterY, 0);
 
     // // 水平回転（Z軸回り）：左右の目を使って計算
     // const deltaY = rightEye.y - leftEye.y;
@@ -96,70 +109,85 @@ export class SuperSaiyajin {
     // hairMesh.rotation.x = verticalRotation; // X軸回り（垂直回転）
 
     // 髪型の位置をログで確認
-    console.log('Hair Mesh Position:', hairMesh.position);
+    console.log('Hair Mesh Position:', this.hairMesh.position);
 
     // メッシュをシーンに追加
-    this.scene.add(hairMesh);
+    this.scene.add(this.hairMesh);
 
     // デバッグ
     const gui = new dat.GUI({ width: 300 });
 
     gui
-      .add(hairMesh.position, 'x')
+      .add(this.hairMesh.position, 'x')
       .min(-500)
       .max(500)
       .step(1)
       .name('hairMeshPositionX');
     gui
-      .add(hairMesh.position, 'y')
+      .add(this.hairMesh.position, 'y')
       .min(-500)
       .max(500)
       .step(1)
       .name('hairMeshPositionY');
     gui
-      .add(hairMesh.position, 'z')
+      .add(this.hairMesh.position, 'z')
       .min(-500)
       .max(500)
       .step(1)
       .name('hairMeshPositionZ');
     gui
-      .add(hairMesh.rotation, 'x')
+      .add(this.hairMesh.rotation, 'x')
       .min(-500)
       .max(500)
       .step(0.1)
       .name('hairMeshRotationX');
     gui
-      .add(hairMesh.rotation, 'y')
+      .add(this.hairMesh.rotation, 'y')
       .min(-500)
       .max(500)
       .step(0.1)
       .name('hairMeshRotationY');
     gui
-      .add(hairMesh.rotation, 'z')
+      .add(this.hairMesh.rotation, 'z')
       .min(-500)
       .max(500)
       .step(0.1)
       .name('hairMeshRotationZ');
     gui
-      .add(hairMesh.scale, 'x')
+      .add(this.hairMesh.scale, 'x')
       .min(-500)
       .max(500)
       .step(0.1)
       .name('hairMeshScaleX');
     gui
-      .add(hairMesh.scale, 'y')
+      .add(this.hairMesh.scale, 'y')
       .min(-500)
       .max(500)
       .step(0.1)
       .name('hairMeshScaleY');
     gui
-      .add(hairMesh.scale, 'z')
+      .add(this.hairMesh.scale, 'z')
       .min(-500)
       .max(500)
       .step(0.1)
       .name('hairMeshScaleZ');
 
-    gui.add(spriteMaterial, 'fog').min(0).max(1).name('spriteMaterialFog');
     gui.show(true);
+
+    // エフェクト表示フラグON
+    this.isRun = true;
   }
+
+  getIsRun() {
+    return this.isRun;
+  }
+
+  animate = () => {
+    if (!this.isRun) {
+      return;
+    }
+    console.log('aaaaa!!!!!', this.landmarks);
+    // xの右方向に移動
+    this.hairMesh.position.x += 2;
+  };
 }
