@@ -1,5 +1,4 @@
 import './style.scss';
-// import { Main } from './bigbanattack/Main';
 import { Main } from './core/Main';
 import * as knnClassifier from '@tensorflow-models/knn-classifier';
 import {

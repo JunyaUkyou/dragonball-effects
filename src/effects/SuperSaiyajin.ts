@@ -53,7 +53,8 @@ export class SuperSaiyajin {
     });
 
     const width = (leftEar.x - rightEar.x) * 3;
-    const hight = width * 2.5;
+    // const hight = width * 2.5;
+    const hight = width;
     console.log({ width, hight });
 
     // スプライトを作成
@@ -68,8 +69,11 @@ export class SuperSaiyajin {
     const headCenterX = (leftEye.x + rightEye.x) / 2;
     // const headCenterY = (leftEye.y + rightEye.y) / 2;
 
+    const hairHeightCenter = hight / 2;
     const headCenterY =
-      leftEye.y < rightEye.y ? leftEye.y + 20 : rightEye.y + 20;
+      leftEye.y < rightEye.y
+        ? leftEye.y + 20 + hairHeightCenter
+        : rightEye.y + 20 + hairHeightCenter;
 
     // const headCenterZ = (leftEye.z + rightEye.z) / 2; // Z座標も考慮
     // console.log({ headCenterX, headCenterY, headCenterZ });
