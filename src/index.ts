@@ -155,6 +155,9 @@ async function predictGesture() {
   ) {
     state.mainInstance?.updateSuperSaiyajinLandmarks(results.landmarks[0]);
 
+    if (state.isEffectActive) {
+      return;
+    }
     const predictResult: KNNModelPredictResult = await predictLandmarks(
       classifier!,
       results
@@ -232,7 +235,7 @@ function showBigBangAttackEffect(landmarks: NormalizedLandmark[][]) {
 }
 
 function showSuperSaiyajinEffect(landmarks: NormalizedLandmark[][]) {
-  state.isEffectActive = true; // エフェクト開始
+  //state.isEffectActive = true; // エフェクト開始
   console.log('スーパーサイヤ人！！！！', { landmarks });
   state.mainInstance!.runSuperSaiyajin();
 
