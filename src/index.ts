@@ -161,7 +161,7 @@ async function predictGesture() {
     );
 
     // 同じラベルの検出回数をカウント
-    const label = predictResult.label;
+    const label = Number(predictResult.label);
     console.log({ label });
     if (detectionCount[label] !== undefined) {
       detectionCount[label] += 1;
@@ -234,7 +234,7 @@ function showBigBangAttackEffect(landmarks: NormalizedLandmark[][]) {
 function showSuperSaiyajinEffect(landmarks: NormalizedLandmark[][]) {
   state.isEffectActive = true; // エフェクト開始
   console.log('スーパーサイヤ人！！！！', { landmarks });
-  state.mainInstance!.runSuperSaiyajin(landmarks[0]);
+  state.mainInstance!.runSuperSaiyajin();
 
   // const leftEye = landmarks[0][LEFT_EYE];
   // const rightEye = landmarks[0][RIGHT_EYE];

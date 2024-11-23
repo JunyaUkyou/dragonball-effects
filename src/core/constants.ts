@@ -10,21 +10,33 @@ export const RENDERING_SIZE = {
 };
 
 export const LABELS = {
-  BIGBANG_ATTACK: '0',
-  MAKANKOUSAPPOU_POSE: '1',
-  MAKANKOUSAPPOU_SEND: '2',
-  KAMEHAMEHA_POSE: '3',
-  KAMEHAMEHA_SEND: '4',
-  KIENZAN_POSE: '5',
-  UPRIGHT: '6',
-  SEIZA: '7',
-  NONACTION: '8',
-  SUPERSAIYAJIN: '9',
-};
+  BIGBANG_ATTACK: 0,
+  WARK: 1,
+  UPRIGHT: 2,
+  GENKIDAMA: 3,
+  RYOUTE_SAYU: 4,
+  KIENNZAN_RIGHT: 5,
+  KIENNZAN_LEFT: 6,
+  KAMEHAMEHA_POSE: 7,
+  KAMEHAMEHA_SEND: 8,
+  SYUNKANIDOU: 9,
+  SUPERSAIYAJIN: 10,
+  STOP: 11,
+  DOWNLOAD: 12,
+} as const;
 export const REQUIRED_DETECTIONS = 3;
 export const PREDICTION_INTERVAL = 1000;
 
-export const TRAIN_ACTIONS = [
+export const TRAIN_ACTIONS: {
+  id: string;
+  label: string;
+  key: keyof typeof LABELS;
+}[] = [
+  {
+    id: 'saveBigBangAttack',
+    label: 'ビッグバンアタック',
+    key: 'BIGBANG_ATTACK',
+  },
   { id: 'wark', label: '歩く', key: 'WARK' },
   { id: 'upright', label: '直立', key: 'UPRIGHT' },
   { id: 'genkidama', label: '元気玉', key: 'GENKIDAMA' },
@@ -46,11 +58,7 @@ export const TRAIN_ACTIONS = [
     label: 'かめはめ波実行',
     key: 'KAMEHAMEHA_SEND',
   },
-  {
-    id: 'saveBigBangAttack',
-    label: 'ビッグバンアタック',
-    key: 'BIGBANG_ATTACK',
-  },
+
   { id: 'syunkanidou', label: '瞬間移動', key: 'SYUNKANIDOU' },
   { id: 'supersaiyajin', label: 'スーパーサイヤ人', key: 'SUPERSAIYAJIN' },
   // { id: 'StopButton', label: '学習を停止', key: 'STOP' },
