@@ -22,7 +22,7 @@ import {
   PREDICTION_INTERVAL,
   REQUIRED_DETECTIONS,
 } from './core/constants';
-
+import { LabelActionType } from './types';
 const MIDDLE_FINGER_MCP = 20;
 const isPose = true;
 
@@ -39,11 +39,10 @@ const state = {
 // 現在のステータス
 const statusMessageElement = document.getElementById('current-status-message');
 
-// ポーズの検出回数を追跡
-const detectionCount: { [key: string]: number } = {
-  [LABELS.BIGBANG_ATTACK]: 0,
-  [LABELS.SUPERSAIYAJIN]: 9,
-};
+const detectionCount: Record<number, number> = Object.values(LABELS).reduce(
+  (acc, label) => ({ ...acc, [label]: 0 }),
+  {}
+);
 
 console.log('こんにちは!!!!');
 
@@ -164,10 +163,18 @@ async function predictGesture() {
     );
 
     // 同じラベルの検出回数をカウント
-    const label = Number(predictResult.label);
+    const label = Number(predictResult.label) as LabelActionType;
     console.log({ label });
-    if (detectionCount[label] !== undefined) {
-      detectionCount[label] += 1;
+    const validLabels = Object.values(LABELS);
+    if (validLabels.includes(label)) {
+      // 無効ラベルのリセット
+      Object.keys(detectionCount).forEach((key) => {
+        if (Number(key) === label) {
+          detectionCount[label] += 1;
+        } else {
+          detectionCount[label] = 0;
+        }
+      });
     }
 
     if (label === LABELS.BIGBANG_ATTACK || label === LABELS.SUPERSAIYAJIN) {

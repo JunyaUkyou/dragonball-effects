@@ -15,9 +15,7 @@ import {
   LABELS,
   TRAIN_ACTIONS,
 } from './core/constants';
-
-// 型定義 LABELSの値のみ許容する
-type LabelActionType = (typeof LABELS)[keyof typeof LABELS];
+import { LabelActionType } from './types';
 
 const classifier = knnClassifier.create(); // KNN分類器
 const videoElement = <HTMLVideoElement>document.getElementById('video'); // カメラ映像
