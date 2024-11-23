@@ -163,6 +163,10 @@ function saveLandmarks(
 
   // 上限に達していない場合のみ登録
   if (currentLabelCount > MAX_SAMPLES_PER_LABEL) {
+    if (statusElement!.textContent?.indexOf('上限達成') === -1) {
+      statusElement!.textContent += ' 上限達成';
+    }
+
     console.log(`Max samples reached for label ${labelAction}.`);
     return;
   }
