@@ -256,7 +256,12 @@ function addEventListeners() {
   TRAIN_ACTIONS.forEach((trainAction) => {
     const button = document.getElementById(trainAction.id);
     if (button) {
-      button.addEventListener('click', () => startSaving(trainAction));
+      button.addEventListener('click', () => {
+        // 5秒後に実行
+        setTimeout(() => {
+          startSaving(trainAction);
+        }, 5000);
+      });
     } else {
       console.warn(`Button with id '${trainAction.id}' not found.`);
     }
