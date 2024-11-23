@@ -25,6 +25,9 @@ export const LABELS = {
   HAND_TO_EAR_GESTURE: 12,
   TONIKAKU_POSE: 13,
   TONIKAKU_FINISH: 14,
+  FACE_ONLY: 15,
+  RIGHT_FRONT: 16,
+  LEFT_FRONT: 17,
 } as const;
 export const REQUIRED_DETECTIONS = 3;
 export const PREDICTION_INTERVAL = 1000;
@@ -72,5 +75,20 @@ export const TRAIN_ACTIONS: {
     id: 'tonikaku_finish',
     label: '明るい安村フィニッシュ',
     key: 'TONIKAKU_FINISH',
+  },
+  {
+    id: 'face-only',
+    label: '顔だけ',
+    key: 'FACE_ONLY',
+  },
+  {
+    id: 'right-front',
+    label: '右手前',
+    key: 'RIGHT_FRONT',
+  },
+  {
+    id: 'left-front',
+    label: '左手前',
+    key: 'LEFT_FRONT',
   },
 ];
