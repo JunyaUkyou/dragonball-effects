@@ -17,12 +17,14 @@ export const LABELS = {
   RYOUTE_SAYU: 4,
   KIENNZAN_RIGHT: 5,
   KIENNZAN_LEFT: 6,
-  KAMEHAMEHA_POSE: 7,
-  KAMEHAMEHA_SEND: 8,
-  SYUNKANIDOU: 9,
-  SUPERSAIYAJIN: 10,
-  STOP: 11,
-  DOWNLOAD: 12,
+  BIGBANG_ATTACK_LEFT: 7,
+  KAMEHAMEHA_POSE: 8,
+  KAMEHAMEHA_SEND: 9,
+  SYUNKANIDOU: 10,
+  SUPERSAIYAJIN: 11,
+  HAND_TO_EAR_GESTURE: 12,
+  TONIKAKU_POSE: 13,
+  TONIKAKU_FINISH: 14,
 } as const;
 export const REQUIRED_DETECTIONS = 3;
 export const PREDICTION_INTERVAL = 1000;
@@ -46,7 +48,7 @@ export const TRAIN_ACTIONS: {
   {
     id: 'bigbanattak-left',
     label: 'ビッグバンアタック（左）',
-    key: 'BIGBANG_ATTACK',
+    key: 'BIGBANG_ATTACK_LEFT',
   },
   {
     id: 'saveKamehameha_pose',
@@ -58,9 +60,17 @@ export const TRAIN_ACTIONS: {
     label: 'かめはめ波実行',
     key: 'KAMEHAMEHA_SEND',
   },
-
   { id: 'syunkanidou', label: '瞬間移動', key: 'SYUNKANIDOU' },
   { id: 'supersaiyajin', label: 'スーパーサイヤ人', key: 'SUPERSAIYAJIN' },
-  // { id: 'StopButton', label: '学習を停止', key: 'STOP' },
-  // { id: 'downloadModelButton', label: 'モデルをダウンロード', key: 'DOWNLOAD' },
+  {
+    id: 'handToEarGesture',
+    label: ' 両耳に手をあてる',
+    key: 'HAND_TO_EAR_GESTURE',
+  },
+  { id: 'tonikaku_pose', label: '明るい安村ポーズ', key: 'TONIKAKU_POSE' },
+  {
+    id: 'tonikaku_finish',
+    label: '明るい安村フィニッシュ',
+    key: 'TONIKAKU_FINISH',
+  },
 ];
