@@ -31,6 +31,8 @@ export class SuperSaiyajin {
     });
     // スプライト作成
     this.hairMesh = new THREE.Sprite(spriteMaterial);
+    // 下端を基準点に設定
+    this.hairMesh.center.set(0.5, 0);
     console.log('SuperSaiyajin constructor');
   }
 
@@ -64,19 +66,14 @@ export class SuperSaiyajin {
 
   getHairMeshPosition(
     leftEye: NormalizedLandmark,
-    rightEye: NormalizedLandmark,
-    hairMeshScale: {
-      x: number;
-      y: number;
-      z: number;
-    }
+    rightEye: NormalizedLandmark
   ) {
     // // 髪型の位置を設定（中央位置）
     const x = (leftEye.x + rightEye.x) / 2;
-    // const headCenterY = (leftEye.y + rightEye.y) / 2;
 
-    const hairHeightCenter = hairMeshScale.y / 2;
-    const y = Math.max(leftEye.y, rightEye.y) + 20 + hairHeightCenter;
+    // 両目の Y 座標（平均値で安定させる）
+    const eyeY = (leftEye.y + rightEye.y) / 2;
+    const y = eyeY + 20;
 
     // 2D表示なので0固定
     const z = 0;
@@ -112,11 +109,7 @@ export class SuperSaiyajin {
     // console.log({ headCenterX, headCenterY, headCenterZ });
     // hairMesh.position.set(headCenterX, headCenterY + 0.2, headCenterZ * 0.1);
 
-    const hairMeshPosition = this.getHairMeshPosition(
-      leftEye,
-      rightEye,
-      hairMeshScale
-    );
+    const hairMeshPosition = this.getHairMeshPosition(leftEye, rightEye);
     console.log({ leftEye, rightEye });
     this.hairMesh.position.set(
       hairMeshPosition.x,
@@ -228,11 +221,7 @@ export class SuperSaiyajin {
     );
 
     // 髪型のポジションを設定
-    const hairMeshPosition = this.getHairMeshPosition(
-      leftEye,
-      rightEye,
-      hairMeshScale
-    );
+    const hairMeshPosition = this.getHairMeshPosition(leftEye, rightEye);
     this.hairMesh.position.set(
       hairMeshPosition.x,
       hairMeshPosition.y,
