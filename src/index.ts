@@ -131,10 +131,6 @@ async function setupVideoStream() {
   return videoElement;
 }
 
-function renderFrame() {
-  window.requestAnimationFrame(renderFrame);
-}
-
 async function predictGesture() {
   // ポーズ検出無効の場合、次のフレームへ移行
   if (!state.isPoseDetection) {
@@ -164,15 +160,15 @@ async function predictGesture() {
 
     // 同じラベルの検出回数をカウント
     const label = Number(predictResult.label) as LabelActionType;
-    console.log({ label });
     const validLabels = Object.values(LABELS);
     if (validLabels.includes(label)) {
       // 無効ラベルのリセット
       Object.keys(detectionCount).forEach((key) => {
-        if (Number(key) === label) {
-          detectionCount[label] += 1;
+        const numKey = Number(key);
+        if (numKey === label) {
+          detectionCount[numKey] += 1;
         } else {
-          detectionCount[label] = 0;
+          detectionCount[numKey] = 0;
         }
       });
     }
@@ -242,7 +238,7 @@ function showBigBangAttackEffect(landmarks: NormalizedLandmark[][]) {
 }
 
 function showSuperSaiyajinEffect(landmarks: NormalizedLandmark[][]) {
-  //state.isEffectActive = true; // エフェクト開始
+  state.isEffectActive = true; // エフェクト開始
   console.log('スーパーサイヤ人！！！！', { landmarks });
   state.mainInstance!.runSuperSaiyajin();
 
