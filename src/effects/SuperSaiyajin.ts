@@ -15,6 +15,7 @@ export class SuperSaiyajin {
   private readonly hairMesh: THREE.Sprite;
   private isRun: boolean = false;
   private landmarks: NormalizedLandmark[] | null = null;
+  private baseDistance = 1.5;
 
   constructor(scene: THREE.Scene) {
     this.scene = scene;
@@ -54,9 +55,10 @@ export class SuperSaiyajin {
   }
 
   getHairMeshScale(leftEar: NormalizedLandmark, rightEar: NormalizedLandmark) {
-    const x = (leftEar.x - rightEar.x) * 3;
+    const x = (leftEar.x - rightEar.x) * 3.3;
     const y = x;
-    const z = 1;
+    // 2D表示なので0固定
+    const z = 0;
     return { x, y, z };
   }
 
@@ -74,14 +76,16 @@ export class SuperSaiyajin {
     // const headCenterY = (leftEye.y + rightEye.y) / 2;
 
     const hairHeightCenter = hairMeshScale.y / 2;
-    const y =
-      leftEye.y < rightEye.y
-        ? leftEye.y + 20 + hairHeightCenter
-        : rightEye.y + 20 + hairHeightCenter;
+    const y = Math.max(leftEye.y, rightEye.y) + 20 + hairHeightCenter;
 
+    // 2D表示なので0固定
     const z = 0;
 
     return { x, y, z };
+  }
+
+  getScaleFactor(z: number) {
+    return this.baseDistance / (this.baseDistance - z);
   }
 
   run() {
@@ -90,11 +94,19 @@ export class SuperSaiyajin {
       return; // landmarksが取得できない場合は終了
     }
     // 髪型の大きさ、位置を決める顔パーツのランドマークを取得
-    const { leftEye, rightEye, nose, leftEar, rightEar } = landmarks;
+    const { leftEye, rightEye, leftEar, rightEar, nose } = landmarks;
 
     // スプライトの大きさを設定
     const hairMeshScale = this.getHairMeshScale(leftEar, rightEar);
-    this.hairMesh.scale.set(hairMeshScale.x, hairMeshScale.y, hairMeshScale.z);
+
+    // 奥行きに応じたスケールの調整
+    const scaleFactor = this.getScaleFactor(nose.z);
+
+    this.hairMesh.scale.set(
+      hairMeshScale.x * scaleFactor,
+      hairMeshScale.y * scaleFactor,
+      hairMeshScale.z
+    );
 
     // const headCenterZ = (leftEye.z + rightEye.z) / 2; // Z座標も考慮
     // console.log({ headCenterX, headCenterY, headCenterZ });
@@ -105,6 +117,7 @@ export class SuperSaiyajin {
       rightEye,
       hairMeshScale
     );
+    console.log({ leftEye, rightEye });
     this.hairMesh.position.set(
       hairMeshPosition.x,
       hairMeshPosition.y,
@@ -175,6 +188,13 @@ export class SuperSaiyajin {
       .step(0.1)
       .name('hairMeshScaleZ');
 
+    gui
+      .add({ baseDistance: this.baseDistance }, 'baseDistance', 1, 5, 0.1)
+      .onChange((value: number) => {
+        // baseDistance をリアルタイムで調整
+        this.baseDistance = value;
+      });
+
     gui.show(true);
 
     // エフェクト表示フラグON
@@ -194,15 +214,24 @@ export class SuperSaiyajin {
     if (!landmarks) {
       return;
     }
-    console.log('aaaaa!!!!!', landmarks);
 
     // 髪型の大きさ、位置を決める顔パーツのランドマークを取得
-    const { leftEye, rightEye, nose, leftEar, rightEar } = landmarks;
+    const { leftEye, rightEye, leftEar, rightEar, nose } = landmarks;
 
+    const hairMeshScale = this.getHairMeshScale(leftEar, rightEar);
+    // 奥行きに応じたスケールの調整
+    const scaleFactor = this.getScaleFactor(nose.z);
+    this.hairMesh.scale.set(
+      hairMeshScale.x * scaleFactor,
+      hairMeshScale.y * scaleFactor,
+      hairMeshScale.z
+    );
+
+    // 髪型のポジションを設定
     const hairMeshPosition = this.getHairMeshPosition(
       leftEye,
       rightEye,
-      this.hairMesh.scale
+      hairMeshScale
     );
     this.hairMesh.position.set(
       hairMeshPosition.x,
