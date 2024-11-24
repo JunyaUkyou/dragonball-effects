@@ -33,80 +33,83 @@ export class SuperSaiyajin {
     console.log('SuperSaiyajin constructor');
   }
 
+  /**ランドマーク情報を設定する */
   setLandmarks(landmarks: NormalizedLandmark[]) {
     this.landmarks = landmarks;
   }
 
-  run(isTest = false) {
+  /**ランドマーク情報を取得する */
+  getLandmarks() {
     if (!this.landmarks) {
-      return;
+      return null;
     }
-    const landmark = this.landmarks;
-    const leftEye = isTest
-      ? landmark[LEFT_EYE]
-      : convertThreejsPosition(landmark[LEFT_EYE]);
-    const rightEye = isTest
-      ? landmark[RIGHT_EYE]
-      : convertThreejsPosition(landmark[RIGHT_EYE]);
-    const nose = isTest
-      ? landmark[NOSE]
-      : convertThreejsPosition(landmark[NOSE]);
-    const leftEar = isTest
-      ? landmark[LEFT_EAR]
-      : convertThreejsPosition(landmark[LEFT_EAR]);
-    const rightEar = isTest
-      ? landmark[RIGHT_EAR]
-      : convertThreejsPosition(landmark[RIGHT_EAR]);
 
-    console.log({ leftEye, rightEye, nose, leftEar, rightEar });
+    const leftEye = convertThreejsPosition(this.landmarks[LEFT_EYE]);
+    const rightEye = convertThreejsPosition(this.landmarks[RIGHT_EYE]);
+    const nose = convertThreejsPosition(this.landmarks[NOSE]);
+    const leftEar = convertThreejsPosition(this.landmarks[LEFT_EAR]);
+    const rightEar = convertThreejsPosition(this.landmarks[RIGHT_EAR]);
 
-    // const hairMaterial = new THREE.MeshBasicMaterial({
-    //   map: hairTexture,
-    //   transparent: true,
-    // }); // 透明度対応
-    // const hairGeometry = new THREE.PlaneGeometry(150, 100); // 髪型のサイズを設定
+    return { leftEye, rightEye, nose, leftEar, rightEar };
+  }
 
-    const width = (leftEar.x - rightEar.x) * 3;
-    // const hight = width * 2.5;
-    const hight = width;
-    console.log({ width, hight });
+  getHairMeshScale(leftEar: NormalizedLandmark, rightEar: NormalizedLandmark) {
+    const x = (leftEar.x - rightEar.x) * 3;
+    const y = x;
+    const z = 1;
+    return { x, y, z };
+  }
 
-    // スプライトの大きさを設定
-    this.hairMesh.scale.set(width, hight, 1);
-
-    // const hairMesh = new THREE.Mesh(hairGeometry, hairMaterial);
-    // テストで中心にだす
-    //hairMesh.position.set(0, 0, 0);
-
+  getHairMeshPosition(
+    leftEye: NormalizedLandmark,
+    rightEye: NormalizedLandmark,
+    hairMeshScale: {
+      x: number;
+      y: number;
+      z: number;
+    }
+  ) {
     // // 髪型の位置を設定（中央位置）
-    const headCenterX = (leftEye.x + rightEye.x) / 2;
+    const x = (leftEye.x + rightEye.x) / 2;
     // const headCenterY = (leftEye.y + rightEye.y) / 2;
 
-    const hairHeightCenter = hight / 2;
-    const headCenterY =
+    const hairHeightCenter = hairMeshScale.y / 2;
+    const y =
       leftEye.y < rightEye.y
         ? leftEye.y + 20 + hairHeightCenter
         : rightEye.y + 20 + hairHeightCenter;
+
+    const z = 0;
+
+    return { x, y, z };
+  }
+
+  run() {
+    const landmarks = this.getLandmarks();
+    if (!landmarks) {
+      return; // landmarksが取得できない場合は終了
+    }
+    // 髪型の大きさ、位置を決める顔パーツのランドマークを取得
+    const { leftEye, rightEye, nose, leftEar, rightEar } = landmarks;
+
+    // スプライトの大きさを設定
+    const hairMeshScale = this.getHairMeshScale(leftEar, rightEar);
+    this.hairMesh.scale.set(hairMeshScale.x, hairMeshScale.y, hairMeshScale.z);
 
     // const headCenterZ = (leftEye.z + rightEye.z) / 2; // Z座標も考慮
     // console.log({ headCenterX, headCenterY, headCenterZ });
     // hairMesh.position.set(headCenterX, headCenterY + 0.2, headCenterZ * 0.1);
 
-    this.hairMesh.position.set(headCenterX, headCenterY, 0);
-
-    // // 水平回転（Z軸回り）：左右の目を使って計算
-    // const deltaY = rightEye.y - leftEye.y;
-    // const deltaX = rightEye.x - leftEye.x;
-    // const horizontalRotation = Math.atan2(deltaY, deltaX); // 水平方向の回転角
-
-    // // 垂直回転（X軸回り）：鼻と目の中心を使って計算
-    // const eyeCenterZ = (leftEye.z + rightEye.z) / 2;
-    // const deltaZ = eyeCenterZ - nose.z;
-    // const verticalRotation = Math.atan2(deltaZ, nose.y - headCenterY); // 垂直方向の回転角
-
-    // // メッシュの回転を適用
-    // hairMesh.rotation.z = -horizontalRotation; // Z軸回り（水平回転）
-    // hairMesh.rotation.x = verticalRotation; // X軸回り（垂直回転）
+    const hairMeshPosition = this.getHairMeshPosition(
+      leftEye,
+      rightEye,
+      hairMeshScale
+    );
+    this.hairMesh.position.set(
+      hairMeshPosition.x,
+      hairMeshPosition.y,
+      hairMeshPosition.z
+    );
 
     // 髪型の位置をログで確認
     console.log('Hair Mesh Position:', this.hairMesh.position);
@@ -186,8 +189,28 @@ export class SuperSaiyajin {
     if (!this.isRun) {
       return;
     }
-    console.log('aaaaa!!!!!', this.landmarks);
+    const landmarks = this.getLandmarks();
+    // landmarksが取得できない場合は終了
+    if (!landmarks) {
+      return;
+    }
+    console.log('aaaaa!!!!!', landmarks);
+
+    // 髪型の大きさ、位置を決める顔パーツのランドマークを取得
+    const { leftEye, rightEye, nose, leftEar, rightEar } = landmarks;
+
+    const hairMeshPosition = this.getHairMeshPosition(
+      leftEye,
+      rightEye,
+      this.hairMesh.scale
+    );
+    this.hairMesh.position.set(
+      hairMeshPosition.x,
+      hairMeshPosition.y,
+      hairMeshPosition.z
+    );
+
     // xの右方向に移動
-    this.hairMesh.position.x += 2;
+    //this.hairMesh.position.x += 2;
   };
 }
