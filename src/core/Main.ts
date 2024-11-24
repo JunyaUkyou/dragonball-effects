@@ -25,7 +25,7 @@ export class Main {
 
   runSuperSaiyajin(isTest = false) {
     console.log('runSuperSaiyajin', { isTest });
-    this.superSaiyajin.run(isTest);
+    this.superSaiyajin.run();
   }
 
   updateSuperSaiyajinLandmarks(landmarks: NormalizedLandmark[]) {
