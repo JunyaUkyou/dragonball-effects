@@ -36,6 +36,10 @@ export class Main {
   //   console.log('core/Main.ts run ', { x, y, z });
   // }
 
+  captureFrame() {
+    this.videoRenderer.captureFrame();
+  }
+
   animate = () => {
     // this.superSaiyajin.update();
     this.videoRenderer.render();

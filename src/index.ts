@@ -60,6 +60,11 @@ function setupEventListeners() {
   document.getElementById('aaaaaaaaaaaa')?.addEventListener('click', () => {
     state.mainInstance?.runBigBangAttack(0, 0, 0);
   });
+
+  document.getElementById('captureFrame')?.addEventListener('click', () => {
+    state.mainInstance?.captureFrame();
+  });
+
   // ボタンリクック
   document
     .getElementById('test_supersaiyajin')
