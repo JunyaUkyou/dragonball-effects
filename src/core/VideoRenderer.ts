@@ -90,7 +90,7 @@ export class VideoRenderer {
       new THREE.PlaneGeometry(this.renderWidth, renderHeight),
       roomMaterial
     );
-    this.roomPlane.position.z = -1;
+    this.roomPlane.position.z = -2;
 
     this.scene.add(this.roomPlane);
 
