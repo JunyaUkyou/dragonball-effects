@@ -57,7 +57,7 @@ export class SuperSaiyajin {
   }
 
   getHairMeshScale(leftEar: NormalizedLandmark, rightEar: NormalizedLandmark) {
-    const x = (leftEar.x - rightEar.x) * 3.3;
+    const x = (leftEar.x - rightEar.x) * 3.5;
     const y = x;
     // 2D表示なので0固定
     const z = 0;
@@ -73,7 +73,7 @@ export class SuperSaiyajin {
 
     // 両目の Y 座標（平均値で安定させる）
     const eyeY = (leftEye.y + rightEye.y) / 2;
-    const y = eyeY + 20;
+    const y = eyeY - 5;
 
     // 2D表示なので0固定
     const z = 0;
@@ -109,7 +109,8 @@ export class SuperSaiyajin {
     // console.log({ headCenterX, headCenterY, headCenterZ });
     // hairMesh.position.set(headCenterX, headCenterY + 0.2, headCenterZ * 0.1);
 
-    const hairMeshPosition = this.getHairMeshPosition(leftEye, rightEye);
+    const hairMeshPosition = this.getHairMeshPosition(leftEar, rightEar);
+    // const hairMeshPosition = this.getHairMeshPosition(leftEye, rightEye);
     console.log({ leftEye, rightEye });
     this.hairMesh.position.set(
       hairMeshPosition.x,
@@ -221,7 +222,7 @@ export class SuperSaiyajin {
     );
 
     // 髪型のポジションを設定
-    const hairMeshPosition = this.getHairMeshPosition(leftEye, rightEye);
+    const hairMeshPosition = this.getHairMeshPosition(leftEar, rightEar);
     this.hairMesh.position.set(
       hairMeshPosition.x,
       hairMeshPosition.y,
