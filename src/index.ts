@@ -59,6 +59,7 @@ function setupEventListeners() {
   // ボタンリクック
   document.getElementById('aaaaaaaaaaaa')?.addEventListener('click', () => {
     state.mainInstance?.runBigBangAttack(0, 0, 0);
+    state.mainInstance?.runMajinBuu(-700, 300, 0);
   });
 
   document.getElementById('captureFrame')?.addEventListener('click', () => {
