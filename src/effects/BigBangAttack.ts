@@ -1,14 +1,15 @@
 import * as THREE from 'three';
 import { Sphere } from './Sphere';
 import { SparkEmitter } from './SparkEmitter';
-//import { SparkEmitter2 } from './SparkEmitter2';
-import { RENDERING_SIZE } from '../core/constants';
+import { RENDERING_HALF_SIZE } from '../core/constants';
+
+const DEFAULT_SIZE = 32;
 
 export class BigBangAttack {
+  private readonly scene: THREE.Scene;
   private readonly texture: THREE.Texture;
   private readonly sphere: Sphere;
-  private readonly sparkEmitter: SparkEmitter;
-  //private readonly sparkEmitter: SparkEmitter2;
+  // private readonly sparkEmitter: SparkEmitter;
 
   private isRun: boolean = false;
 
@@ -16,32 +17,25 @@ export class BigBangAttack {
   private scaleIncrement: number = 0.1;
 
   constructor(scene: THREE.Scene) {
+    this.scene = scene;
     console.log('BigBangAttack constructor');
 
     // テクスチャー
     this.texture = new THREE.TextureLoader().load('/texture/3658520_s.jpg');
 
-    // エネルギー弾の球体を作成しシーンに追加
-    // const spherePositionX = -100;
-    // const spherePositionY = 40;
-    // const spherePositionZ = 20;
-
-    // ジェスチャー認識後、エネルギー弾を表示する時に映像がフリーズする事があったため
-    // 映像描写時に見えない場所にエネルギー弾を作っておく
+    // ビッグバンアタックの球体を作成
     this.sphere = new Sphere({
       texture: this.texture,
       radius: 10,
-      width: 32,
-      height: 32,
+      width: DEFAULT_SIZE,
+      height: DEFAULT_SIZE,
     });
-    this.sphere.mesh.position.set(0, -10000, 0);
-    scene.add(this.sphere.mesh);
 
     // SparkEmitter の追加
     //const spherePositionZ = 20;
-    this.sparkEmitter = new SparkEmitter();
+    // this.sparkEmitter = new SparkEmitter();
     //this.sparkEmitter = new SparkEmitter2();
-    scene.add(this.sparkEmitter); // スパークをシーンに追加
+    // scene.add(this.sparkEmitter); // スパークをシーンに追加
 
     // アニメーション開始
     //this.animate();
@@ -60,10 +54,10 @@ export class BigBangAttack {
     this.sphere.mesh.position.set(x, y, z);
     // エフェクト表示フラグON
     this.isRun = true;
-
-    //this.scene.add(this.sphere.mesh); // 球体をシーンに追加
+    // 球体をシーンに追加
+    this.scene.add(this.sphere.mesh);
     // スパークを画面表示位置に移動する
-    this.sparkEmitter.positionChange(x, y);
+    //this.sparkEmitter.positionChange(x, y);
     //this.scene.add(this.sparkEmitter); // スパークをシーンに追加
   }
 
@@ -79,13 +73,44 @@ export class BigBangAttack {
 
   private startMovingSphere() {
     this.sphere.mesh.position.x -= 100.0; // 動きを滑らかに調整
-    if (this.sphere.mesh.position.x < (RENDERING_SIZE.width / 2) * -1) {
+    // 現在の球体の半分サイズを取得
+    const currentSphereWidth = DEFAULT_SIZE * this.sphere.mesh.scale.x;
+    const currentSphereHalfWidth = currentSphereWidth / 2;
+
+    if (
+      this.sphere.mesh.position.x <
+      (RENDERING_HALF_SIZE.width + currentSphereHalfWidth) * -1
+    ) {
+      console.log('最終的な球体の大きさ', this.sphere.mesh);
       console.log('移動停止', this.sphere.mesh.position.x);
       this.isRun = false;
       this.scaleIncrement = 0.1;
+
+      // シーンから削除
+      this.removeMesh();
+
       return; // アニメーション終了
     }
   }
+
+  removeMesh = () => {
+    if (this.sphere.mesh) {
+      // シーンから削除
+      this.scene.remove(this.sphere.mesh);
+
+      // リソースの解放
+      if (this.sphere.mesh.geometry) {
+        this.sphere.mesh.geometry.dispose();
+      }
+      if (this.sphere.mesh.material) {
+        if (Array.isArray(this.sphere.mesh.material)) {
+          this.sphere.mesh.material.forEach((material) => material.dispose());
+        } else {
+          this.sphere.mesh.material.dispose();
+        }
+      }
+    }
+  };
 
   updateRotate = (second = 1000, offset = 2) => {
     this.texture.offset.x = performance.now() / second / offset;
@@ -116,7 +141,7 @@ export class BigBangAttack {
     // エネルギー弾の大きさ
     this.updateSphere();
     // SparkEmitter の更新処理
-    this.sparkEmitter.update();
+    //this.sparkEmitter.update();
 
     // エネルギー弾の大きさに応じて色や透明度を調整
     const scaleX = this.sphere.mesh.scale.x;
@@ -135,42 +160,25 @@ export class BigBangAttack {
     if (scaleX > 4 && scaleX < 6) {
       this.scaleIncrement = 0.03;
       this.updateRotate(1000, 1);
-
-      console.log('aaaa');
     } else if (scaleX > 6 && scaleX < 8) {
       this.scaleIncrement = 0.03;
       this.updateRotate(1000, 1);
-
-      console.log('bbbb');
       statusMessageElement!.textContent = '天さん！僕の超能力が効かない！';
     } else if (scaleX > 8 && scaleX < 10) {
-      console.log('色かわらない');
       statusMessageElement!.textContent = '地球もろとも消すつもりか!!!!';
     } else if (scaleX > 10 && scaleX < 11) {
-      console.log('色かわらない2');
       statusMessageElement!.textContent = 'うわぁぁぁぁ!!!!';
     } else if (scaleX > 11) {
       statusMessageElement!.textContent = 'さよなら天さん、、';
-      console.log('ccccc');
+
       // スパークを画面表示外に移動する
-      this.sparkEmitter.positionChange(0, -10000);
+      //this.sparkEmitter.positionChange(0, -10000);
       //this.scene.remove(this.sparkEmitter);
       //this.sparkEmitter.clearAll();
 
       this.scaleIncrement = 0;
       // エネルギー弾の移動
       this.startMovingSphere();
-      // setTimeout(() => {
-      //   //this.scene.remove(this.sparkEmitter); //スパーク削除
-      //   this.startMovingSphere(); // 球体の移動を開始
-      // }, 4000); // 4秒後に移動開始
     }
-
-    // this.renderer.render(this.scene, this.camera);
-    // const id = requestAnimationFrame(this.animate);
-
-    // 描画をやめる
-    // const cancel = document.getElementById('cancel');
-    // cancel?.addEventListener('click', () => cancelAnimationFrame(id));
   };
 }

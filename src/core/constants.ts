@@ -9,6 +9,11 @@ export const RENDERING_SIZE = {
   height: 600,
 };
 
+export const RENDERING_HALF_SIZE = {
+  width: RENDERING_SIZE.width / 2,
+  height: RENDERING_SIZE.height / 2,
+};
+
 export const LABELS = {
   BIGBANG_ATTACK: 0,
   WARK: 1,
