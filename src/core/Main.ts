@@ -24,6 +24,14 @@ export class Main {
     this.animate();
   }
 
+  isEffectInProgress() {
+    return (
+      this.bigBangAttack.getIsRun() ||
+      this.superSaiyajin.getIsRun() ||
+      this.teleportation.getIsRun()
+    );
+  }
+
   runBigBangAttack(x: number, y: number, z: number) {
     this.bigBangAttack.run(x, y, z);
   }

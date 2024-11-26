@@ -29,7 +29,7 @@ export class Teleportation extends BaseEffect {
 
   async run() {
     this.isRun = true;
-    this.liveCommentary.updateMessage('瞬間移動だ！！');
+    //this.liveCommentary.updateMessage('瞬間移動だ！！');
     this.roomPlane.position.z = 1;
 
     setTimeout(() => {

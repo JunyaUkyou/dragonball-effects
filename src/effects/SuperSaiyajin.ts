@@ -89,6 +89,9 @@ export class SuperSaiyajin extends BaseEffect {
     if (!landmarks) {
       return; // landmarksが取得できない場合は終了
     }
+    // エフェクト表示フラグON
+    this.isRun = true;
+
     // 髪型の大きさ、位置を決める顔パーツのランドマークを取得
     const { leftEye, rightEye, leftEar, rightEar, nose } = landmarks;
 
@@ -188,10 +191,10 @@ export class SuperSaiyajin extends BaseEffect {
         this.baseDistance = value;
       });
 
-    gui.show(true);
+    gui.show(false);
 
-    // エフェクト表示フラグON
-    this.isRun = true;
+    // エフェクト表示フラグOFF
+    this.isRun = false;
   }
 
   animate = () => {

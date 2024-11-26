@@ -29,6 +29,9 @@ export class BigBangAttack extends BaseEffect {
   }
 
   run(x: number, y: number, z: number) {
+    // エフェクト表示フラグON
+    this.isRun = true;
+
     console.log('run called');
     // 元の色に戻す (白色)
     const initialColor = new THREE.Color(1, 1, 1); // 白色 (RGB: 1, 1, 1)
@@ -39,8 +42,6 @@ export class BigBangAttack extends BaseEffect {
     this.sphere.mesh.scale.set(1, 1, 1);
     // エネルギー弾のポジション初期値
     this.sphere.mesh.position.set(x, y, z);
-    // エフェクト表示フラグON
-    this.isRun = true;
     // 球体をシーンに追加
     this.scene.add(this.sphere.mesh);
   }
