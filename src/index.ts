@@ -214,8 +214,9 @@ async function predictGesture() {
       resetDetectionCounts(); // カウントをリセット
     } else if (label === LABELS.SYUNKANIDOU) {
       console.log('瞬間移動');
-      state.liveCommentary.updateMessage('瞬間移動だ！！！');
+      state.liveCommentary.updateMessage('瞬間移動だーー！！！');
       showSyunkanIdouEffect(); // エフェクト表示
+      resetDetectionCounts(); // カウントをリセット
     }
   } else {
     resetDetectionCounts(); // カウントをリセット
@@ -274,8 +275,10 @@ function showSuperSaiyajinEffect(landmarks: NormalizedLandmark[][]) {
 
 function showSyunkanIdouEffect() {
   state.isEffectActive = true; // エフェクト開始
-  console.log('瞬間移動！！！！');
-  state.mainInstance!.runTeleportation();
+  console.log('瞬間移動だーーー！！！！');
+  setTimeout(() => {
+    state.mainInstance!.runTeleportation();
+  }, 1000);
 }
 
 setupEventListeners();

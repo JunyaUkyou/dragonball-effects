@@ -28,10 +28,10 @@ export class Teleportation extends BaseEffect {
   }
 
   async run() {
+    this.liveCommentary.updateMessage('瞬間移動だ！！');
     setTimeout(() => {
       this.roomPlane.position.z = -2;
-    }, 500);
-    playSoundEffect('/sounds/teleportation.mp3');
+    }, 1200);
     this.roomPlane.position.z = 1;
   }
   // 終了処理
