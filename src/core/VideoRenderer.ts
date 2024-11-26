@@ -22,6 +22,7 @@ export class VideoRenderer {
     // カメラを追加
     const frustumSize = RENDERING_SIZE.height; // フラストレーションの高さを固定
     const aspectRatio = RENDERING_SIZE.width / RENDERING_SIZE.height;
+    console.log({ frustumSize, aspectRatio });
     // this.camera = new THREE.PerspectiveCamera(75, aspectRatio, 1, 1000);
     this.camera = new THREE.OrthographicCamera(
       (frustumSize * aspectRatio) / -2, // left
