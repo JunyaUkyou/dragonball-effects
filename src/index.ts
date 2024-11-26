@@ -1,5 +1,6 @@
 import './style.scss';
 import { Main } from './core/Main';
+import { LiveCommentary } from './core/LiveCommentary';
 import * as knnClassifier from '@tensorflow-models/knn-classifier';
 import {
   GestureRecognizer,
@@ -34,10 +35,8 @@ const state = {
   recognizer: null as GestureRecognizer | PoseLandmarker | null,
   isEffectActive: false,
   isPoseDetection: false,
+  liveCommentary: new LiveCommentary(),
 };
-
-// 現在のステータス
-const statusMessageElement = document.getElementById('current-status-message');
 
 const detectionCount: Record<number, number> = Object.values(LABELS).reduce(
   (acc, label) => ({ ...acc, [label]: 0 }),
@@ -52,9 +51,10 @@ function setupEventListeners() {
     state.isPoseDetection = !state.isPoseDetection;
     console.log('state.isPoseDetection', state.isPoseDetection);
 
-    statusMessageElement!.textContent = state.isPoseDetection
+    const commentaryMessage: string = state.isPoseDetection
       ? 'ポーズ検出中'
       : 'ポーズ検出を開始してください';
+    state.liveCommentary.updateMessage(commentaryMessage);
   });
   // ボタンリクック
   document.getElementById('aaaaaaaaaaaa')?.addEventListener('click', () => {
@@ -192,9 +192,9 @@ async function predictGesture() {
     ];
     if (showEffects.includes(label)) {
       if (detectionCount[label] === 1) {
-        statusMessageElement!.textContent = 'どこからか気を感じる';
+        state.liveCommentary.updateMessage('どこからか気を感じる');
       } else {
-        statusMessageElement!.textContent = '気が強くなってきた！！';
+        state.liveCommentary.updateMessage('気が強くなってきた！！');
       }
     }
     if (detectionCount[label] < REQUIRED_DETECTIONS) {
@@ -204,22 +204,22 @@ async function predictGesture() {
     // 同じポーズが続けて検出
     // ビッグバンアタックのみエフェクト表示
     if (label === LABELS.BIGBANG_ATTACK) {
-      statusMessageElement!.textContent = 'ビッグバンアタックだ！！！';
+      state.liveCommentary.updateMessage('ビッグバンアタックだ！！！');
       showBigBangAttackEffect(results.landmarks); // エフェクト表示
       resetDetectionCounts(); // カウントをリセット
     } else if (label === LABELS.SUPERSAIYAJIN) {
       console.log('スーパーサイヤ人');
-      statusMessageElement!.textContent = 'スーパーサイヤ人だ！！！';
+      state.liveCommentary.updateMessage('スーパーサイヤ人だ！！！');
       showSuperSaiyajinEffect(results.landmarks); // エフェクト表示
       resetDetectionCounts(); // カウントをリセット
     } else if (label === LABELS.SYUNKANIDOU) {
       console.log('瞬間移動');
-      statusMessageElement!.textContent = '瞬間移動だ！！！';
+      state.liveCommentary.updateMessage('瞬間移動だ！！！');
       showSyunkanIdouEffect(); // エフェクト表示
     }
   } else {
     resetDetectionCounts(); // カウントをリセット
-    statusMessageElement!.textContent = 'ポーズ検出中';
+    state.liveCommentary.updateMessage('ポーズ検出中');
   }
 
   // window.requestAnimationFrame(predictGesture);

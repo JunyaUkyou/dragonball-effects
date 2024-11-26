@@ -247,3 +247,22 @@ button.btn-border:hover {
     padding: 0;
   }
 }
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-15px);
+  }
+  50% {
+    transform: translateX(15px);
+  }
+  75% {
+    transform: translateX(-15px);
+  }
+}
+
+.shake {
+  animation: shake 0.5s ease-in-out;
+}
