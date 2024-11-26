@@ -121,10 +121,6 @@ export class BigBangAttack extends BaseEffect {
     // エネルギー弾の大きさに応じて色や透明度を調整
     const scaleX = this.sphere.mesh.scale.x;
 
-    // 現在のステータス
-    const statusMessageElement = document.getElementById(
-      'current-status-message'
-    );
     if (scaleX > 4) {
       // 色の変更
       this.updateColor(scaleX);
@@ -138,13 +134,13 @@ export class BigBangAttack extends BaseEffect {
     } else if (scaleX > 6 && scaleX < 8) {
       this.scaleIncrement = 0.03;
       this.updateRotate(1000, 1);
-      statusMessageElement!.textContent = '天さん！僕の超能力が効かない！';
+      this.liveCommentary.updateMessage('天さん！僕の超能力が効かない！');
     } else if (scaleX > 8 && scaleX < 10) {
-      statusMessageElement!.textContent = '地球もろとも消すつもりか!!!!';
+      this.liveCommentary.updateMessage('地球もろとも消すつもりか!!!!');
     } else if (scaleX > 10 && scaleX < 11) {
-      statusMessageElement!.textContent = 'うわぁぁぁぁ!!!!';
+      this.liveCommentary.updateMessage('うわぁぁぁぁ!!!!');
     } else if (scaleX > 11) {
-      statusMessageElement!.textContent = 'さよなら天さん、、';
+      this.liveCommentary.updateMessage('さよなら天さん、、');
 
       this.scaleIncrement = 0;
       // エネルギー弾の移動
