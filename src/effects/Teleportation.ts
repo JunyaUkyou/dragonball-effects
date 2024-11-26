@@ -28,11 +28,14 @@ export class Teleportation extends BaseEffect {
   }
 
   async run() {
+    this.isRun = true;
     this.liveCommentary.updateMessage('瞬間移動だ！！');
+    this.roomPlane.position.z = 1;
+
     setTimeout(() => {
+      this.isRun = false;
       this.roomPlane.position.z = -2;
     }, 1200);
-    this.roomPlane.position.z = 1;
   }
   // 終了処理
   stop = () => {};
