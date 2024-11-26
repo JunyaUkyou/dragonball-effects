@@ -2,6 +2,7 @@ import { VideoRenderer } from './VideoRenderer';
 import { BigBangAttack } from '../effects/BigBangAttack';
 import { MajinBuu } from '../effects/MajinBuu';
 import { SuperSaiyajin } from '../effects/SuperSaiyajin';
+import { Teleportation } from '../effects/Teleportation';
 import { NormalizedLandmark } from '@mediapipe/tasks-vision';
 
 export class Main {
@@ -9,6 +10,7 @@ export class Main {
   private bigBangAttack: BigBangAttack;
   private superSaiyajin: SuperSaiyajin;
   private majinBuu: MajinBuu;
+  private teleportation: Teleportation;
 
   constructor(video: HTMLVideoElement) {
     this.videoRenderer = new VideoRenderer(video);
@@ -17,6 +19,7 @@ export class Main {
     this.bigBangAttack = new BigBangAttack(scene);
     this.superSaiyajin = new SuperSaiyajin(scene);
     this.majinBuu = new MajinBuu(scene);
+    this.teleportation = new Teleportation(scene);
 
     this.animate();
   }
@@ -33,6 +36,11 @@ export class Main {
   runMajinBuu(x: number, y: number, z: number) {
     console.log('runMajinBuu');
     this.majinBuu.run(x, y, z);
+  }
+
+  runTeleportation() {
+    console.log('runTeleportation');
+    this.teleportation.run();
   }
 
   updateSuperSaiyajinLandmarks(landmarks: NormalizedLandmark[]) {

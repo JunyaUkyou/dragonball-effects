@@ -17,3 +17,8 @@ export function convertThreejsPosition(
     visibility,
   };
 }
+
+export async function playSoundEffect(audioUrl: string) {
+  const audio = new Audio(audioUrl);
+  audio.play();
+}

@@ -62,6 +62,12 @@ function setupEventListeners() {
     state.mainInstance?.runMajinBuu(0, 0, 0);
   });
 
+  document
+    .getElementById('test_teleportation')
+    ?.addEventListener('click', () => {
+      state.mainInstance?.runTeleportation();
+    });
+
   document.getElementById('captureFrame')?.addEventListener('click', () => {
     state.mainInstance?.captureFrame();
   });
@@ -179,31 +185,37 @@ async function predictGesture() {
       });
     }
 
-    if (label === LABELS.BIGBANG_ATTACK || label === LABELS.SUPERSAIYAJIN) {
+    const showEffects: LabelActionType[] = [
+      LABELS.BIGBANG_ATTACK,
+      LABELS.SUPERSAIYAJIN,
+      LABELS.SYUNKANIDOU,
+    ];
+    if (showEffects.includes(label)) {
       if (detectionCount[label] === 1) {
         statusMessageElement!.textContent = 'どこからか気を感じる';
       } else {
         statusMessageElement!.textContent = '気が強くなってきた！！';
       }
     }
+    if (detectionCount[label] < REQUIRED_DETECTIONS) {
+      return;
+    }
 
     // 同じポーズが続けて検出
     // ビッグバンアタックのみエフェクト表示
-    if (
-      detectionCount[label] >= REQUIRED_DETECTIONS &&
-      label === LABELS.BIGBANG_ATTACK
-    ) {
+    if (label === LABELS.BIGBANG_ATTACK) {
       statusMessageElement!.textContent = 'ビッグバンアタックだ！！！';
       showBigBangAttackEffect(results.landmarks); // エフェクト表示
       resetDetectionCounts(); // カウントをリセット
-    } else if (
-      detectionCount[label] >= REQUIRED_DETECTIONS &&
-      label === LABELS.SUPERSAIYAJIN
-    ) {
+    } else if (label === LABELS.SUPERSAIYAJIN) {
       console.log('スーパーサイヤ人');
       statusMessageElement!.textContent = 'スーパーサイヤ人だ！！！';
       showSuperSaiyajinEffect(results.landmarks); // エフェクト表示
       resetDetectionCounts(); // カウントをリセット
+    } else if (label === LABELS.SYUNKANIDOU) {
+      console.log('瞬間移動');
+      statusMessageElement!.textContent = '瞬間移動だ！！！';
+      showSyunkanIdouEffect(); // エフェクト表示
     }
   } else {
     resetDetectionCounts(); // カウントをリセット
@@ -258,6 +270,12 @@ function showSuperSaiyajinEffect(landmarks: NormalizedLandmark[][]) {
   setTimeout(() => {
     state.isEffectActive = false; // エフェクト終了
   }, EFFECT_DISPLAY_MILLISECOND); // 8秒間エフェクトを表示する想定
+}
+
+function showSyunkanIdouEffect() {
+  state.isEffectActive = true; // エフェクト開始
+  console.log('瞬間移動！！！！');
+  state.mainInstance!.runTeleportation();
 }
 
 setupEventListeners();

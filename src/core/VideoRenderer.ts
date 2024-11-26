@@ -1,13 +1,11 @@
 import * as THREE from 'three';
 import { RENDERING_SIZE } from '../core/constants';
-import * as dat from 'lil-gui';
 
 export class VideoRenderer {
   private readonly scene: THREE.Scene;
   //private readonly camera: THREE.PerspectiveCamera;
   private readonly camera: THREE.OrthographicCamera;
   private readonly renderer: THREE.WebGLRenderer;
-  private roomPlane: THREE.Mesh;
 
   private video: HTMLVideoElement;
 
@@ -63,7 +61,10 @@ export class VideoRenderer {
     videoTexture.minFilter = THREE.LinearFilter;
     videoTexture.colorSpace = THREE.SRGBColorSpace;
     videoTexture.generateMipmaps = false;
-    const videoMaterial = new THREE.MeshBasicMaterial({ map: videoTexture });
+    const videoMaterial = new THREE.MeshBasicMaterial({
+      map: videoTexture,
+      transparent: true,
+    });
 
     // カメラ映像を平面として表示
     const planeGeometry = new THREE.PlaneGeometry(
@@ -73,44 +74,8 @@ export class VideoRenderer {
 
     const videoPlane = new THREE.Mesh(planeGeometry, videoMaterial);
     videoPlane.position.z = -1;
+    videoPlane.material.opacity = 1;
     this.scene.add(videoPlane);
-
-    // 部屋の画像用のテクスチャ
-    const roomTexture = new THREE.TextureLoader().load(
-      '/texture/empty_room.png'
-    );
-    roomTexture.colorSpace = THREE.SRGBColorSpace;
-
-    const roomMaterial = new THREE.MeshBasicMaterial({
-      map: roomTexture,
-      transparent: true,
-      //opacity: 0,
-    });
-
-    this.roomPlane = new THREE.Mesh(
-      new THREE.PlaneGeometry(this.renderWidth, renderHeight),
-      roomMaterial
-    );
-    this.roomPlane.position.z = -2;
-
-    this.scene.add(this.roomPlane);
-
-    // デバッグ
-    const gui = new dat.GUI({ width: 300 });
-
-    gui
-      .add(this.roomPlane.position, 'z')
-      .min(-10)
-      .max(10)
-      .step(0.1)
-      .name('roomPlanePositionZ');
-    gui
-      .add(videoMaterial, 'opacity')
-      .min(0)
-      .max(1)
-      .name('videoMaterialPpacity');
-
-    gui.show(true);
   }
 
   // VideoElementを取得するメソッド
@@ -122,7 +87,7 @@ export class VideoRenderer {
     return this.scene;
   }
 
-  getCamera(): THREE.PerspectiveCamera {
+  getCamera(): THREE.OrthographicCamera {
     return this.camera;
   }
 
