@@ -63,7 +63,6 @@ export class VideoRenderer {
     videoTexture.generateMipmaps = false;
     const videoMaterial = new THREE.MeshBasicMaterial({
       map: videoTexture,
-      transparent: true,
     });
 
     // カメラ映像を平面として表示
@@ -74,7 +73,6 @@ export class VideoRenderer {
 
     const videoPlane = new THREE.Mesh(planeGeometry, videoMaterial);
     videoPlane.position.z = -1;
-    videoPlane.material.opacity = 1;
     this.scene.add(videoPlane);
   }
 
