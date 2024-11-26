@@ -1,23 +1,21 @@
 import * as THREE from 'three';
 import { Sphere } from './Sphere';
 import { SparkEmitter } from './SparkEmitter';
+import { BaseEffect } from './BaseEffect';
 import { RENDERING_HALF_SIZE } from '../core/constants';
 
 const DEFAULT_SIZE = 32;
 
-export class BigBangAttack {
-  private readonly scene: THREE.Scene;
+export class BigBangAttack extends BaseEffect {
   private readonly texture: THREE.Texture;
   private readonly sphere: Sphere;
   // private readonly sparkEmitter: SparkEmitter;
-
-  private isRun: boolean = false;
 
   // スケール拡大用の係数
   private scaleIncrement: number = 0.1;
 
   constructor(scene: THREE.Scene) {
-    this.scene = scene;
+    super(scene);
     console.log('BigBangAttack constructor');
 
     // テクスチャー
@@ -127,10 +125,6 @@ export class BigBangAttack {
     (this.sphere.mesh.material as THREE.MeshBasicMaterial).opacity = opacity;
     (this.sphere.mesh.material as THREE.MeshBasicMaterial).transparent = true;
   };
-
-  getIsRun() {
-    return this.isRun;
-  }
 
   animate = () => {
     if (!this.isRun) {
