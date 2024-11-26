@@ -250,16 +250,16 @@ button.btn-border:hover {
 @keyframes shake {
   0%,
   100% {
-    transform: translateX(0);
+    transform: translateY(0);
   }
   25% {
-    transform: translateX(-15px);
+    transform: translateY(-15px);
   }
   50% {
-    transform: translateX(15px);
+    transform: translateY(15px);
   }
   75% {
-    transform: translateX(-15px);
+    transform: translateY(-15px);
   }
 }
 
