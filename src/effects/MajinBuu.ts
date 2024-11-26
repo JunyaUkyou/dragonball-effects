@@ -49,8 +49,6 @@ export class MajinBuu {
     this.group.rotation.x = Math.PI;
     this.scene.add(this.group);
 
-    console.log('ssss', { y, finalPositionY: this.finalPositionY, size });
-
     // デバッグ
     const gui = new dat.GUI({ width: 300 });
 
