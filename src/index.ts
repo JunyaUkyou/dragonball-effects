@@ -59,7 +59,7 @@ function setupEventListeners() {
   // ボタンリクック
   document.getElementById('aaaaaaaaaaaa')?.addEventListener('click', () => {
     state.mainInstance?.runBigBangAttack(0, 0, 0);
-    state.mainInstance?.runMajinBuu(-700, 300, 0);
+    state.mainInstance?.runMajinBuu(0, 0, 0);
   });
 
   document.getElementById('captureFrame')?.addEventListener('click', () => {
@@ -236,6 +236,7 @@ function showBigBangAttackEffect(landmarks: NormalizedLandmark[][]) {
   const landmarkZ = Math.max(0, middleFingerMcp.z * 100);
   console.log({ landmarkX, landmarkY, landmarkZ, middleFingerMcp });
   state.mainInstance!.runBigBangAttack(landmarkX - 100, landmarkY, landmarkZ);
+  state.mainInstance!.runMajinBuu(landmarkX - 100, landmarkY, landmarkZ);
 
   // エフェクト終了後にジェスチャー取得を再開
   setTimeout(() => {

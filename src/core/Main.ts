@@ -56,6 +56,9 @@ export class Main {
     if (this.bigBangAttack.getIsRun()) {
       this.bigBangAttack.animate();
     }
+    if (this.majinBuu.getIsRun()) {
+      this.majinBuu.animate();
+    }
     requestAnimationFrame(this.animate);
   };
 }
