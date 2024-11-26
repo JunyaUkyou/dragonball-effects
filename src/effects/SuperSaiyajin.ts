@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { NormalizedLandmark } from '@mediapipe/tasks-vision';
+import { BaseEffect } from './BaseEffect';
 import { convertThreejsPosition } from '../core/Utilities';
 import * as dat from 'lil-gui';
 
@@ -9,16 +10,14 @@ const LEFT_EAR = 7;
 const RIGHT_EAR = 8;
 const NOSE = 0;
 
-export class SuperSaiyajin {
-  private readonly scene: THREE.Scene;
+export class SuperSaiyajin extends BaseEffect {
   private readonly texture: THREE.Texture;
   private readonly hairMesh: THREE.Sprite;
-  private isRun: boolean = false;
   private landmarks: NormalizedLandmark[] | null = null;
   private baseDistance = 1.5;
 
   constructor(scene: THREE.Scene) {
-    this.scene = scene;
+    super(scene);
     // テクスチャー
     this.texture = new THREE.TextureLoader().load(
       '/texture/supersaiyajin_hair.png'
@@ -193,10 +192,6 @@ export class SuperSaiyajin {
 
     // エフェクト表示フラグON
     this.isRun = true;
-  }
-
-  getIsRun() {
-    return this.isRun;
   }
 
   animate = () => {
