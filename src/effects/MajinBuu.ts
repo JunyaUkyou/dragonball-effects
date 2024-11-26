@@ -1,16 +1,15 @@
 import * as THREE from 'three';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader.js';
 import * as dat from 'lil-gui';
+import { BaseEffect } from './BaseEffect';
 import { RENDERING_HALF_SIZE } from '../core/constants';
 
-export class MajinBuu {
-  private readonly scene: THREE.Scene;
+export class MajinBuu extends BaseEffect {
   private group: THREE.Group;
-  private isRun: boolean = false;
   private finalPositionY: number = 0;
 
   constructor(scene: THREE.Scene) {
-    this.scene = scene;
+    super(scene);
     this.group = new THREE.Group();
 
     const loader = new SVGLoader();
@@ -90,10 +89,6 @@ export class MajinBuu {
     this.isRun = true;
   }
 
-  getIsRun() {
-    return this.isRun;
-  }
-
   animate = () => {
     if (!this.isRun) {
       return;
@@ -105,6 +100,7 @@ export class MajinBuu {
     }
     this.isRun = false;
   };
+
   // 終了処理
   stop = () => {
     // シーンから削除
