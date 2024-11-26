@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { Sphere } from './Sphere';
-import { SparkEmitter } from './SparkEmitter';
 import { BaseEffect } from './BaseEffect';
 import { RENDERING_HALF_SIZE } from '../core/constants';
 
@@ -9,7 +8,6 @@ const DEFAULT_SIZE = 32;
 export class BigBangAttack extends BaseEffect {
   private readonly texture: THREE.Texture;
   private readonly sphere: Sphere;
-  // private readonly sparkEmitter: SparkEmitter;
 
   // スケール拡大用の係数
   private scaleIncrement: number = 0.1;
@@ -28,15 +26,6 @@ export class BigBangAttack extends BaseEffect {
       width: DEFAULT_SIZE,
       height: DEFAULT_SIZE,
     });
-
-    // SparkEmitter の追加
-    //const spherePositionZ = 20;
-    // this.sparkEmitter = new SparkEmitter();
-    //this.sparkEmitter = new SparkEmitter2();
-    // scene.add(this.sparkEmitter); // スパークをシーンに追加
-
-    // アニメーション開始
-    //this.animate();
   }
 
   run(x: number, y: number, z: number) {
@@ -54,19 +43,13 @@ export class BigBangAttack extends BaseEffect {
     this.isRun = true;
     // 球体をシーンに追加
     this.scene.add(this.sphere.mesh);
-    // スパークを画面表示位置に移動する
-    //this.sparkEmitter.positionChange(x, y);
-    //this.scene.add(this.sparkEmitter); // スパークをシーンに追加
   }
 
   private updateSphere() {
     if (this.scaleIncrement === 0) return;
-    // 球体のスケールを徐々に拡大
-    //console.log(this.sphere.mesh.scale.x);
     this.sphere.mesh.scale.x += this.scaleIncrement;
     this.sphere.mesh.scale.y += this.scaleIncrement;
     this.sphere.mesh.scale.z += this.scaleIncrement;
-    // this.sphere.mesh.position.x -= this.scaleIncrement;
   }
 
   private startMovingSphere() {
@@ -134,8 +117,6 @@ export class BigBangAttack extends BaseEffect {
     this.updateRotate();
     // エネルギー弾の大きさ
     this.updateSphere();
-    // SparkEmitter の更新処理
-    //this.sparkEmitter.update();
 
     // エネルギー弾の大きさに応じて色や透明度を調整
     const scaleX = this.sphere.mesh.scale.x;
@@ -164,11 +145,6 @@ export class BigBangAttack extends BaseEffect {
       statusMessageElement!.textContent = 'うわぁぁぁぁ!!!!';
     } else if (scaleX > 11) {
       statusMessageElement!.textContent = 'さよなら天さん、、';
-
-      // スパークを画面表示外に移動する
-      //this.sparkEmitter.positionChange(0, -10000);
-      //this.scene.remove(this.sparkEmitter);
-      //this.sparkEmitter.clearAll();
 
       this.scaleIncrement = 0;
       // エネルギー弾の移動
