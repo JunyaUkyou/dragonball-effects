@@ -3,6 +3,7 @@ import { NormalizedLandmark } from '@mediapipe/tasks-vision';
 import { BaseEffect } from './BaseEffect';
 import { convertThreejsPosition } from '../core/Utilities';
 import * as dat from 'lil-gui';
+import { LiveCommentary } from '../core/LiveCommentary';
 
 const LEFT_EYE = 2;
 const RIGHT_EYE = 5;
@@ -15,9 +16,14 @@ export class SuperSaiyajin extends BaseEffect {
   private readonly hairMesh: THREE.Sprite;
   private landmarks: NormalizedLandmark[] | null = null;
   private baseDistance = 1.5;
+  private readonly liveCommentary: LiveCommentary;
 
-  constructor(scene: THREE.Scene) {
+  constructor(
+    scene: THREE.Scene,
+    liveCommentary: LiveCommentary = new LiveCommentary()
+  ) {
     super(scene);
+    this.liveCommentary = liveCommentary;
     // テクスチャー
     this.texture = new THREE.TextureLoader().load(
       '/texture/supersaiyajin_hair.png'

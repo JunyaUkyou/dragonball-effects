@@ -1,11 +1,17 @@
 import * as THREE from 'three';
 import { BaseEffect } from './BaseEffect';
 import { RENDERING_SIZE } from '../core/constants';
+import { LiveCommentary } from '../core/LiveCommentary';
 
 export class Teleportation extends BaseEffect {
   private roomPlane: THREE.Mesh;
-  constructor(scene: THREE.Scene) {
+  private readonly liveCommentary: LiveCommentary;
+  constructor(
+    scene: THREE.Scene,
+    liveCommentary: LiveCommentary = new LiveCommentary()
+  ) {
     super(scene);
+    this.liveCommentary = liveCommentary;
     // 部屋の画像用のテクスチャ
     const roomTexture = new THREE.TextureLoader().load(
       '/texture/empty_room.png'

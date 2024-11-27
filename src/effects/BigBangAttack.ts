@@ -2,38 +2,45 @@ import * as THREE from 'three';
 import { Sphere } from './Sphere';
 import { BaseEffect } from './BaseEffect';
 import { RENDERING_HALF_SIZE } from '../core/constants';
+import { LiveCommentary } from '../core/LiveCommentary';
 
 const DEFAULT_SIZE = 32;
 
 export class BigBangAttack extends BaseEffect {
-  private readonly texture: THREE.Texture;
-  private readonly sphere: Sphere;
+  protected texture: THREE.Texture;
+  protected _sphere: Sphere | null = null;
+  private readonly liveCommentary: LiveCommentary;
 
   // スケール拡大用の係数
   private scaleIncrement: number = 0.1;
 
-  constructor(scene: THREE.Scene) {
+  constructor(
+    scene: THREE.Scene,
+    liveCommentary: LiveCommentary = new LiveCommentary()
+  ) {
     super(scene);
-    console.log('BigBangAttack constructor');
-
-    // テクスチャー
+    this.liveCommentary = liveCommentary;
     this.texture = new THREE.TextureLoader().load('/texture/3658520_s.jpg');
-
-    // ビッグバンアタックの球体を作成
-    this.sphere = new Sphere({
-      texture: this.texture,
-      radius: 10,
-      width: DEFAULT_SIZE,
-      height: DEFAULT_SIZE,
-    });
   }
 
-  run(x: number, y: number, z: number) {
-    this.liveCommentary.updateMessage('ビッグバンアタックだ！！！');
-    // エフェクト表示フラグON
-    this.isRun = true;
+  get sphere(): Sphere {
+    if (this._sphere === null) {
+      this._sphere = new Sphere({
+        texture: this.texture,
+        radius: 10,
+        width: DEFAULT_SIZE,
+        height: DEFAULT_SIZE,
+      });
+    }
+    return this._sphere;
+  }
 
-    console.log('run called');
+  private startEffect() {
+    this.isRun = true;
+    this.liveCommentary.updateMessage('ビッグバンアタックだ！！！');
+  }
+
+  private initSphere(x: number, y: number, z: number) {
     // 元の色に戻す (白色)
     const initialColor = new THREE.Color(1, 1, 1); // 白色 (RGB: 1, 1, 1)
     (this.sphere.mesh.material as THREE.MeshBasicMaterial).color = initialColor;
@@ -45,6 +52,14 @@ export class BigBangAttack extends BaseEffect {
     this.sphere.mesh.position.set(x, y, z);
     // 球体をシーンに追加
     this.scene.add(this.sphere.mesh);
+  }
+
+  run(x: number, y: number, z: number) {
+    // エフェクト開始処理
+    this.startEffect();
+
+    // ビッグバンアタック初期処理
+    this.initSphere(x, y, z);
   }
 
   private updateSphere() {
@@ -92,6 +107,8 @@ export class BigBangAttack extends BaseEffect {
           this.sphere.mesh.material.dispose();
         }
       }
+      // テクスチャのリソース開放
+      this.texture.dispose();
     }
   };
 
