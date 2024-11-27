@@ -62,7 +62,7 @@ export class SuperSaiyajin extends BaseEffect {
   }
 
   getHairMeshScale(leftEar: NormalizedLandmark, rightEar: NormalizedLandmark) {
-    const x = (leftEar.x - rightEar.x) * 3.5;
+    const x = (leftEar.x - rightEar.x) * 5;
     const y = x;
     // 2D表示なので0固定
     const z = 0;
@@ -78,7 +78,7 @@ export class SuperSaiyajin extends BaseEffect {
 
     // 両目の Y 座標（平均値で安定させる）
     const eyeY = (leftEye.y + rightEye.y) / 2;
-    const y = eyeY - 5;
+    const y = eyeY - 55;
 
     // 2D表示なので0固定
     const z = 0;
