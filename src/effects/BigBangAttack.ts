@@ -29,6 +29,7 @@ export class BigBangAttack extends BaseEffect {
   }
 
   run(x: number, y: number, z: number) {
+    this.liveCommentary.updateMessage('ビッグバンアタックだ！！！');
     // エフェクト表示フラグON
     this.isRun = true;
 

@@ -4,51 +4,81 @@ import { MajinBuu } from '../effects/MajinBuu';
 import { SuperSaiyajin } from '../effects/SuperSaiyajin';
 import { Teleportation } from '../effects/Teleportation';
 import { NormalizedLandmark } from '@mediapipe/tasks-vision';
+import { LabelActionType } from '../types';
+import { LABELS, LANDMARK } from '../core/constants';
+import { convertThreejsPosition } from '../core/Utilities';
 
 export class Main {
   private videoRenderer: VideoRenderer;
-  private bigBangAttack: BigBangAttack;
-  private superSaiyajin: SuperSaiyajin;
-  private majinBuu: MajinBuu;
-  private teleportation: Teleportation;
+  private _bigBangAttack: BigBangAttack | null = null;
+  private _superSaiyajin: SuperSaiyajin | null = null;
+  private _majinBuu: MajinBuu | null = null;
+  private _teleportation: Teleportation | null = null;
 
   constructor(video: HTMLVideoElement) {
     this.videoRenderer = new VideoRenderer(video);
-
-    const scene = this.videoRenderer.getScene();
-    this.bigBangAttack = new BigBangAttack(scene);
-    this.superSaiyajin = new SuperSaiyajin(scene);
-    this.majinBuu = new MajinBuu(scene);
-    this.teleportation = new Teleportation(scene);
-
     this.animate();
   }
 
+  // ビッグバンアタック
+  get bigBangAttack(): BigBangAttack {
+    if (this._bigBangAttack === null) {
+      const scene = this.videoRenderer.getScene();
+      this._bigBangAttack = new BigBangAttack(scene);
+    }
+    return this._bigBangAttack;
+  }
+  // 魔人ブウ
+  get majinBuu(): MajinBuu {
+    if (this._majinBuu === null) {
+      const scene = this.videoRenderer.getScene();
+      this._majinBuu = new MajinBuu(scene);
+    }
+    return this._majinBuu;
+  }
+  // スーパーサイヤ人
+  get superSaiyajin(): SuperSaiyajin {
+    if (this._superSaiyajin === null) {
+      const scene = this.videoRenderer.getScene();
+      this._superSaiyajin = new SuperSaiyajin(scene);
+    }
+    return this._superSaiyajin;
+  }
+  // スーパーサイヤ人
+  get teleportation(): Teleportation {
+    if (this._teleportation === null) {
+      const scene = this.videoRenderer.getScene();
+      this._teleportation = new Teleportation(scene);
+    }
+    return this._teleportation;
+  }
+
   isEffectInProgress() {
-    return (
-      this.bigBangAttack.getIsRun() ||
-      this.superSaiyajin.getIsRun() ||
-      this.teleportation.getIsRun()
-    );
+    return this.bigBangAttack.getIsRun() || this.teleportation.getIsRun();
   }
 
-  runBigBangAttack(x: number, y: number, z: number) {
-    this.bigBangAttack.run(x, y, z);
-  }
+  showEffect(
+    label: LabelActionType,
+    landmarks: NormalizedLandmark[],
+    onComplete: () => void
+  ) {
+    // ビッグバンアタックのみエフェクト表示
+    if (label === LABELS.BIGBANG_ATTACK) {
+      const middleFingerMcp = landmarks[LANDMARK.MIDDLE_FINGER_MCP];
+      const { x, y, z } = convertThreejsPosition(middleFingerMcp);
+      this.bigBangAttack.run(x - 100, y, z);
+      // 魔人ブウも起動する
+      this.majinBuu.run(x - 100, y, z);
+      onComplete();
+    } else if (label === LABELS.SUPERSAIYAJIN) {
+      this.superSaiyajin.run();
+      onComplete();
+    } else if (label === LABELS.SYUNKANIDOU) {
+      this.teleportation.run();
+      onComplete();
+    }
 
-  runSuperSaiyajin(isTest = false) {
-    console.log('runSuperSaiyajin', { isTest });
-    this.superSaiyajin.run();
-  }
-
-  runMajinBuu(x: number, y: number, z: number) {
-    console.log('runMajinBuu');
-    this.majinBuu.run(x, y, z);
-  }
-
-  runTeleportation() {
-    console.log('runTeleportation');
-    this.teleportation.run();
+    onComplete();
   }
 
   updateSuperSaiyajinLandmarks(landmarks: NormalizedLandmark[]) {

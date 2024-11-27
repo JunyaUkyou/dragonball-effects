@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { BaseEffect } from './BaseEffect';
 import { RENDERING_SIZE } from '../core/constants';
-import { playSoundEffect } from '../core/Utilities';
 
 export class Teleportation extends BaseEffect {
   private roomPlane: THREE.Mesh;
@@ -28,6 +27,7 @@ export class Teleportation extends BaseEffect {
   }
 
   async run() {
+    this.liveCommentary.updateMessage('瞬間移動だーー！！！');
     this.isRun = true;
     //this.liveCommentary.updateMessage('瞬間移動だ！！');
     this.roomPlane.position.z = 1;

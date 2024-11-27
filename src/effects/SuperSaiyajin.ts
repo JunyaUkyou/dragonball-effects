@@ -89,6 +89,7 @@ export class SuperSaiyajin extends BaseEffect {
     if (!landmarks) {
       return; // landmarksが取得できない場合は終了
     }
+    this.liveCommentary.updateMessage('スーパーサイヤ人だ！！！');
     // エフェクト表示フラグON
     this.isRun = true;
 
@@ -194,7 +195,7 @@ export class SuperSaiyajin extends BaseEffect {
     gui.show(false);
 
     // エフェクト表示フラグOFF
-    this.isRun = false;
+    //this.isRun = false;
   }
 
   animate = () => {
