@@ -1,5 +1,6 @@
 import { VideoRenderer } from './VideoRenderer';
 import { BigBangAttack } from '../effects/BigBangAttack';
+import { Kamehameha } from '../effects/Kamehameha';
 import { MajinBuu } from '../effects/MajinBuu';
 import { SuperSaiyajin } from '../effects/SuperSaiyajin';
 import { SuperSaiyajinOura } from '../effects/SuperSaiyajinOura';
@@ -12,6 +13,7 @@ import { convertThreejsPosition } from '../core/Utilities';
 export class Main {
   private videoRenderer: VideoRenderer;
   private _bigBangAttack: BigBangAttack | null = null;
+  private _kamehameha: Kamehameha | null = null;
   private _superSaiyajin: SuperSaiyajin | null = null;
   private _superSaiyajinOura: SuperSaiyajinOura | null = null;
   private _majinBuu: MajinBuu | null = null;
@@ -29,6 +31,14 @@ export class Main {
       this._bigBangAttack = new BigBangAttack(scene);
     }
     return this._bigBangAttack;
+  }
+  // ビッグバンアタック
+  get kamehameha(): Kamehameha {
+    if (this._kamehameha === null) {
+      const scene = this.videoRenderer.getScene();
+      this._kamehameha = new Kamehameha(scene);
+    }
+    return this._kamehameha;
   }
   // 魔人ブウ
   get majinBuu(): MajinBuu {
@@ -65,6 +75,11 @@ export class Main {
 
   isEffectInProgress() {
     return this.bigBangAttack.getIsRun() || this.teleportation.getIsRun();
+  }
+
+  runKamehameha(x: number, y: number, z: number) {
+    console.log({ x, y, z });
+    this.kamehameha.start(x, y, z);
   }
 
   runOura(landmarks: NormalizedLandmark[]) {
@@ -122,6 +137,10 @@ export class Main {
     }
     if (this.superSaiyajinOura.getIsRun()) {
       this.superSaiyajinOura.animate();
+    }
+
+    if (this.kamehameha.getIsRun()) {
+      this.kamehameha.animate();
     }
     requestAnimationFrame(this.animate);
   };

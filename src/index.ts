@@ -56,6 +56,9 @@ function setupEventListeners() {
       : 'ポーズ検出を開始してください';
     state.liveCommentary.updateMessage(commentaryMessage);
   });
+  document.getElementById('test_kamehameha')?.addEventListener('click', () => {
+    state.mainInstance?.runKamehameha(0, 0, 0);
+  });
   // ボタンリクック
   document.getElementById('aaaaaaaaaaaa')?.addEventListener('click', () => {
     state.mainInstance?.runBigBangAttack(0, 0, 0);
