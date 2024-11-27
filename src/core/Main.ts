@@ -2,6 +2,7 @@ import { VideoRenderer } from './VideoRenderer';
 import { BigBangAttack } from '../effects/BigBangAttack';
 import { MajinBuu } from '../effects/MajinBuu';
 import { SuperSaiyajin } from '../effects/SuperSaiyajin';
+import { SuperSaiyajinOura } from '../effects/SuperSaiyajinOura';
 import { Teleportation } from '../effects/Teleportation';
 import { NormalizedLandmark } from '@mediapipe/tasks-vision';
 import { LabelActionType } from '../types';
@@ -12,6 +13,7 @@ export class Main {
   private videoRenderer: VideoRenderer;
   private _bigBangAttack: BigBangAttack | null = null;
   private _superSaiyajin: SuperSaiyajin | null = null;
+  private _superSaiyajinOura: SuperSaiyajinOura | null = null;
   private _majinBuu: MajinBuu | null = null;
   private _teleportation: Teleportation | null = null;
 
@@ -44,7 +46,15 @@ export class Main {
     }
     return this._superSaiyajin;
   }
-  // スーパーサイヤ人
+  // スーパーサイヤ人オーラ
+  get superSaiyajinOura(): SuperSaiyajinOura {
+    if (this._superSaiyajinOura === null) {
+      const scene = this.videoRenderer.getScene();
+      this._superSaiyajinOura = new SuperSaiyajinOura(scene);
+    }
+    return this._superSaiyajinOura;
+  }
+  // 瞬間移動
   get teleportation(): Teleportation {
     if (this._teleportation === null) {
       const scene = this.videoRenderer.getScene();
@@ -55,6 +65,12 @@ export class Main {
 
   isEffectInProgress() {
     return this.bigBangAttack.getIsRun() || this.teleportation.getIsRun();
+  }
+
+  runOura(landmarks: NormalizedLandmark[]) {
+    const scene = this.videoRenderer.getScene();
+    this.superSaiyajinOura.run();
+    console.log('runOura');
   }
 
   showEffect(
@@ -70,6 +86,7 @@ export class Main {
       onComplete();
     } else if (label === LABELS.SUPERSAIYAJIN) {
       this.superSaiyajin.run();
+      this.superSaiyajinOura.run();
       onComplete();
     } else if (label === LABELS.SYUNKANIDOU) {
       this.teleportation.run();
@@ -81,6 +98,7 @@ export class Main {
 
   updateSuperSaiyajinLandmarks(landmarks: NormalizedLandmark[]) {
     this.superSaiyajin.setLandmarks(landmarks);
+    this.superSaiyajinOura.setLandmarks(landmarks);
   }
 
   // run(x: number, y: number, z: number) {
@@ -92,7 +110,6 @@ export class Main {
   }
 
   animate = () => {
-    // this.superSaiyajin.update();
     this.videoRenderer.render();
     if (this.superSaiyajin.getIsRun()) {
       this.superSaiyajin.animate();
@@ -102,6 +119,9 @@ export class Main {
     }
     if (this.majinBuu.getIsRun()) {
       this.majinBuu.animate();
+    }
+    if (this.superSaiyajinOura.getIsRun()) {
+      this.superSaiyajinOura.animate();
     }
     requestAnimationFrame(this.animate);
   };

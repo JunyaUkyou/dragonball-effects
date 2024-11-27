@@ -61,6 +61,33 @@ function setupEventListeners() {
     state.mainInstance?.runBigBangAttack(0, 0, 0);
     state.mainInstance?.runMajinBuu(0, 0, 0);
   });
+  document.getElementById('test_oura')?.addEventListener('click', () => {
+    const landmark = {
+      x: 0,
+      y: 0,
+      z: 0,
+      visibility: 0,
+    };
+    const landmarks = Array.from({ length: 33 }, () => ({ ...landmark }));
+    // 鼻
+    landmarks[0].x = 0.479557603597641;
+    landmarks[0].y = 0.35142379999160767;
+    // 左肩
+    landmarks[11].x = 0.5321693420410156;
+    landmarks[11].y = 0.4688338339328766;
+    // 右肩
+    landmarks[12].x = 0.416135311126709;
+    landmarks[12].y = 0.4704115092754364;
+    // 左手人差し指
+    landmarks[19].x = 0.6057005524635315;
+    landmarks[19].y = 0.5646845698356628;
+    // 右手人差し指
+    landmarks[19].x = 0.6057005524635315;
+    landmarks[19].y = 0.5646845698356628;
+
+    //state.mainInstance?.updateSuperSaiyajinLandmarks(landmarks);
+    state.mainInstance?.runOura(landmarks);
+  });
 
   document
     .getElementById('test_teleportation')
@@ -215,6 +242,7 @@ async function predictGesture() {
     if (!isDetectionOK) {
       return;
     }
+    console.log(results.landmarks[0]);
     state.isEffectInProgress = true;
     const onEffectComplete = () => {
       console.log('onEffectComplete');
