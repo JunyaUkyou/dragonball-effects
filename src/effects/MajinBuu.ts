@@ -2,7 +2,9 @@ import * as THREE from 'three';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader.js';
 import * as dat from 'lil-gui';
 import { BaseEffect } from './BaseEffect';
-import { RENDERING_HALF_SIZE } from '../core/constants';
+import { RENDERING_HALF_SIZE, LANDMARK } from '../core/constants';
+import { NormalizedLandmark } from '@mediapipe/tasks-vision';
+import { convertThreejsPosition } from '../core/Utilities';
 
 export class MajinBuu extends BaseEffect {
   private group: THREE.Group;
@@ -32,11 +34,24 @@ export class MajinBuu extends BaseEffect {
     });
   }
 
-  run(x: number, y: number, z: number) {
+  private getStartPosition(landmarks: NormalizedLandmark[]) {
+    const middleFingerMcp = landmarks[LANDMARK.MIDDLE_FINGER_MCP];
+    const { x, y, z } = convertThreejsPosition(middleFingerMcp);
+
+    return {
+      x: x - 100,
+      y,
+      z,
+    };
+  }
+
+  start(landmarks: NormalizedLandmark[]) {
+    // ランドマーク情報からビッグバンアタック開始位置を取得
+    const { y, z } = this.getStartPosition(landmarks);
+
     // バウンディングボックスを計算
     const boundingBox = new THREE.Box3().setFromObject(this.group);
     // バウンディングボックスの情報を取得
-    const center = boundingBox.getCenter(new THREE.Vector3()); // 中心点
     const size = boundingBox.getSize(new THREE.Vector3()); // サイズ
 
     const finalPositionX = -(RENDERING_HALF_SIZE.width - 50);

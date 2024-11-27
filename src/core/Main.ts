@@ -64,11 +64,9 @@ export class Main {
   ) {
     // ビッグバンアタックのみエフェクト表示
     if (label === LABELS.BIGBANG_ATTACK) {
-      const middleFingerMcp = landmarks[LANDMARK.MIDDLE_FINGER_MCP];
-      const { x, y, z } = convertThreejsPosition(middleFingerMcp);
-      this.bigBangAttack.run(x - 100, y, z);
+      this.bigBangAttack.start(landmarks);
       // 魔人ブウも起動する
-      this.majinBuu.run(x - 100, y, z);
+      this.majinBuu.start(landmarks);
       onComplete();
     } else if (label === LABELS.SUPERSAIYAJIN) {
       this.superSaiyajin.run();

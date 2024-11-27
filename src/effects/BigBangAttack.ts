@@ -3,6 +3,9 @@ import { Sphere } from './Sphere';
 import { BaseEffect } from './BaseEffect';
 import { RENDERING_HALF_SIZE } from '../core/constants';
 import { LiveCommentary } from '../core/LiveCommentary';
+import { NormalizedLandmark } from '@mediapipe/tasks-vision';
+import { LANDMARK } from '../core/constants';
+import { convertThreejsPosition } from '../core/Utilities';
 
 const DEFAULT_SIZE = 32;
 
@@ -20,6 +23,7 @@ export class BigBangAttack extends BaseEffect {
   ) {
     super(scene);
     this.liveCommentary = liveCommentary;
+
     this.texture = new THREE.TextureLoader().load('/texture/3658520_s.jpg');
   }
 
@@ -54,7 +58,21 @@ export class BigBangAttack extends BaseEffect {
     this.scene.add(this.sphere.mesh);
   }
 
-  run(x: number, y: number, z: number) {
+  private getStartPosition(landmarks: NormalizedLandmark[]) {
+    const middleFingerMcp = landmarks[LANDMARK.MIDDLE_FINGER_MCP];
+    const { x, y, z } = convertThreejsPosition(middleFingerMcp);
+
+    return {
+      x: x - 100,
+      y,
+      z,
+    };
+  }
+
+  start(landmarks: NormalizedLandmark[]) {
+    // ランドマーク情報からビッグバンアタック開始位置を取得
+    const { x, y, z } = this.getStartPosition(landmarks);
+
     // エフェクト開始処理
     this.startEffect();
 
@@ -107,8 +125,6 @@ export class BigBangAttack extends BaseEffect {
           this.sphere.mesh.material.dispose();
         }
       }
-      // テクスチャのリソース開放
-      this.texture.dispose();
     }
   };
 
