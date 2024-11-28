@@ -3,6 +3,7 @@ import { NormalizedLandmark } from '@mediapipe/tasks-vision';
 import { BaseEffect } from './BaseEffect';
 import { convertThreejsPosition } from '../core/Utilities';
 import * as dat from 'lil-gui';
+import { LiveCommentary } from '../core/LiveCommentary';
 
 const LEFT_EYE = 2;
 const RIGHT_EYE = 5;
@@ -15,9 +16,14 @@ export class SuperSaiyajin extends BaseEffect {
   private readonly hairMesh: THREE.Sprite;
   private landmarks: NormalizedLandmark[] | null = null;
   private baseDistance = 1.5;
+  private readonly liveCommentary: LiveCommentary;
 
-  constructor(scene: THREE.Scene) {
+  constructor(
+    scene: THREE.Scene,
+    liveCommentary: LiveCommentary = new LiveCommentary()
+  ) {
     super(scene);
+    this.liveCommentary = liveCommentary;
     // テクスチャー
     this.texture = new THREE.TextureLoader().load(
       '/texture/supersaiyajin_hair.png'
@@ -56,7 +62,7 @@ export class SuperSaiyajin extends BaseEffect {
   }
 
   getHairMeshScale(leftEar: NormalizedLandmark, rightEar: NormalizedLandmark) {
-    const x = (leftEar.x - rightEar.x) * 3.5;
+    const x = (leftEar.x - rightEar.x) * 5;
     const y = x;
     // 2D表示なので0固定
     const z = 0;
@@ -72,7 +78,7 @@ export class SuperSaiyajin extends BaseEffect {
 
     // 両目の Y 座標（平均値で安定させる）
     const eyeY = (leftEye.y + rightEye.y) / 2;
-    const y = eyeY - 5;
+    const y = eyeY - 55;
 
     // 2D表示なので0固定
     const z = 0;
@@ -89,6 +95,10 @@ export class SuperSaiyajin extends BaseEffect {
     if (!landmarks) {
       return; // landmarksが取得できない場合は終了
     }
+    this.liveCommentary.updateMessage('スーパーサイヤ人だ！！！');
+    // エフェクト表示フラグON
+    this.isRun = true;
+
     // 髪型の大きさ、位置を決める顔パーツのランドマークを取得
     const { leftEye, rightEye, leftEar, rightEar, nose } = landmarks;
 
@@ -188,10 +198,10 @@ export class SuperSaiyajin extends BaseEffect {
         this.baseDistance = value;
       });
 
-    gui.show(true);
+    gui.show(false);
 
-    // エフェクト表示フラグON
-    this.isRun = true;
+    // エフェクト表示フラグOFF
+    //this.isRun = false;
   }
 
   animate = () => {

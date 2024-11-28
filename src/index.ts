@@ -24,7 +24,7 @@ import {
   REQUIRED_DETECTIONS,
 } from './core/constants';
 import { LabelActionType } from './types';
-const MIDDLE_FINGER_MCP = 20;
+
 const isPose = true;
 
 // グローバル変数管理用オブジェクト
@@ -33,9 +33,9 @@ const state = {
   video: null as HTMLVideoElement | null,
   classifier: null as knnClassifier.KNNClassifier | null,
   recognizer: null as GestureRecognizer | PoseLandmarker | null,
-  isEffectActive: false,
   isPoseDetection: false,
   liveCommentary: new LiveCommentary(),
+  isEffectInProgress: false,
 };
 
 const detectionCount: Record<number, number> = Object.values(LABELS).reduce(
@@ -56,10 +56,40 @@ function setupEventListeners() {
       : 'ポーズ検出を開始してください';
     state.liveCommentary.updateMessage(commentaryMessage);
   });
+  document.getElementById('test_kamehameha')?.addEventListener('click', () => {
+    state.mainInstance?.runKamehameha(0, 0, 0);
+  });
   // ボタンリクック
   document.getElementById('aaaaaaaaaaaa')?.addEventListener('click', () => {
     state.mainInstance?.runBigBangAttack(0, 0, 0);
     state.mainInstance?.runMajinBuu(0, 0, 0);
+  });
+  document.getElementById('test_oura')?.addEventListener('click', () => {
+    const landmark = {
+      x: 0,
+      y: 0,
+      z: 0,
+      visibility: 0,
+    };
+    const landmarks = Array.from({ length: 33 }, () => ({ ...landmark }));
+    // 鼻
+    landmarks[0].x = 0.479557603597641;
+    landmarks[0].y = 0.35142379999160767;
+    // 左肩
+    landmarks[11].x = 0.5321693420410156;
+    landmarks[11].y = 0.4688338339328766;
+    // 右肩
+    landmarks[12].x = 0.416135311126709;
+    landmarks[12].y = 0.4704115092754364;
+    // 左手人差し指
+    landmarks[19].x = 0.6057005524635315;
+    landmarks[19].y = 0.5646845698356628;
+    // 右手人差し指
+    landmarks[19].x = 0.6057005524635315;
+    landmarks[19].y = 0.5646845698356628;
+
+    //state.mainInstance?.updateSuperSaiyajinLandmarks(landmarks);
+    state.mainInstance?.runOura(landmarks);
   });
 
   document
@@ -143,9 +173,34 @@ async function setupVideoStream() {
   return videoElement;
 }
 
+function predictResultLabelCheck(label: LabelActionType) {
+  const showEffects: LabelActionType[] = [
+    LABELS.BIGBANG_ATTACK,
+    LABELS.SUPERSAIYAJIN,
+    LABELS.SYUNKANIDOU,
+  ];
+
+  if (!showEffects.includes(label)) {
+    resetDetectionCounts(); // カウントをリセット
+    state.liveCommentary.updateMessage('ポーズ検出中');
+    return false;
+  }
+
+  if (detectionCount[label] >= REQUIRED_DETECTIONS) {
+    return true;
+  }
+  if (detectionCount[label] === 1) {
+    console.log({ label });
+    state.liveCommentary.updateMessage('どこからか気を感じる');
+  } else if (detectionCount[label] === 2) {
+    state.liveCommentary.updateMessage('気が強くなってきた！！');
+  }
+  return false;
+}
+
 async function predictGesture() {
   // ポーズ検出無効の場合、次のフレームへ移行
-  if (!state.isPoseDetection) {
+  if (!state.isPoseDetection || state.isEffectInProgress) {
     // window.requestAnimationFrame(predictGesture);
     return;
   }
@@ -162,7 +217,8 @@ async function predictGesture() {
   ) {
     state.mainInstance?.updateSuperSaiyajinLandmarks(results.landmarks[0]);
 
-    if (state.isEffectActive) {
+    if (state.mainInstance?.isEffectInProgress()) {
+      console.log('isEffectInProgress is true');
       return;
     }
     const predictResult: KNNModelPredictResult = await predictLandmarks(
@@ -185,39 +241,22 @@ async function predictGesture() {
       });
     }
 
-    const showEffects: LabelActionType[] = [
-      LABELS.BIGBANG_ATTACK,
-      LABELS.SUPERSAIYAJIN,
-      LABELS.SYUNKANIDOU,
-    ];
-    if (showEffects.includes(label)) {
-      if (detectionCount[label] === 1) {
-        state.liveCommentary.updateMessage('どこからか気を感じる');
-      } else {
-        state.liveCommentary.updateMessage('気が強くなってきた！！');
-      }
-    }
-    if (detectionCount[label] < REQUIRED_DETECTIONS) {
+    const isDetectionOK = predictResultLabelCheck(label);
+    if (!isDetectionOK) {
       return;
     }
-
-    // 同じポーズが続けて検出
-    // ビッグバンアタックのみエフェクト表示
-    if (label === LABELS.BIGBANG_ATTACK) {
-      state.liveCommentary.updateMessage('ビッグバンアタックだ！！！');
-      showBigBangAttackEffect(results.landmarks); // エフェクト表示
+    console.log(results.landmarks[0]);
+    state.isEffectInProgress = true;
+    const onEffectComplete = () => {
+      console.log('onEffectComplete');
       resetDetectionCounts(); // カウントをリセット
-    } else if (label === LABELS.SUPERSAIYAJIN) {
-      console.log('スーパーサイヤ人');
-      state.liveCommentary.updateMessage('スーパーサイヤ人だ！！！');
-      showSuperSaiyajinEffect(results.landmarks); // エフェクト表示
-      resetDetectionCounts(); // カウントをリセット
-    } else if (label === LABELS.SYUNKANIDOU) {
-      console.log('瞬間移動');
-      state.liveCommentary.updateMessage('瞬間移動だーー！！！');
-      showSyunkanIdouEffect(); // エフェクト表示
-      resetDetectionCounts(); // カウントをリセット
-    }
+      state.isEffectInProgress = false;
+    };
+    state.mainInstance!.showEffect(
+      label,
+      results.landmarks[0],
+      onEffectComplete
+    );
   } else {
     resetDetectionCounts(); // カウントをリセット
     state.liveCommentary.updateMessage('ポーズ検出中');
@@ -231,54 +270,6 @@ function resetDetectionCounts() {
   for (const key in detectionCount) {
     detectionCount[key] = 0;
   }
-}
-
-// エフェクトを表示する関数
-function showBigBangAttackEffect(landmarks: NormalizedLandmark[][]) {
-  state.isEffectActive = true; // エフェクト開始
-  console.log('ビッグバンアタック！！！！', { landmarks });
-  const middleFingerMcp = landmarks[0][MIDDLE_FINGER_MCP];
-  // Three.jsの座標系に合わせた座標変換
-  const landmarkX =
-    middleFingerMcp.x * RENDERING_SIZE.width - RENDERING_SIZE.width / 2; // X: -300〜300
-  const landmarkY = -(
-    middleFingerMcp.y * RENDERING_SIZE.height -
-    RENDERING_SIZE.height / 2
-  ); // Y: 200〜-200 (上下反転)
-  // Z座標は負の値の場合は0にする
-  const landmarkZ = Math.max(0, middleFingerMcp.z * 100);
-  console.log({ landmarkX, landmarkY, landmarkZ, middleFingerMcp });
-  state.mainInstance!.runBigBangAttack(landmarkX - 100, landmarkY, landmarkZ);
-  state.mainInstance!.runMajinBuu(landmarkX - 100, landmarkY, landmarkZ);
-
-  // エフェクト終了後にジェスチャー取得を再開
-  setTimeout(() => {
-    state.isEffectActive = false; // エフェクト終了
-  }, EFFECT_DISPLAY_MILLISECOND); // 8秒間エフェクトを表示する想定
-}
-
-function showSuperSaiyajinEffect(landmarks: NormalizedLandmark[][]) {
-  state.isEffectActive = true; // エフェクト開始
-  console.log('スーパーサイヤ人！！！！', { landmarks });
-  state.mainInstance!.runSuperSaiyajin();
-
-  // const leftEye = landmarks[0][LEFT_EYE];
-  // const rightEye = landmarks[0][RIGHT_EYE];
-  // const leftEar = landmarks[0][LEFT_EAR];
-  // const rightEar = landmarks[0][RIGHT_EAR];
-
-  // エフェクト終了後にジェスチャー取得を再開
-  setTimeout(() => {
-    state.isEffectActive = false; // エフェクト終了
-  }, EFFECT_DISPLAY_MILLISECOND); // 8秒間エフェクトを表示する想定
-}
-
-function showSyunkanIdouEffect() {
-  state.isEffectActive = true; // エフェクト開始
-  console.log('瞬間移動だーーー！！！！');
-  setTimeout(() => {
-    state.mainInstance!.runTeleportation();
-  }, 1000);
 }
 
 setupEventListeners();

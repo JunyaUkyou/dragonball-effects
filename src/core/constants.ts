@@ -1,3 +1,6 @@
+export const LANDMARK = {
+  MIDDLE_FINGER_MCP: 20,
+};
 export const TRAINING_DATA_PATH = '/src/models/knn-classifier-model.text';
 export const EFFECT_DISPLAY_MILLISECOND = 80000;
 export const MEDIA_CONSTRAINTS = {
