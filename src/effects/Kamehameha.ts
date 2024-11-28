@@ -3,6 +3,9 @@ import { Sphere } from "./Sphere";
 import { BaseEffect } from "./BaseEffect";
 import { LiveCommentary } from "../core/LiveCommentary";
 import * as dat from "lil-gui";
+import { NormalizedLandmark } from "@mediapipe/tasks-vision";
+import { LANDMARK } from "../core/constants";
+import { convertThreejsPosition } from "../core/Utilities";
 
 const DEFAULT_SIZE = 32;
 const START_COLOR = new THREE.Color("#ffd700");
@@ -52,7 +55,21 @@ export class Kamehameha extends BaseEffect {
     this.scene.add(this.sphere.mesh);
   }
 
-  start(x: number, y: number, z: number) {
+  private getStartPosition(landmarks: NormalizedLandmark[]) {
+    const middleFingerMcp = landmarks[LANDMARK.LEFT_INDEX];
+    const { x, y, z } = convertThreejsPosition(middleFingerMcp);
+
+    return {
+      x,
+      y,
+      z,
+    };
+  }
+
+  start(landmarks: NormalizedLandmark[]) {
+    // ランドマーク情報からビッグバンアタック開始位置を取得
+    const { x, y, z } = this.getStartPosition(landmarks);
+
     // エフェクト開始処理
     this.startEffect();
 
@@ -116,6 +133,7 @@ export class Kamehameha extends BaseEffect {
       this.sphere.mesh.scale.y += 0.7;
       if (this.sphere.mesh.scale.x > 130 || this.sphere.mesh.scale.y > 130) {
         this.removeMesh();
+        this.isRun = false;
       }
     }
   };
