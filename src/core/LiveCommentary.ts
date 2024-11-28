@@ -25,7 +25,6 @@ export class LiveCommentary {
     }
     // 現在のメッセージと比較し、同じなら何もしない
     if (this.statusMessageElement.textContent === message) {
-      console.log("Message already displayed. Skipping update.");
       return;
     }
 
