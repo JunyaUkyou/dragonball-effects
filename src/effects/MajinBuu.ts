@@ -1,21 +1,22 @@
-import * as THREE from 'three';
-import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader.js';
-import * as dat from 'lil-gui';
-import { BaseEffect } from './BaseEffect';
-import { RENDERING_HALF_SIZE, LANDMARK } from '../core/constants';
-import { NormalizedLandmark } from '@mediapipe/tasks-vision';
-import { convertThreejsPosition } from '../core/Utilities';
+import * as THREE from "three";
+import { SVGLoader } from "three/examples/jsm/loaders/SVGLoader.js";
+import * as dat from "lil-gui";
+import { BaseEffect } from "./BaseEffect";
+import { RENDERING_HALF_SIZE, LANDMARK } from "../core/constants";
+import { NormalizedLandmark } from "@mediapipe/tasks-vision";
+import { convertThreejsPosition, getDelta } from "../core/Utilities";
 
 export class MajinBuu extends BaseEffect {
   private group: THREE.Group;
   private finalPositionY: number = 0;
+  private lastUpdateTime = performance.now();
 
   constructor(scene: THREE.Scene) {
     super(scene);
     this.group = new THREE.Group();
 
     const loader = new SVGLoader();
-    loader.load('/texture/majinbuu.svg', (data) => {
+    loader.load("/texture/majinbuu.svg", (data) => {
       const paths = data.paths;
 
       paths.forEach((path) => {
@@ -67,37 +68,37 @@ export class MajinBuu extends BaseEffect {
     const gui = new dat.GUI({ width: 300 });
 
     gui
-      .add(this.group.position, 'x')
+      .add(this.group.position, "x")
       .min(-1300)
       .max(1300)
       .step(1)
-      .name('positionX');
+      .name("positionX");
     gui
-      .add(this.group.position, 'y')
+      .add(this.group.position, "y")
       .min(-1300)
       .max(1300)
       .step(1)
-      .name('positionY');
-    gui.add(this.group.scale, 'x').min(-10).max(10).step(0.1).name('scaleX');
-    gui.add(this.group.scale, 'y').min(-10).max(10).step(0.1).name('scaleY');
+      .name("positionY");
+    gui.add(this.group.scale, "x").min(-10).max(10).step(0.1).name("scaleX");
+    gui.add(this.group.scale, "y").min(-10).max(10).step(0.1).name("scaleY");
     gui
-      .add(this.group.rotation, 'x')
+      .add(this.group.rotation, "x")
       .min(-10)
       .max(10)
       .step(0.1)
-      .name('rotationX');
+      .name("rotationX");
     gui
-      .add(this.group.rotation, 'y')
+      .add(this.group.rotation, "y")
       .min(-10)
       .max(10)
       .step(0.1)
-      .name('rotationY');
+      .name("rotationY");
     gui
-      .add(this.group.rotation, 'z')
+      .add(this.group.rotation, "z")
       .min(-10)
       .max(10)
       .step(0.1)
-      .name('rotationZ');
+      .name("rotationZ");
     gui.show(true);
 
     // エフェクト表示フラグON
@@ -108,9 +109,13 @@ export class MajinBuu extends BaseEffect {
     if (!this.isRun) {
       return;
     }
+    const now = performance.now();
+    const delta = getDelta(this.lastUpdateTime);
+    this.lastUpdateTime = now;
+    const speed = 30;
 
     if (this.finalPositionY >= this.group.position.y) {
-      this.group.position.y += 5;
+      this.group.position.y += speed * delta;
       return;
     }
     this.isRun = false;
