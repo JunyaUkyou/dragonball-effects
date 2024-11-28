@@ -4,6 +4,7 @@ import { Kamehameha } from "../effects/Kamehameha";
 import { MajinBuu } from "../effects/MajinBuu";
 import { SuperSaiyajin } from "../effects/SuperSaiyajin";
 import { SuperSaiyajinOura } from "../effects/SuperSaiyajinOura";
+import { AngelRing } from "../effects/AngelRing";
 import { Teleportation } from "../effects/Teleportation";
 import { NormalizedLandmark } from "@mediapipe/tasks-vision";
 import { LabelActionType } from "../types";
@@ -18,6 +19,8 @@ export class Main {
   private _superSaiyajinOura: SuperSaiyajinOura | null = null;
   private _majinBuu: MajinBuu | null = null;
   private _teleportation: Teleportation | null = null;
+  private _angelRing: AngelRing | null = null;
+  private heavenFlag = false;
 
   constructor(video: HTMLVideoElement) {
     this.videoRenderer = new VideoRenderer(video);
@@ -72,6 +75,14 @@ export class Main {
     }
     return this._teleportation;
   }
+  // ビッグバンアタック
+  get angelRing(): AngelRing {
+    if (this._angelRing === null) {
+      const scene = this.videoRenderer.getScene();
+      this._angelRing = new AngelRing(scene);
+    }
+    return this._angelRing;
+  }
 
   isSuperSaiyajinRunning() {
     return this.superSaiyajin.getIsRun();
@@ -114,16 +125,21 @@ export class Main {
     } else if (label === LABELS.SYUNKANIDOU) {
       this.teleportation.run();
       onComplete();
-    } else {
+    } else if (label === LABELS.KAMEHAMEHA_POSE) {
       this.kamehameha.start(landmarks);
+    } else if (label === LABELS.ANGEL_RING && this.heavenFlag) {
+      this.angelRing.start();
     }
-
+    this.angelRing.start();
     onComplete();
   }
 
   updateSuperSaiyajinLandmarks(landmarks: NormalizedLandmark[]) {
     this.superSaiyajin.setLandmarks(landmarks);
     this.superSaiyajinOura.setLandmarks(landmarks);
+    if (this.heavenFlag) {
+      this.angelRing.setLandmarks(landmarks);
+    }
   }
 
   // run(x: number, y: number, z: number) {
@@ -151,6 +167,10 @@ export class Main {
 
     if (this.kamehameha.getIsRun()) {
       this.kamehameha.animate();
+    }
+
+    if (this.angelRing.getIsRun() && this.heavenFlag) {
+      this.angelRing.animate();
     }
     requestAnimationFrame(this.animate);
   };

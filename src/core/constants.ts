@@ -1,4 +1,7 @@
 export const LANDMARK = {
+  NOSE: 0,
+  LEFT_EAR: 7,
+  RIGHT_EAR: 8,
   LEFT_INDEX: 19,
   MIDDLE_FINGER_MCP: 20,
 };
@@ -37,6 +40,7 @@ export const LABELS = {
   FACE_ONLY: 15,
   RIGHT_FRONT: 16,
   LEFT_FRONT: 17,
+  ANGEL_RING: 18,
 } as const;
 export const REQUIRED_DETECTIONS = 3;
 export const PREDICTION_INTERVAL = 1000;
@@ -99,5 +103,10 @@ export const TRAIN_ACTIONS: {
     id: "left-front",
     label: "左手前",
     key: "LEFT_FRONT",
+  },
+  {
+    id: "angel-ring",
+    label: "天使の輪",
+    key: "ANGEL_RING",
   },
 ];

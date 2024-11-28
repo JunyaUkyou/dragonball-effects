@@ -102,6 +102,34 @@ function setupEventListeners() {
     state.mainInstance?.captureFrame();
   });
 
+  document.getElementById("test_angelRIng")?.addEventListener("click", () => {
+    const label = LABELS.ANGEL_RING;
+    const landmark = {
+      x: 0,
+      y: 0,
+      z: 0,
+      visibility: 0,
+    };
+    const landmarks = Array.from({ length: 33 }, () => ({ ...landmark }));
+    landmarks[0].x = 0.4950178563594818;
+    landmarks[0].y = 0.3238070011138916;
+    landmarks[0].z = -0.28601548075675964;
+
+    landmarks[7].x = 0.5109738707542419;
+    landmarks[7].y = 0.31133267283439636;
+    landmarks[7].z = -0.11465384066104889;
+
+    landmarks[8].x = 0.4702219069004059;
+    landmarks[8].y = 0.3110896050930023;
+    landmarks[8].z = -0.1136602982878685;
+
+    const testFinish = () => {
+      console.log("test Finish");
+    };
+
+    state.mainInstance?.showEffect(label, landmarks, testFinish);
+  });
+
   // ボタンリクック
   document
     .getElementById("test_supersaiyajin")
