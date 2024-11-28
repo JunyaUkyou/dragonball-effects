@@ -173,6 +173,11 @@ async function setupVideoStream() {
   return videoElement;
 }
 
+function initializeEffectState() {
+  resetDetectionCounts(); // カウントをリセット
+  state.liveCommentary.updateMessage("ポーズ検出中");
+}
+
 function predictResultLabelCheck(label: LabelActionType) {
   const showEffects: LabelActionType[] = [
     LABELS.BIGBANG_ATTACK,
@@ -182,11 +187,16 @@ function predictResultLabelCheck(label: LabelActionType) {
   ];
 
   if (!showEffects.includes(label)) {
-    resetDetectionCounts(); // カウントをリセット
-    state.liveCommentary.updateMessage("ポーズ検出中");
+    initializeEffectState();
     return false;
   }
-
+  if (
+    label === LABELS.SUPERSAIYAJIN &&
+    state.mainInstance!.isSuperSaiyajinRunning()
+  ) {
+    initializeEffectState();
+    return false;
+  }
   if (detectionCount[label] >= REQUIRED_DETECTIONS) {
     return true;
   }
@@ -259,8 +269,7 @@ async function predictGesture() {
       onEffectComplete
     );
   } else {
-    resetDetectionCounts(); // カウントをリセット
-    state.liveCommentary.updateMessage("ポーズ検出中");
+    initializeEffectState();
   }
 
   // window.requestAnimationFrame(predictGesture);

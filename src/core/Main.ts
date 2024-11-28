@@ -73,6 +73,10 @@ export class Main {
     return this._teleportation;
   }
 
+  isSuperSaiyajinRunning() {
+    return this.superSaiyajin.getIsRun();
+  }
+
   isEffectInProgress() {
     return (
       this.bigBangAttack.getIsRun() ||
