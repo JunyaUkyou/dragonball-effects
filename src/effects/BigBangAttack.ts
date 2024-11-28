@@ -88,7 +88,7 @@ export class BigBangAttack extends BaseEffect {
     this.sphere.mesh.scale.z += scaleDelta;
   }
 
-  private startMovingSphere(delta: number, speed = 1.3) {
+  private startMovingSphere(delta: number, speed = 1.6) {
     const offsetData = (1 / delta) * speed;
 
     this.sphere.mesh.position.x -= 100.0 - offsetData; // 動きを滑らかに調整

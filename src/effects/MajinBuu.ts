@@ -59,7 +59,11 @@ export class MajinBuu extends BaseEffect {
     this.finalPositionY = y + (size.y * 0.7) / 2;
     //this.finalPositionY = y;
 
-    this.group.position.set(finalPositionX, -RENDERING_HALF_SIZE.height, z);
+    this.group.position.set(
+      finalPositionX,
+      -RENDERING_HALF_SIZE.height - (size.y * 0.7) / 2,
+      z
+    );
     this.group.scale.set(0.7, 0.7, 1);
     this.group.rotation.x = Math.PI;
     this.scene.add(this.group);
@@ -112,7 +116,7 @@ export class MajinBuu extends BaseEffect {
     const now = performance.now();
     const delta = getDelta(this.lastUpdateTime);
     this.lastUpdateTime = now;
-    const speed = 30;
+    const speed = 20;
 
     if (this.finalPositionY >= this.group.position.y) {
       this.group.position.y += speed * delta;
