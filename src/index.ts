@@ -34,7 +34,7 @@ const state = {
   classifier: null as knnClassifier.KNNClassifier | null,
   recognizer: null as GestureRecognizer | PoseLandmarker | null,
   isPoseDetection: false,
-  liveCommentary: new LiveCommentary(),
+  liveCommentary: LiveCommentary.getInstance(),
   isEffectInProgress: false,
 };
 

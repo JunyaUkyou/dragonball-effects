@@ -1,20 +1,20 @@
-import * as THREE from 'three';
-import { BaseEffect } from './BaseEffect';
-import { RENDERING_SIZE } from '../core/constants';
-import { LiveCommentary } from '../core/LiveCommentary';
+import * as THREE from "three";
+import { BaseEffect } from "./BaseEffect";
+import { RENDERING_SIZE } from "../core/constants";
+import { LiveCommentary } from "../core/LiveCommentary";
 
 export class Teleportation extends BaseEffect {
   private roomPlane: THREE.Mesh;
   private readonly liveCommentary: LiveCommentary;
   constructor(
     scene: THREE.Scene,
-    liveCommentary: LiveCommentary = new LiveCommentary()
+    liveCommentary: LiveCommentary = LiveCommentary.getInstance()
   ) {
     super(scene);
     this.liveCommentary = liveCommentary;
     // 部屋の画像用のテクスチャ
     const roomTexture = new THREE.TextureLoader().load(
-      '/texture/empty_room.png'
+      "/texture/empty_room.png"
     );
     roomTexture.colorSpace = THREE.SRGBColorSpace;
 
@@ -33,7 +33,7 @@ export class Teleportation extends BaseEffect {
   }
 
   async run() {
-    this.liveCommentary.updateMessage('瞬間移動だーー！！！');
+    this.liveCommentary.updateMessage("瞬間移動だーー！！！");
     this.isRun = true;
     //this.liveCommentary.updateMessage('瞬間移動だ！！');
     this.roomPlane.position.z = 1;

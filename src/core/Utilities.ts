@@ -1,5 +1,5 @@
-import { RENDERING_SIZE } from './constants';
-import { NormalizedLandmark } from '@mediapipe/tasks-vision';
+import { RENDERING_SIZE } from "./constants";
+import { NormalizedLandmark } from "@mediapipe/tasks-vision";
 
 export function convertThreejsPosition(
   landmark: NormalizedLandmark
@@ -21,4 +21,9 @@ export function convertThreejsPosition(
 export async function playSoundEffect(audioUrl: string) {
   const audio = new Audio(audioUrl);
   audio.play();
+}
+
+export function getDelta(lastTime: number) {
+  const now = performance.now();
+  return (now - lastTime) / 1000;
 }

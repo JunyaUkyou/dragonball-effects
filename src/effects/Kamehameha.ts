@@ -17,7 +17,7 @@ export class Kamehameha extends BaseEffect {
 
   constructor(
     scene: THREE.Scene,
-    liveCommentary: LiveCommentary = new LiveCommentary()
+    liveCommentary: LiveCommentary = LiveCommentary.getInstance()
   ) {
     super(scene);
     this.liveCommentary = liveCommentary;

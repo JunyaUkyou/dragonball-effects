@@ -1,9 +1,9 @@
-import * as THREE from 'three';
-import { BaseEffect } from './BaseEffect';
-import { LiveCommentary } from '../core/LiveCommentary';
-import { NormalizedLandmark } from '@mediapipe/tasks-vision';
-import * as dat from 'lil-gui';
-import { convertThreejsPosition } from '../core/Utilities';
+import * as THREE from "three";
+import { BaseEffect } from "./BaseEffect";
+import { LiveCommentary } from "../core/LiveCommentary";
+import { NormalizedLandmark } from "@mediapipe/tasks-vision";
+import * as dat from "lil-gui";
+import { convertThreejsPosition } from "../core/Utilities";
 
 export class SuperSaiyajinOura extends BaseEffect {
   private readonly liveCommentary: LiveCommentary;
@@ -11,17 +11,17 @@ export class SuperSaiyajinOura extends BaseEffect {
   private landmarks: NormalizedLandmark[] | null = null;
   protected texture: THREE.Texture;
   private baseDistance = 1.5;
-  private readonly startColor = new THREE.Color('#d3d3d3');
-  private readonly endColor = new THREE.Color('#ffd700');
+  private readonly startColor = new THREE.Color("#d3d3d3");
+  private readonly endColor = new THREE.Color("#ffd700");
 
   constructor(
     scene: THREE.Scene,
-    liveCommentary: LiveCommentary = new LiveCommentary()
+    liveCommentary: LiveCommentary = LiveCommentary.getInstance()
   ) {
     super(scene);
     this.liveCommentary = liveCommentary;
     this.texture = new THREE.TextureLoader().load(
-      '/texture/supersaiyajin_oura.png'
+      "/texture/supersaiyajin_oura.png"
     );
     // スプライト作成
     const spriteMaterial = new THREE.SpriteMaterial({
@@ -160,42 +160,42 @@ export class SuperSaiyajinOura extends BaseEffect {
 
     const gui = new dat.GUI({ width: 300 }); // デバッグ
     gui
-      .add(this.auraSprite.scale, 'x')
+      .add(this.auraSprite.scale, "x")
       .min(-2000)
       .max(2000)
       .step(1)
-      .name('auraSpriteScaleX');
+      .name("auraSpriteScaleX");
     gui
-      .add(this.auraSprite.scale, 'y')
+      .add(this.auraSprite.scale, "y")
       .min(-2000)
       .max(2000)
       .step(1)
-      .name('auraSpriteScaleY');
+      .name("auraSpriteScaleY");
     gui
-      .add(this.auraSprite.position, 'x')
+      .add(this.auraSprite.position, "x")
       .min(-650)
       .max(650)
       .step(1)
-      .name('auraSpritePositionX');
+      .name("auraSpritePositionX");
     gui
-      .add(this.auraSprite.position, 'y')
+      .add(this.auraSprite.position, "y")
       .min(-500)
       .max(500)
       .step(1)
-      .name('auraSpritePositionY');
+      .name("auraSpritePositionY");
 
     gui
-      .add(this.auraSprite.center, 'x')
+      .add(this.auraSprite.center, "x")
       .min(0)
       .max(5)
       .step(0.1)
-      .name('auraCenterCenterX');
+      .name("auraCenterCenterX");
     gui
-      .add(this.auraSprite.center, 'y')
+      .add(this.auraSprite.center, "y")
       .min(0)
       .max(5)
       .step(0.1)
-      .name('auraCenterCenterY');
+      .name("auraCenterCenterY");
     // gui
     //   .addColor(colorObject, 'color') // ラッパーオブジェクトを使用
     //   .onChange((value: number) => {

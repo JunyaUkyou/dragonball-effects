@@ -1,11 +1,11 @@
-import * as THREE from 'three';
-import { Sphere } from './Sphere';
-import { BaseEffect } from './BaseEffect';
-import { RENDERING_HALF_SIZE } from '../core/constants';
-import { LiveCommentary } from '../core/LiveCommentary';
-import { NormalizedLandmark } from '@mediapipe/tasks-vision';
-import { LANDMARK } from '../core/constants';
-import { convertThreejsPosition } from '../core/Utilities';
+import * as THREE from "three";
+import { Sphere } from "./Sphere";
+import { BaseEffect } from "./BaseEffect";
+import { RENDERING_HALF_SIZE } from "../core/constants";
+import { LiveCommentary } from "../core/LiveCommentary";
+import { NormalizedLandmark } from "@mediapipe/tasks-vision";
+import { LANDMARK } from "../core/constants";
+import { convertThreejsPosition, getDelta } from "../core/Utilities";
 
 const DEFAULT_SIZE = 32;
 
@@ -13,18 +13,19 @@ export class BigBangAttack extends BaseEffect {
   protected texture: THREE.Texture;
   protected _sphere: Sphere | null = null;
   private readonly liveCommentary: LiveCommentary;
+  private lastUpdateTime = performance.now();
 
   // スケール拡大用の係数
-  private scaleIncrement: number = 0.1;
+  private scaleIncrement: number = 0.25;
 
   constructor(
     scene: THREE.Scene,
-    liveCommentary: LiveCommentary = new LiveCommentary()
+    liveCommentary: LiveCommentary = LiveCommentary.getInstance()
   ) {
     super(scene);
     this.liveCommentary = liveCommentary;
 
-    this.texture = new THREE.TextureLoader().load('/texture/3658520_s.jpg');
+    this.texture = new THREE.TextureLoader().load("/texture/3658520_s.jpg");
   }
 
   get sphere(): Sphere {
@@ -41,7 +42,7 @@ export class BigBangAttack extends BaseEffect {
 
   private startEffect() {
     this.isRun = true;
-    this.liveCommentary.updateMessage('ビッグバンアタックだ！！！');
+    this.liveCommentary.updateMessage("ビッグバンアタックだ！！！");
   }
 
   private initSphere(x: number, y: number, z: number) {
@@ -80,15 +81,17 @@ export class BigBangAttack extends BaseEffect {
     this.initSphere(x, y, z);
   }
 
-  private updateSphere() {
+  private updateSphere(scaleDelta: number) {
     if (this.scaleIncrement === 0) return;
-    this.sphere.mesh.scale.x += this.scaleIncrement;
-    this.sphere.mesh.scale.y += this.scaleIncrement;
-    this.sphere.mesh.scale.z += this.scaleIncrement;
+    this.sphere.mesh.scale.x += scaleDelta;
+    this.sphere.mesh.scale.y += scaleDelta;
+    this.sphere.mesh.scale.z += scaleDelta;
   }
 
-  private startMovingSphere() {
-    this.sphere.mesh.position.x -= 100.0; // 動きを滑らかに調整
+  private startMovingSphere(delta: number, speed = 1.3) {
+    const offsetData = (1 / delta) * speed;
+
+    this.sphere.mesh.position.x -= 100.0 - offsetData; // 動きを滑らかに調整
     // 現在の球体の半分サイズを取得
     const currentSphereWidth = DEFAULT_SIZE * this.sphere.mesh.scale.x;
     const currentSphereHalfWidth = currentSphereWidth / 2;
@@ -97,10 +100,10 @@ export class BigBangAttack extends BaseEffect {
       this.sphere.mesh.position.x <
       (RENDERING_HALF_SIZE.width + currentSphereHalfWidth) * -1
     ) {
-      console.log('最終的な球体の大きさ', this.sphere.mesh);
-      console.log('移動停止', this.sphere.mesh.position.x);
+      console.log("最終的な球体の大きさ", this.sphere.mesh);
+      console.log("移動停止", this.sphere.mesh.position.x);
       this.isRun = false;
-      this.scaleIncrement = 0.1;
+      this.scaleIncrement = 0;
 
       // シーンから削除
       this.removeMesh();
@@ -128,9 +131,10 @@ export class BigBangAttack extends BaseEffect {
     }
   };
 
-  updateRotate = (second = 1000, offset = 2) => {
-    this.texture.offset.x = performance.now() / second / offset;
-    this.texture.offset.y = performance.now() / second / offset;
+  updateRotate = (delta: number, speed = 1.3, offset = 2) => {
+    const offsetDelta = delta * speed;
+    this.texture.offset.x += offsetDelta / offset;
+    this.texture.offset.y += offsetDelta / offset;
   };
 
   updateColor = (scaleX: number) => {
@@ -148,10 +152,17 @@ export class BigBangAttack extends BaseEffect {
     if (!this.isRun) {
       return;
     }
+    const now = performance.now();
+    const delta = getDelta(this.lastUpdateTime);
+    this.lastUpdateTime = now;
+
+    // スケールを経過時間に基づいて増加
+    const scaleDelta = this.scaleIncrement * delta; // 例: 0.1（毎秒）× 経過秒数
+
     // エネルギー弾の回転
-    this.updateRotate();
+    this.updateRotate(delta);
     // エネルギー弾の大きさ
-    this.updateSphere();
+    this.updateSphere(scaleDelta);
 
     // エネルギー弾の大きさに応じて色や透明度を調整
     const scaleX = this.sphere.mesh.scale.x;
@@ -164,22 +175,19 @@ export class BigBangAttack extends BaseEffect {
     }
 
     if (scaleX > 4 && scaleX < 6) {
-      this.scaleIncrement = 0.03;
-      this.updateRotate(1000, 1);
+      //this.scaleIncrement = 0.03;
     } else if (scaleX > 6 && scaleX < 8) {
-      this.scaleIncrement = 0.03;
-      this.updateRotate(1000, 1);
-      this.liveCommentary.updateMessage('天さん！僕の超能力が効かない！');
+      this.liveCommentary.updateMessage("天さん！僕の超能力が効かない！");
     } else if (scaleX > 8 && scaleX < 10) {
-      this.liveCommentary.updateMessage('地球もろとも消すつもりか!!!!');
+      this.liveCommentary.updateMessage("地球もろとも消すつもりか!!!!");
     } else if (scaleX > 10 && scaleX < 11) {
-      this.liveCommentary.updateMessage('うわぁぁぁぁ!!!!');
+      this.liveCommentary.updateMessage("うわぁぁぁぁ!!!!");
     } else if (scaleX > 11) {
-      this.liveCommentary.updateMessage('さよなら天さん、、');
+      this.liveCommentary.updateMessage("さよなら天さん、、");
 
       this.scaleIncrement = 0;
       // エネルギー弾の移動
-      this.startMovingSphere();
+      this.startMovingSphere(delta);
     }
   };
 }

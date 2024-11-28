@@ -21,6 +21,9 @@ export class Main {
   private _teleportation: Teleportation | null = null;
   private _angelRing: AngelRing | null = null;
   private heavenFlag = false;
+  private lastFrameTime = performance.now();
+  private targetFPS = 60;
+  private frameInterval = 1000 / this.targetFPS;
 
   constructor(video: HTMLVideoElement) {
     this.videoRenderer = new VideoRenderer(video);
@@ -36,13 +39,13 @@ export class Main {
     return this._bigBangAttack;
   }
   // ビッグバンアタック
-  get kamehameha(): Kamehameha {
-    if (this._kamehameha === null) {
-      const scene = this.videoRenderer.getScene();
-      this._kamehameha = new Kamehameha(scene);
-    }
-    return this._kamehameha;
-  }
+  // get kamehameha(): Kamehameha {
+  //   if (this._kamehameha === null) {
+  //     const scene = this.videoRenderer.getScene();
+  //     this._kamehameha = new Kamehameha(scene);
+  //   }
+  //   return this._kamehameha;
+  // }
   // 魔人ブウ
   get majinBuu(): MajinBuu {
     if (this._majinBuu === null) {
@@ -90,9 +93,8 @@ export class Main {
 
   isEffectInProgress() {
     return (
-      this.bigBangAttack.getIsRun() ||
-      this.teleportation.getIsRun() ||
-      this.kamehameha.getIsRun()
+      this.bigBangAttack.getIsRun() || this.teleportation.getIsRun()
+      // || this.kamehameha.getIsRun()
     );
   }
 
@@ -126,7 +128,7 @@ export class Main {
       this.teleportation.run();
       onComplete();
     } else if (label === LABELS.KAMEHAMEHA_POSE) {
-      this.kamehameha.start(landmarks);
+      // this.kamehameha.start(landmarks);
     } else if (label === LABELS.ANGEL_RING && this.heavenFlag) {
       this.angelRing.start();
     }
@@ -151,26 +153,34 @@ export class Main {
   }
 
   animate = () => {
-    this.videoRenderer.render();
-    if (this.superSaiyajin.getIsRun()) {
-      this.superSaiyajin.animate();
-    }
-    if (this.bigBangAttack.getIsRun()) {
-      this.bigBangAttack.animate();
-    }
-    if (this.majinBuu.getIsRun()) {
-      this.majinBuu.animate();
-    }
-    if (this.superSaiyajinOura.getIsRun()) {
-      this.superSaiyajinOura.animate();
-    }
+    const now = performance.now();
+    const delta = now - this.lastFrameTime;
+    if (delta >= this.frameInterval) {
+      const fps = 1000 / delta;
+      //console.log(`FPS: ${fps.toFixed(2)}`);
+      this.lastFrameTime = now;
 
-    if (this.kamehameha.getIsRun()) {
-      this.kamehameha.animate();
-    }
+      this.videoRenderer.render();
+      if (this.superSaiyajin.getIsRun()) {
+        this.superSaiyajin.animate();
+      }
+      if (this.bigBangAttack.getIsRun()) {
+        this.bigBangAttack.animate();
+      }
+      if (this.majinBuu.getIsRun()) {
+        this.majinBuu.animate();
+      }
+      if (this.superSaiyajinOura.getIsRun()) {
+        this.superSaiyajinOura.animate();
+      }
 
-    if (this.angelRing.getIsRun() && this.heavenFlag) {
-      this.angelRing.animate();
+      // if (this.kamehameha.getIsRun()) {
+      //   this.kamehameha.animate();
+      // }
+
+      if (this.angelRing.getIsRun() && this.heavenFlag) {
+        this.angelRing.animate();
+      }
     }
     requestAnimationFrame(this.animate);
   };

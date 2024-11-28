@@ -1,9 +1,9 @@
-import * as THREE from 'three';
-import { NormalizedLandmark } from '@mediapipe/tasks-vision';
-import { BaseEffect } from './BaseEffect';
-import { convertThreejsPosition } from '../core/Utilities';
-import * as dat from 'lil-gui';
-import { LiveCommentary } from '../core/LiveCommentary';
+import * as THREE from "three";
+import { NormalizedLandmark } from "@mediapipe/tasks-vision";
+import { BaseEffect } from "./BaseEffect";
+import { convertThreejsPosition } from "../core/Utilities";
+import * as dat from "lil-gui";
+import { LiveCommentary } from "../core/LiveCommentary";
 
 const LEFT_EYE = 2;
 const RIGHT_EYE = 5;
@@ -20,13 +20,13 @@ export class SuperSaiyajin extends BaseEffect {
 
   constructor(
     scene: THREE.Scene,
-    liveCommentary: LiveCommentary = new LiveCommentary()
+    liveCommentary: LiveCommentary = LiveCommentary.getInstance()
   ) {
     super(scene);
     this.liveCommentary = liveCommentary;
     // テクスチャー
     this.texture = new THREE.TextureLoader().load(
-      '/texture/supersaiyajin_hair.png'
+      "/texture/supersaiyajin_hair.png"
     );
 
     // スプライトマテリアルを作成
@@ -38,7 +38,7 @@ export class SuperSaiyajin extends BaseEffect {
     this.hairMesh = new THREE.Sprite(spriteMaterial);
     // 下端を基準点に設定
     this.hairMesh.center.set(0.5, 0);
-    console.log('SuperSaiyajin constructor');
+    console.log("SuperSaiyajin constructor");
   }
 
   /**ランドマーク情報を設定する */
@@ -95,7 +95,7 @@ export class SuperSaiyajin extends BaseEffect {
     if (!landmarks) {
       return; // landmarksが取得できない場合は終了
     }
-    this.liveCommentary.updateMessage('スーパーサイヤ人だ！！！');
+    this.liveCommentary.updateMessage("スーパーサイヤ人だ！！！");
     // エフェクト表示フラグON
     this.isRun = true;
 
@@ -128,7 +128,7 @@ export class SuperSaiyajin extends BaseEffect {
     );
 
     // 髪型の位置をログで確認
-    console.log('Hair Mesh Position:', this.hairMesh.position);
+    console.log("Hair Mesh Position:", this.hairMesh.position);
 
     // メッシュをシーンに追加
     this.scene.add(this.hairMesh);
@@ -137,62 +137,62 @@ export class SuperSaiyajin extends BaseEffect {
     const gui = new dat.GUI({ width: 300 });
 
     gui
-      .add(this.hairMesh.position, 'x')
+      .add(this.hairMesh.position, "x")
       .min(-500)
       .max(500)
       .step(1)
-      .name('hairMeshPositionX');
+      .name("hairMeshPositionX");
     gui
-      .add(this.hairMesh.position, 'y')
+      .add(this.hairMesh.position, "y")
       .min(-500)
       .max(500)
       .step(1)
-      .name('hairMeshPositionY');
+      .name("hairMeshPositionY");
     gui
-      .add(this.hairMesh.position, 'z')
+      .add(this.hairMesh.position, "z")
       .min(-500)
       .max(500)
       .step(1)
-      .name('hairMeshPositionZ');
+      .name("hairMeshPositionZ");
     gui
-      .add(this.hairMesh.rotation, 'x')
+      .add(this.hairMesh.rotation, "x")
       .min(-500)
       .max(500)
       .step(0.1)
-      .name('hairMeshRotationX');
+      .name("hairMeshRotationX");
     gui
-      .add(this.hairMesh.rotation, 'y')
+      .add(this.hairMesh.rotation, "y")
       .min(-500)
       .max(500)
       .step(0.1)
-      .name('hairMeshRotationY');
+      .name("hairMeshRotationY");
     gui
-      .add(this.hairMesh.rotation, 'z')
+      .add(this.hairMesh.rotation, "z")
       .min(-500)
       .max(500)
       .step(0.1)
-      .name('hairMeshRotationZ');
+      .name("hairMeshRotationZ");
     gui
-      .add(this.hairMesh.scale, 'x')
+      .add(this.hairMesh.scale, "x")
       .min(-500)
       .max(500)
       .step(0.1)
-      .name('hairMeshScaleX');
+      .name("hairMeshScaleX");
     gui
-      .add(this.hairMesh.scale, 'y')
+      .add(this.hairMesh.scale, "y")
       .min(-500)
       .max(500)
       .step(0.1)
-      .name('hairMeshScaleY');
+      .name("hairMeshScaleY");
     gui
-      .add(this.hairMesh.scale, 'z')
+      .add(this.hairMesh.scale, "z")
       .min(-500)
       .max(500)
       .step(0.1)
-      .name('hairMeshScaleZ');
+      .name("hairMeshScaleZ");
 
     gui
-      .add({ baseDistance: this.baseDistance }, 'baseDistance', 1, 5, 0.1)
+      .add({ baseDistance: this.baseDistance }, "baseDistance", 1, 5, 0.1)
       .onChange((value: number) => {
         // baseDistance をリアルタイムで調整
         this.baseDistance = value;
