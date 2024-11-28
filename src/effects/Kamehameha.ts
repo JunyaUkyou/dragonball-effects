@@ -5,7 +5,7 @@ import { LiveCommentary } from "../core/LiveCommentary";
 import * as dat from "lil-gui";
 import { NormalizedLandmark } from "@mediapipe/tasks-vision";
 import { LANDMARK } from "../core/constants";
-import { convertThreejsPosition } from "../core/Utilities";
+import { convertThreejsPosition, getDelta } from "../core/Utilities";
 
 const DEFAULT_SIZE = 32;
 const START_COLOR = new THREE.Color("#ffd700");
@@ -14,6 +14,7 @@ export class Kamehameha extends BaseEffect {
   protected texture: THREE.Texture;
   protected _sphere: Sphere | null = null;
   private readonly liveCommentary: LiveCommentary;
+  private lastUpdateTime = performance.now();
 
   constructor(
     scene: THREE.Scene,
@@ -112,25 +113,35 @@ export class Kamehameha extends BaseEffect {
     if (!this.isRun) {
       return;
     }
+    const now = performance.now();
+    const delta = getDelta(this.lastUpdateTime);
+    const poseOffset = 10;
+    const offsetData = delta / poseOffset;
 
-    this.liveCommentary.updateMessage("くらえーーー！！！");
+    console.log({ delta, offsetData });
+    this.lastUpdateTime = now;
+
     this.updateRotate();
-    if (this.sphere.mesh.scale.x < 6) {
-      this.sphere.mesh.scale.x += 0.005;
-      this.sphere.mesh.scale.y += 0.005;
-      if (this.sphere.mesh.scale.x > 2 && this.sphere.mesh.scale.x < 3) {
-        this.liveCommentary.updateMessage("か〜");
+    if (this.sphere.mesh.scale.x < 7) {
+      console.log();
+      this.sphere.mesh.scale.x += 0.003 + offsetData;
+      this.sphere.mesh.scale.y += 0.003 + offsetData;
+
+      if (this.sphere.mesh.scale.x < 3) {
+        this.liveCommentary.updateMessage("くらえーーー！！！");
       } else if (this.sphere.mesh.scale.x > 3 && this.sphere.mesh.scale.x < 4) {
-        this.liveCommentary.updateMessage("め〜");
+        this.liveCommentary.updateMessage("か〜");
       } else if (this.sphere.mesh.scale.x > 4 && this.sphere.mesh.scale.x < 5) {
-        this.liveCommentary.updateMessage("は〜");
+        this.liveCommentary.updateMessage("め〜");
       } else if (this.sphere.mesh.scale.x > 5 && this.sphere.mesh.scale.x < 6) {
+        this.liveCommentary.updateMessage("は〜");
+      } else if (this.sphere.mesh.scale.x > 6 && this.sphere.mesh.scale.x < 7) {
         this.liveCommentary.updateMessage("め〜");
       }
     } else {
       this.liveCommentary.updateMessage("は〜");
-      this.sphere.mesh.scale.x += 0.7;
-      this.sphere.mesh.scale.y += 0.7;
+      this.sphere.mesh.scale.x += 1 + offsetData;
+      this.sphere.mesh.scale.y += 1 + offsetData;
       if (this.sphere.mesh.scale.x > 130 || this.sphere.mesh.scale.y > 130) {
         this.removeMesh();
         this.isRun = false;

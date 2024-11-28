@@ -38,14 +38,14 @@ export class Main {
     }
     return this._bigBangAttack;
   }
-  // ビッグバンアタック
-  // get kamehameha(): Kamehameha {
-  //   if (this._kamehameha === null) {
-  //     const scene = this.videoRenderer.getScene();
-  //     this._kamehameha = new Kamehameha(scene);
-  //   }
-  //   return this._kamehameha;
-  // }
+  // かめはめ波
+  get kamehameha(): Kamehameha {
+    if (this._kamehameha === null) {
+      const scene = this.videoRenderer.getScene();
+      this._kamehameha = new Kamehameha(scene);
+    }
+    return this._kamehameha;
+  }
   // 魔人ブウ
   get majinBuu(): MajinBuu {
     if (this._majinBuu === null) {
@@ -93,14 +93,15 @@ export class Main {
 
   isEffectInProgress() {
     return (
-      this.bigBangAttack.getIsRun() || this.teleportation.getIsRun()
-      // || this.kamehameha.getIsRun()
+      this.bigBangAttack.getIsRun() ||
+      this.teleportation.getIsRun() ||
+      this.kamehameha.getIsRun()
     );
   }
 
   runKamehameha(x: number, y: number, z: number) {
     console.log({ x, y, z });
-    // this.kamehameha.start(x, y, z);
+    //this.kamehameha.start(x, y, z);
   }
 
   runOura(landmarks: NormalizedLandmark[]) {
@@ -128,7 +129,7 @@ export class Main {
       this.teleportation.run();
       onComplete();
     } else if (label === LABELS.KAMEHAMEHA_POSE) {
-      // this.kamehameha.start(landmarks);
+      this.kamehameha.start(landmarks);
     } else if (label === LABELS.ANGEL_RING && this.heavenFlag) {
       this.angelRing.start();
     }
@@ -174,9 +175,9 @@ export class Main {
         this.superSaiyajinOura.animate();
       }
 
-      // if (this.kamehameha.getIsRun()) {
-      //   this.kamehameha.animate();
-      // }
+      if (this.kamehameha.getIsRun()) {
+        this.kamehameha.animate();
+      }
 
       if (this.angelRing.getIsRun() && this.heavenFlag) {
         this.angelRing.animate();
