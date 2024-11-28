@@ -1,19 +1,19 @@
-import './style.scss';
-import { Main } from './core/Main';
-import { LiveCommentary } from './core/LiveCommentary';
-import * as knnClassifier from '@tensorflow-models/knn-classifier';
+import "./style.scss";
+import { Main } from "./core/Main";
+import { LiveCommentary } from "./core/LiveCommentary";
+import * as knnClassifier from "@tensorflow-models/knn-classifier";
 import {
   GestureRecognizer,
   NormalizedLandmark,
   PoseLandmarker,
-} from '@mediapipe/tasks-vision';
-import { getRecognizer, getLandmarkerResult } from './models/landmarker';
+} from "@mediapipe/tasks-vision";
+import { getRecognizer, getLandmarkerResult } from "./models/landmarker";
 
 import {
   loadKNNModel,
   predictLandmarks,
   KNNModelPredictResult,
-} from './models/classifier';
+} from "./models/classifier";
 
 import {
   MEDIA_CONSTRAINTS,
@@ -22,8 +22,8 @@ import {
   EFFECT_DISPLAY_MILLISECOND,
   PREDICTION_INTERVAL,
   REQUIRED_DETECTIONS,
-} from './core/constants';
-import { LabelActionType } from './types';
+} from "./core/constants";
+import { LabelActionType } from "./types";
 
 const isPose = true;
 
@@ -43,28 +43,28 @@ const detectionCount: Record<number, number> = Object.values(LABELS).reduce(
   {}
 );
 
-console.log('こんにちは!!!!');
+console.log("こんにちは!!!!");
 
 function setupEventListeners() {
   // ポーズ認識開始
-  document.getElementById('pose')?.addEventListener('click', () => {
+  document.getElementById("pose")?.addEventListener("click", () => {
     state.isPoseDetection = !state.isPoseDetection;
-    console.log('state.isPoseDetection', state.isPoseDetection);
+    console.log("state.isPoseDetection", state.isPoseDetection);
 
     const commentaryMessage: string = state.isPoseDetection
-      ? 'ポーズ検出中'
-      : 'ポーズ検出を開始してください';
+      ? "ポーズ検出中"
+      : "ポーズ検出を開始してください";
     state.liveCommentary.updateMessage(commentaryMessage);
   });
-  document.getElementById('test_kamehameha')?.addEventListener('click', () => {
+  document.getElementById("test_kamehameha")?.addEventListener("click", () => {
     state.mainInstance?.runKamehameha(0, 0, 0);
   });
   // ボタンリクック
-  document.getElementById('aaaaaaaaaaaa')?.addEventListener('click', () => {
+  document.getElementById("aaaaaaaaaaaa")?.addEventListener("click", () => {
     state.mainInstance?.runBigBangAttack(0, 0, 0);
     state.mainInstance?.runMajinBuu(0, 0, 0);
   });
-  document.getElementById('test_oura')?.addEventListener('click', () => {
+  document.getElementById("test_oura")?.addEventListener("click", () => {
     const landmark = {
       x: 0,
       y: 0,
@@ -93,20 +93,20 @@ function setupEventListeners() {
   });
 
   document
-    .getElementById('test_teleportation')
-    ?.addEventListener('click', () => {
+    .getElementById("test_teleportation")
+    ?.addEventListener("click", () => {
       state.mainInstance?.runTeleportation();
     });
 
-  document.getElementById('captureFrame')?.addEventListener('click', () => {
+  document.getElementById("captureFrame")?.addEventListener("click", () => {
     state.mainInstance?.captureFrame();
   });
 
   // ボタンリクック
   document
-    .getElementById('test_supersaiyajin')
-    ?.addEventListener('click', () => {
-      console.log('スーパーサイヤ人 テスト実行 クリック');
+    .getElementById("test_supersaiyajin")
+    ?.addEventListener("click", () => {
+      console.log("スーパーサイヤ人 テスト実行 クリック");
       const landmark = {
         x: 0,
         y: 0,
@@ -144,11 +144,11 @@ async function init() {
     state.video = await setupVideoStream();
     state.mainInstance = new Main(state.video);
 
-    console.log('初期化完了！ジェスチャー認識を開始します...');
+    console.log("初期化完了！ジェスチャー認識を開始します...");
     //renderFrame();
     setInterval(predictGesture, PREDICTION_INTERVAL);
   } catch (error) {
-    console.error('初期化中にエラーが発生しました:', error);
+    console.error("初期化中にエラーが発生しました:", error);
   }
 }
 
@@ -167,7 +167,7 @@ async function setupVideoStream() {
     },
   };
   const stream = await navigator.mediaDevices.getUserMedia(constraints);
-  const videoElement = document.createElement('video');
+  const videoElement = document.createElement("video");
   videoElement.srcObject = stream;
   await videoElement.play(); // 映像の再生を強制
   return videoElement;
@@ -178,11 +178,12 @@ function predictResultLabelCheck(label: LabelActionType) {
     LABELS.BIGBANG_ATTACK,
     LABELS.SUPERSAIYAJIN,
     LABELS.SYUNKANIDOU,
+    LABELS.KAMEHAMEHA_POSE,
   ];
 
   if (!showEffects.includes(label)) {
     resetDetectionCounts(); // カウントをリセット
-    state.liveCommentary.updateMessage('ポーズ検出中');
+    state.liveCommentary.updateMessage("ポーズ検出中");
     return false;
   }
 
@@ -191,9 +192,9 @@ function predictResultLabelCheck(label: LabelActionType) {
   }
   if (detectionCount[label] === 1) {
     console.log({ label });
-    state.liveCommentary.updateMessage('どこからか気を感じる');
+    state.liveCommentary.updateMessage("どこからか気を感じる");
   } else if (detectionCount[label] === 2) {
-    state.liveCommentary.updateMessage('気が強くなってきた！！');
+    state.liveCommentary.updateMessage("気が強くなってきた！！");
   }
   return false;
 }
@@ -218,7 +219,7 @@ async function predictGesture() {
     state.mainInstance?.updateSuperSaiyajinLandmarks(results.landmarks[0]);
 
     if (state.mainInstance?.isEffectInProgress()) {
-      console.log('isEffectInProgress is true');
+      console.log("isEffectInProgress is true");
       return;
     }
     const predictResult: KNNModelPredictResult = await predictLandmarks(
@@ -248,7 +249,7 @@ async function predictGesture() {
     console.log(results.landmarks[0]);
     state.isEffectInProgress = true;
     const onEffectComplete = () => {
-      console.log('onEffectComplete');
+      console.log("onEffectComplete");
       resetDetectionCounts(); // カウントをリセット
       state.isEffectInProgress = false;
     };
@@ -259,7 +260,7 @@ async function predictGesture() {
     );
   } else {
     resetDetectionCounts(); // カウントをリセット
-    state.liveCommentary.updateMessage('ポーズ検出中');
+    state.liveCommentary.updateMessage("ポーズ検出中");
   }
 
   // window.requestAnimationFrame(predictGesture);

@@ -1,7 +1,8 @@
 export const LANDMARK = {
+  LEFT_INDEX: 19,
   MIDDLE_FINGER_MCP: 20,
 };
-export const TRAINING_DATA_PATH = '/src/models/knn-classifier-model.text';
+export const TRAINING_DATA_PATH = "/src/models/knn-classifier-model.text";
 export const EFFECT_DISPLAY_MILLISECOND = 80000;
 export const MEDIA_CONSTRAINTS = {
   width: 1920,
@@ -46,57 +47,57 @@ export const TRAIN_ACTIONS: {
   key: keyof typeof LABELS;
 }[] = [
   {
-    id: 'saveBigBangAttack',
-    label: 'ビッグバンアタック',
-    key: 'BIGBANG_ATTACK',
+    id: "saveBigBangAttack",
+    label: "ビッグバンアタック",
+    key: "BIGBANG_ATTACK",
   },
-  { id: 'wark', label: '歩く', key: 'WARK' },
-  { id: 'upright', label: '直立', key: 'UPRIGHT' },
-  { id: 'genkidama', label: '元気玉', key: 'GENKIDAMA' },
-  { id: 'ryoute-sayu', label: '両手を左右に伸ばす', key: 'RYOUTE_SAYU' },
-  { id: 'kiennzan-right', label: '気円斬（右）', key: 'KIENNZAN_RIGHT' },
-  { id: 'kiennzan-left', label: '気円斬（左）', key: 'KIENNZAN_LEFT' },
+  { id: "wark", label: "歩く", key: "WARK" },
+  { id: "upright", label: "直立", key: "UPRIGHT" },
+  { id: "genkidama", label: "元気玉", key: "GENKIDAMA" },
+  { id: "ryoute-sayu", label: "両手を左右に伸ばす", key: "RYOUTE_SAYU" },
+  { id: "kiennzan-right", label: "気円斬（右）", key: "KIENNZAN_RIGHT" },
+  { id: "kiennzan-left", label: "気円斬（左）", key: "KIENNZAN_LEFT" },
   {
-    id: 'bigbanattak-left',
-    label: 'ビッグバンアタック（左）',
-    key: 'BIGBANG_ATTACK_LEFT',
-  },
-  {
-    id: 'saveKamehameha_pose',
-    label: 'かめはめ波構え',
-    key: 'KAMEHAMEHA_POSE',
+    id: "bigbanattak-left",
+    label: "ビッグバンアタック（左）",
+    key: "BIGBANG_ATTACK_LEFT",
   },
   {
-    id: 'saveKamehameha_send',
-    label: 'かめはめ波実行',
-    key: 'KAMEHAMEHA_SEND',
-  },
-  { id: 'syunkanidou', label: '瞬間移動', key: 'SYUNKANIDOU' },
-  { id: 'supersaiyajin', label: 'スーパーサイヤ人', key: 'SUPERSAIYAJIN' },
-  {
-    id: 'handToEarGesture',
-    label: ' 両耳に手をあてる',
-    key: 'HAND_TO_EAR_GESTURE',
-  },
-  { id: 'tonikaku_pose', label: '明るい安村ポーズ', key: 'TONIKAKU_POSE' },
-  {
-    id: 'tonikaku_finish',
-    label: '明るい安村フィニッシュ',
-    key: 'TONIKAKU_FINISH',
+    id: "saveKamehameha_pose",
+    label: "かめはめ波構え",
+    key: "KAMEHAMEHA_POSE",
   },
   {
-    id: 'face-only',
-    label: '顔だけ',
-    key: 'FACE_ONLY',
+    id: "saveKamehameha_send",
+    label: "かめはめ波実行",
+    key: "KAMEHAMEHA_SEND",
+  },
+  { id: "syunkanidou", label: "瞬間移動", key: "SYUNKANIDOU" },
+  { id: "supersaiyajin", label: "スーパーサイヤ人", key: "SUPERSAIYAJIN" },
+  {
+    id: "handToEarGesture",
+    label: " 両耳に手をあてる",
+    key: "HAND_TO_EAR_GESTURE",
+  },
+  { id: "tonikaku_pose", label: "明るい安村ポーズ", key: "TONIKAKU_POSE" },
+  {
+    id: "tonikaku_finish",
+    label: "明るい安村フィニッシュ",
+    key: "TONIKAKU_FINISH",
   },
   {
-    id: 'right-front',
-    label: '右手前',
-    key: 'RIGHT_FRONT',
+    id: "face-only",
+    label: "顔だけ",
+    key: "FACE_ONLY",
   },
   {
-    id: 'left-front',
-    label: '左手前',
-    key: 'LEFT_FRONT',
+    id: "right-front",
+    label: "右手前",
+    key: "RIGHT_FRONT",
+  },
+  {
+    id: "left-front",
+    label: "左手前",
+    key: "LEFT_FRONT",
   },
 ];

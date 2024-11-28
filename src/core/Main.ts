@@ -1,14 +1,14 @@
-import { VideoRenderer } from './VideoRenderer';
-import { BigBangAttack } from '../effects/BigBangAttack';
-import { Kamehameha } from '../effects/Kamehameha';
-import { MajinBuu } from '../effects/MajinBuu';
-import { SuperSaiyajin } from '../effects/SuperSaiyajin';
-import { SuperSaiyajinOura } from '../effects/SuperSaiyajinOura';
-import { Teleportation } from '../effects/Teleportation';
-import { NormalizedLandmark } from '@mediapipe/tasks-vision';
-import { LabelActionType } from '../types';
-import { LABELS, LANDMARK } from '../core/constants';
-import { convertThreejsPosition } from '../core/Utilities';
+import { VideoRenderer } from "./VideoRenderer";
+import { BigBangAttack } from "../effects/BigBangAttack";
+import { Kamehameha } from "../effects/Kamehameha";
+import { MajinBuu } from "../effects/MajinBuu";
+import { SuperSaiyajin } from "../effects/SuperSaiyajin";
+import { SuperSaiyajinOura } from "../effects/SuperSaiyajinOura";
+import { Teleportation } from "../effects/Teleportation";
+import { NormalizedLandmark } from "@mediapipe/tasks-vision";
+import { LabelActionType } from "../types";
+import { LABELS, LANDMARK } from "../core/constants";
+import { convertThreejsPosition } from "../core/Utilities";
 
 export class Main {
   private videoRenderer: VideoRenderer;
@@ -74,18 +74,22 @@ export class Main {
   }
 
   isEffectInProgress() {
-    return this.bigBangAttack.getIsRun() || this.teleportation.getIsRun();
+    return (
+      this.bigBangAttack.getIsRun() ||
+      this.teleportation.getIsRun() ||
+      this.kamehameha.getIsRun()
+    );
   }
 
   runKamehameha(x: number, y: number, z: number) {
     console.log({ x, y, z });
-    this.kamehameha.start(x, y, z);
+    // this.kamehameha.start(x, y, z);
   }
 
   runOura(landmarks: NormalizedLandmark[]) {
     const scene = this.videoRenderer.getScene();
     this.superSaiyajinOura.run();
-    console.log('runOura');
+    console.log("runOura");
   }
 
   showEffect(
@@ -106,6 +110,8 @@ export class Main {
     } else if (label === LABELS.SYUNKANIDOU) {
       this.teleportation.run();
       onComplete();
+    } else {
+      this.kamehameha.start(landmarks);
     }
 
     onComplete();
