@@ -196,6 +196,7 @@ export class SuperSaiyajinOura extends BaseEffect {
       .max(5)
       .step(0.1)
       .name("auraCenterCenterY");
+    gui.show(false);
     // gui
     //   .addColor(colorObject, 'color') // ラッパーオブジェクトを使用
     //   .onChange((value: number) => {
