@@ -8,6 +8,7 @@ import { RENDERING_SIZE } from "../core/constants";
 import * as dat from "lil-gui";
 
 export class Heaven extends BaseEffect {
+  protected texture: THREE.Texture;
   private mesh: THREE.Mesh;
   private angelRing: AngelRing;
   private readonly liveCommentary: LiveCommentary;
@@ -15,6 +16,7 @@ export class Heaven extends BaseEffect {
   private currentStep: number = 0; // 現在のステップ
   private readonly stepInterval: number = 8000; // 各処理の間隔（ミリ秒）
   private landmarks: AngelRingNormalizedLandmark | null = null;
+  private ctx: CanvasRenderingContext2D | null;
   constructor(
     scene: THREE.Scene,
     liveCommentary: LiveCommentary = LiveCommentary.getInstance()
@@ -26,10 +28,30 @@ export class Heaven extends BaseEffect {
       RENDERING_SIZE.width,
       RENDERING_SIZE.height
     );
+
+    const canvas = document.createElement("canvas");
+    canvas.width = RENDERING_SIZE.width;
+    canvas.height = RENDERING_SIZE.height;
+    this.ctx = canvas.getContext("2d");
+
+    // 背景と文字を描画
+    this.ctx!.fillStyle = "black"; // 背景色
+    this.ctx!.fillRect(0, 0, RENDERING_SIZE.width, RENDERING_SIZE.height);
+    this.ctx!.fillStyle = "white"; // 文字色
+    this.ctx!.font = "50px Arial";
+    this.ctx!.textAlign = "center";
+    this.ctx!.textBaseline = "middle";
+    this.ctx!.fillText(
+      "グチャ！",
+      RENDERING_SIZE.width / 2,
+      RENDERING_SIZE.height / 2
+    );
+    this.texture = new THREE.CanvasTexture(canvas);
+
     const material = new THREE.MeshBasicMaterial({
-      color: 0x000000, // 黒
+      map: this.texture,
       transparent: true, // 透明度を操作するため
-      opacity: 0, // 初期状態は透明
+      opacity: 1, // 初期状態は透明
     });
     this.mesh = new THREE.Mesh(geometry, material);
     this.mesh.position.z = -3;
@@ -47,6 +69,26 @@ export class Heaven extends BaseEffect {
       rightEar: landmarks[LANDMARK.RIGHT_EAR],
     };
     this.landmarks = angleRingLandmarks;
+  }
+
+  updateText(newText: string) {
+    // 背景を再描画
+    this.ctx!.fillStyle = "black"; // 背景色
+    this.ctx!.fillRect(0, 0, RENDERING_SIZE.width, RENDERING_SIZE.height);
+
+    // 新しい文字を描画
+    this.ctx!.fillStyle = "white"; // 文字色
+    this.ctx!.font = "50px Arial";
+    this.ctx!.textAlign = "center";
+    this.ctx!.textBaseline = "middle";
+    this.ctx!.fillText(
+      newText,
+      RENDERING_SIZE.width / 2,
+      RENDERING_SIZE.height / 2
+    );
+
+    // テクスチャを更新
+    this.texture.needsUpdate = true;
   }
 
   /**ランドマーク情報を取得する */
@@ -70,7 +112,7 @@ export class Heaven extends BaseEffect {
     const landmarks = this.getLandmarks();
     this.angelRing.start(landmarks, -5);
 
-    this.setGUI(true);
+    this.setGUI(false);
   }
 
   stop() {
@@ -98,14 +140,10 @@ export class Heaven extends BaseEffect {
       this.performStep(this.currentStep, elapsedTime);
     }
 
-    // 全ての処理が完了していればループを終了
+    // 暗転時に天使の輪を描画
     if (this.currentStep > 3) {
       const landmarks = this.getLandmarks();
-      console.log("currentStep", { landmarks });
       this.angelRing.animate(landmarks);
-      //console.log("全ての処理が完了しました");
-      //this.isRun = false;
-      //return;
     }
   };
   private performStep(step: number, elapsedTime: number) {
@@ -115,13 +153,11 @@ export class Heaven extends BaseEffect {
         break;
       case 1:
         this.liveCommentary.updateMessage(
-          "ビッグバンアタック魔人ブウに全然効いてない。魔人ブウ ピンピンしてる"
+          "魔人ブウ強えービッグバンアタック全然効いてないわ"
         );
         break;
       case 2:
-        this.liveCommentary.updateMessage(
-          "こうなったら、運よく生き残った人にお願いして、後でドラゴンボールで生き返らせてもらうしかないね…！"
-        );
+        this.liveCommentary.updateMessage("ひーん にげろー 殺されるー");
         break;
       case 3:
         // 暗転
@@ -133,24 +169,14 @@ export class Heaven extends BaseEffect {
 
         (this.mesh.material as THREE.Material).opacity = 1;
         this.mesh.position.z = 2;
-        this.liveCommentary.updateMessage("全員しんだ");
-
         break;
       case 4:
-        this.liveCommentary.updateMessage(
-          "6ヶ月の修行、お疲れさま！この期間で君の中で眠っていた戦闘民族サイヤ人のパワーがどんどん覚醒してるよ！"
-        );
+        this.updateText("バキバキ！ボコボコ！");
         break;
       case 5:
-        this.liveCommentary.updateMessage(
-          "この調子で修行を1年、2年続けていけば、スーパーサイヤ人3くらいになって魔神ブウにも勝てると思うよ！"
-        );
-        break;
-      case 6:
         // 暗転解除
         (this.mesh.material as THREE.Material).opacity = 0;
         this.mesh.position.z = -3;
-
         break;
       default:
         break;

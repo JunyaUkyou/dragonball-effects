@@ -31,8 +31,6 @@ export class AngelRing {
     this.mesh = new THREE.Sprite(spriteMaterial);
     // 下端を基準点に設定
     this.mesh.center.set(0.5, 0);
-
-    console.log("AngelRing constructor");
   }
 
   // /**ランドマーク情報を設定する */
@@ -60,8 +58,6 @@ export class AngelRing {
 
   private getPosition(noseLandmark: NormalizedLandmark, defaultZ: number) {
     const landmark = convertThreejsPosition(noseLandmark);
-    const scaleFactor = this.getScaleFactor(noseLandmark.z);
-    console.log({ scaleFactor, noseLandmark });
 
     return {
       positionX: landmark.x,
@@ -96,12 +92,10 @@ export class AngelRing {
   }
 
   start(landmarks: AngelRingNormalizedLandmark | null, potistionZ: number = 1) {
-    console.log({ landmarks });
     if (!landmarks) {
       return; // landmarksが取得できない場合は終了
     }
 
-    console.log({ landmarks });
     // ランドマーク情報からビッグバンアタック開始位置を取得
     const { positionX, positionY, positionZ } = this.getPosition(
       landmarks.nose,
@@ -116,8 +110,6 @@ export class AngelRing {
     this.mesh.scale.set(scaleX, scaleY, scaleZ);
 
     this.scene.add(this.mesh);
-
-    console.log("シーン追加");
 
     const guiObject = {
       color: new THREE.Color(0xffff00),
@@ -167,6 +159,8 @@ export class AngelRing {
       .max(10)
       .step(0.1)
       .name("AngelRingRotationX");
+
+    gui.show(false);
   }
 
   animate = (landmarks: AngelRingNormalizedLandmark | null) => {
