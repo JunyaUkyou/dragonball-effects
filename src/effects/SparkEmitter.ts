@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { Spark } from './Spark';
 
-export class SparkEmitter extends THREE.Object3D {
+export class SparkEmitter extends THREE.Group {
   private _sparkList: Spark[] = [];
   private _sparkNum: number = 300;
 

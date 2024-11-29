@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { RENDERING_SIZE } from '../config/constants';
+import { RENDERING_SIZE } from '../core/constants';
 
-export class Spark extends THREE.Object3D {
+export class Spark extends THREE.Group {
   private readonly _mesh: THREE.Mesh;
   private _speed: number = Math.random() * 0.2 + 0.1;
   private _opacity: number = 0.5;

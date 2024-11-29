@@ -9,7 +9,13 @@ import {
   PoseLandmarkerResult,
 } from '@mediapipe/tasks-vision';
 import { getRecognizer, getLandmarkerResult } from './models/landmarker';
-import { MEDIA_CONSTRAINTS, RENDERING_SIZE, LABELS } from './config/constants';
+import {
+  MEDIA_CONSTRAINTS,
+  RENDERING_SIZE,
+  LABELS,
+  TRAIN_ACTIONS,
+} from './core/constants';
+import { LabelActionType } from './types';
 
 const classifier = knnClassifier.create(); // KNN分類器
 const videoElement = <HTMLVideoElement>document.getElementById('video'); // カメラ映像
@@ -18,35 +24,12 @@ const canvasCtx = canvasElement.getContext('2d', { willReadFrequently: true });
 
 // 現在のステータス
 const statusElement = document.getElementById('status');
-// ビックバンアタック
-const saveBigBangAttack = document.getElementById('saveBigBangAttack'); // 学習ボタン
-// 魔貫光殺砲
-const saveMakankousappou_pose = document.getElementById(
-  'saveMakankousappou_pose'
-);
-const saveMakankousappou_send = document.getElementById(
-  'saveMakankousappou_send'
-);
-// かめはめ波
-const saveKamehameha_pose = document.getElementById('saveKamehameha_pose');
-const saveKamehameha_send = document.getElementById('saveKamehameha_send');
-
-// 気円斬構え
-const kienzan_pose = document.getElementById('kienzan_pose');
-
-// 直立
-const upright = document.getElementById('upright');
-// 正座
-const seiza = document.getElementById('seiza');
-
-// その他アクション
-const nonAction = document.getElementById('nonAction');
 
 const StopElement = document.getElementById('StopButton'); // 出力ボタン
 const downloadModelElement = document.getElementById('downloadModelButton'); // 出力ボタン
 
 let isSave = false; // 記録フラグ
-let labelAction = 0;
+let labelAction: LabelActionType = 0;
 let isPose = true;
 let recognizer: GestureRecognizer | PoseLandmarker;
 const predictionInterval = 1000; // 1秒ごとに姿勢推定
@@ -116,7 +99,6 @@ async function registerGesture() {
     );
 
     if (results.landmarks.length > 0) {
-      //console.log('推論結果あり', results);
       // 推論結果を保存する
       // この処理は毎フレーム呼ばれないため、推論の可視化処理を行っても次フレームで消えてしまう
       // 毎フレーム動作するrenderFrame()でランドマークの推論の可視化処理を行う
@@ -165,16 +147,24 @@ function visualize(
 
   canvasCtx.restore();
 }
+function getCountForLabel() {
+  // 現在のラベルの登録数を取得
+  const classCounts = classifier.getClassExampleCount();
+  return classCounts[labelAction] || 0;
+}
 
 function saveLandmarks(
   results: GestureRecognizerResult | PoseLandmarkerResult
 ) {
   // 現在のラベルの登録数を取得
-  const classCounts = classifier.getClassExampleCount();
-  const currentLabelCount = classCounts[labelAction] || 0;
+  const currentLabelCount = getCountForLabel();
 
   // 上限に達していない場合のみ登録
   if (currentLabelCount > MAX_SAMPLES_PER_LABEL) {
+    if (statusElement!.textContent?.indexOf('上限達成') === -1) {
+      statusElement!.textContent += ' 上限達成';
+    }
+
     console.log(`Max samples reached for label ${labelAction}.`);
     return;
   }
@@ -227,46 +217,21 @@ async function saveClassifier() {
   return JSON.stringify(parsedDataset);
 }
 
-function startSaving(labelValue: string) {
-  console.log({ labelValue });
+function startSaving(trainAction: {
+  id: string;
+  label: string;
+  key: keyof typeof LABELS;
+}) {
   isSave = true;
-  labelAction = Number(labelValue);
+  labelAction = LABELS[trainAction.key];
+  console.log({ trainAction, labelAction });
+  statusElement!.textContent = trainAction.label += '学習中';
 
-  let string;
-  switch (labelValue) {
-    case LABELS.BIGBANG_ATTACK:
-      string = 'ビッグバンアタック';
-      break;
-    case LABELS.MAKANKOUSAPPOU_POSE:
-      string = '魔貫光殺砲構え';
-      break;
-    case LABELS.MAKANKOUSAPPOU_SEND:
-      string = '魔貫光殺砲実行';
-      break;
-    case LABELS.KAMEHAMEHA_POSE:
-      string = 'かめはめ波構え';
-      break;
-    case LABELS.KAMEHAMEHA_SEND:
-      string = 'かめはめ波実行';
-      break;
-    case LABELS.KAMEHAMEHA_SEND:
-      string = 'かめはめ波実行';
-      break;
-    case LABELS.KIENZAN_POSE:
-      string = '気円斬構え';
-      break;
-    case LABELS.UPRIGHT:
-      string = '直立';
-      break;
-    case LABELS.SEIZA:
-      string = '正座';
-      break;
-    case LABELS.NONACTION:
-      string = 'その他アクション';
-      break;
+  // 学習するラベルがすでに登録されている場合は削除する
+  const currentCount = getCountForLabel();
+  if (currentCount > 0) {
+    classifier.clearClass(labelAction);
   }
-
-  statusElement!.textContent = string += '学習中';
 }
 
 function stopSaving() {
@@ -286,34 +251,24 @@ function addEventListeners() {
     videoElement.srcObject = stream;
     videoElement.addEventListener('loadeddata', renderFrame);
   });
-  // ビックバンアタック学習ボタンクリック
-  saveBigBangAttack!.addEventListener('click', () =>
-    startSaving(LABELS.BIGBANG_ATTACK)
-  );
-  // 魔貫光殺砲学習ボタンクリック
-  saveMakankousappou_pose!.addEventListener('click', () =>
-    startSaving(LABELS.MAKANKOUSAPPOU_POSE)
-  );
-  saveMakankousappou_send!.addEventListener('click', () =>
-    startSaving(LABELS.MAKANKOUSAPPOU_SEND)
-  );
-  // かめはめ波学習ボタンクリック
-  saveKamehameha_pose!.addEventListener('click', () =>
-    startSaving(LABELS.KAMEHAMEHA_POSE)
-  );
-  saveKamehameha_send!.addEventListener('click', () =>
-    startSaving(LABELS.KAMEHAMEHA_SEND)
-  );
-  // 気円斬構え
-  kienzan_pose!.addEventListener('click', () =>
-    startSaving(LABELS.KIENZAN_POSE)
-  );
-  // 直立（正面、右向き、左向き、手は横）
-  upright!.addEventListener('click', () => startSaving(LABELS.UPRIGHT));
-  // 正座（中腰含む）
-  seiza!.addEventListener('click', () => startSaving(LABELS.SEIZA));
-  // その他学習ボタンクリック（PC操作など）
-  nonAction!.addEventListener('click', () => startSaving(LABELS.NONACTION));
+
+  // ボタンにイベントを一括登録
+  TRAIN_ACTIONS.forEach(() => {});
+
+  TRAIN_ACTIONS.forEach((trainAction) => {
+    const button = document.getElementById(trainAction.id);
+    if (button) {
+      button.addEventListener('click', () => {
+        // 5秒後に実行
+        setTimeout(() => {
+          startSaving(trainAction);
+        }, 5000);
+      });
+    } else {
+      console.warn(`Button with id '${trainAction.id}' not found.`);
+    }
+  });
+
   // 学習停止ボタンクリック
   StopElement!.addEventListener('click', stopSaving);
   // ダウンロードボタンクリック

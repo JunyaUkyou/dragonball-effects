@@ -44,34 +44,39 @@ button.btn-border:hover {
   background: #000;
 }
 
-.buttons {
-  height: 600px;
-  display: flex;
-  justify-content: space-around;
-}
+#train-container {
+  .buttons {
+    height: 600px;
+    display: flex;
+    justify-content: space-around;
+  }
 
-.button-description {
-  font-size: 1.6rem;
-  font-weight: 800;
-  position: relative;
-  line-height: 1.4;
-  padding: 0.5em 1em;
-  display: inline-block;
-  border-bottom: solid 2px black;
-}
+  .button-description {
+    font-size: 1.6rem;
+    font-weight: 800;
+    position: relative;
+    line-height: 1.4;
+    padding: 0.5em 1em;
+    display: inline-block;
+    border-bottom: solid 2px black;
+  }
 
-.left {
-  display: flex;
-  flex-flow: column;
-  justify-content: space-between;
-}
+  .train-actions {
+    display: flex;
+    flex-flow: column;
+  }
+  .left {
+    display: flex;
+    flex-flow: column;
+    justify-content: space-between;
+  }
 
-.right {
-  display: flex;
-  flex-flow: column;
-  justify-content: space-between;
+  .right {
+    display: flex;
+    flex-flow: column;
+    justify-content: space-between;
+  }
 }
-
 /*推論*/
 .prediction-menu {
   margin: 20px 0;
@@ -217,12 +222,13 @@ button.btn-border:hover {
     min-width: 120px;
 
     width: 700px;
+    height: 200px;
     color: #555;
     font-size: 16px;
     background: #e0edff;
     border-radius: 10px;
-    text-align: center;
-    line-height: 200px;
+    /*text-align: center;*/
+    line-height: 2;
   }
 
   .balloon1-left:before {
@@ -238,7 +244,26 @@ button.btn-border:hover {
   .balloon1-left p {
     font-size: 30px;
 
-    margin: 0;
+    margin: 10px;
     padding: 0;
   }
+}
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-15px);
+  }
+  50% {
+    transform: translateY(15px);
+  }
+  75% {
+    transform: translateY(-15px);
+  }
+}
+
+.shake {
+  animation: shake 0.5s ease-in-out;
 }
