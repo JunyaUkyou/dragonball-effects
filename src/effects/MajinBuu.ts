@@ -137,6 +137,7 @@ export class MajinBuu extends BaseEffect {
     const progress = Math.min(elapsedTime / totalDuration, 1);
 
     // 現在位置を更新
+    // 線形補間（Lerp）
     const nextPositionY =
       this.startPositionY +
       (this.finalPositionY - this.startPositionY) * progress;
