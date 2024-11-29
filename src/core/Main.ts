@@ -4,8 +4,8 @@ import { Kamehameha } from "../effects/Kamehameha";
 import { MajinBuu } from "../effects/MajinBuu";
 import { SuperSaiyajin } from "../effects/SuperSaiyajin";
 import { SuperSaiyajinOura } from "../effects/SuperSaiyajinOura";
-import { AngelRing } from "../effects/AngelRing";
 import { Teleportation } from "../effects/Teleportation";
+import { SuperSaiyajinEvent } from "../effects/SuperSaiyajinEvent";
 import { NormalizedLandmark } from "@mediapipe/tasks-vision";
 import { LabelActionType } from "../types";
 import { LABELS, LANDMARK } from "../core/constants";
@@ -25,6 +25,7 @@ export class Main {
   private lastFrameTime = performance.now();
   private targetFPS = 60;
   private frameInterval = 1000 / this.targetFPS;
+  private _superSaiyajinEvent: SuperSaiyajinEvent | null = null;
 
   constructor(video: HTMLVideoElement) {
     this.videoRenderer = new VideoRenderer(video);
@@ -87,6 +88,14 @@ export class Main {
     }
     return this._heaven;
   }
+  // スーパーサイヤ人イベント
+  get superSaiyajinEvent(): SuperSaiyajinEvent {
+    if (this._superSaiyajinEvent === null) {
+      const scene = this.videoRenderer.getScene();
+      this._superSaiyajinEvent = new SuperSaiyajinEvent(scene);
+    }
+    return this._superSaiyajinEvent;
+  }
 
   isSuperSaiyajinRunning() {
     return this.superSaiyajin.getIsRun();
@@ -97,7 +106,8 @@ export class Main {
       this.bigBangAttack.getIsRun() ||
       this.teleportation.getIsRun() ||
       this.kamehameha.getIsRun() ||
-      this.heaven.getIsRun()
+      this.heaven.getIsRun() ||
+      this.superSaiyajinEvent.getIsRun()
     );
   }
   endEffect = () => {};
@@ -122,6 +132,11 @@ export class Main {
     this.heaven.start();
   }
 
+  SuperSaiyajinStart() {
+    this.superSaiyajin.run();
+    this.superSaiyajinOura.run();
+  }
+
   showEffect(
     label: LabelActionType,
     landmarks: NormalizedLandmark[],
@@ -134,8 +149,9 @@ export class Main {
       this.majinBuu.start(landmarks);
       //onComplete();
     } else if (label === LABELS.SUPERSAIYAJIN) {
-      this.superSaiyajin.run();
-      this.superSaiyajinOura.run();
+      this.superSaiyajinEvent.start();
+      // this.superSaiyajin.run();
+      // this.superSaiyajinOura.run();
       //onComplete();
     } else if (label === LABELS.SYUNKANIDOU) {
       this.teleportation.run();
@@ -192,6 +208,9 @@ export class Main {
 
       if (this.heaven.getIsRun()) {
         this.heaven.animate();
+      }
+      if (this.superSaiyajinEvent.getIsRun()) {
+        this.superSaiyajinEvent.animate();
       }
     }
     requestAnimationFrame(this.animate);

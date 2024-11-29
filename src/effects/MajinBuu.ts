@@ -104,7 +104,7 @@ export class MajinBuu extends BaseEffect {
       .max(10)
       .step(0.1)
       .name("rotationZ");
-    gui.show(true);
+    gui.show(false);
 
     // エフェクト表示フラグON
     this.isRun = true;

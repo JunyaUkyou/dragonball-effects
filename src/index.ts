@@ -61,7 +61,14 @@ function setupEventListeners() {
   document.addEventListener("completeEffect", (event) => {
     const customEvent = event as CustomEvent;
     console.log("受信したデータ:", customEvent.detail);
-    state.mainInstance!.heavenStart();
+    switch (customEvent.detail.label) {
+      case LABELS.BIGBANG_ATTACK:
+        state.mainInstance!.heavenStart();
+        break;
+      case LABELS.SUPERSAIYAJIN:
+        state.mainInstance!.SuperSaiyajinStart();
+        break;
+    }
   });
 
   // エフェクト完了イベント
