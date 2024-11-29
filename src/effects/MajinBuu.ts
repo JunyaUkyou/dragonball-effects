@@ -9,7 +9,8 @@ import { convertThreejsPosition, getDelta } from "../core/Utilities";
 export class MajinBuu extends BaseEffect {
   private group: THREE.Group;
   private finalPositionY: number = 0;
-  private lastUpdateTime = performance.now();
+  private startPositionY: number = 0;
+  private startTime: number | null = null; // アニメーションの開始時間
 
   constructor(scene: THREE.Scene) {
     super(scene);
@@ -113,16 +114,38 @@ export class MajinBuu extends BaseEffect {
     if (!this.isRun) {
       return;
     }
-    const now = performance.now();
-    const delta = getDelta(this.lastUpdateTime);
-    this.lastUpdateTime = now;
-    const speed = 20;
 
-    if (this.finalPositionY >= this.group.position.y) {
-      this.group.position.y += speed * delta;
+    // 目標位置まで到達している場合
+    if (this.group.position.y >= this.finalPositionY) {
       return;
     }
-    this.isRun = false;
+
+    const now = performance.now();
+
+    // 初回フレームでスタート時間を設定
+    if (!this.startTime) {
+      this.startTime = now;
+      // 初期位置を記録
+      this.startPositionY = this.group.position.y;
+    }
+    // 経過時間
+    const elapsedTime = now - this.startTime;
+    // 目標の位置まで到達する時間
+    const totalDuration = 10000;
+
+    // 進捗率を計算
+    const progress = Math.min(elapsedTime / totalDuration, 1);
+
+    // 現在位置を更新
+    const nextPositionY =
+      this.startPositionY +
+      (this.finalPositionY - this.startPositionY) * progress;
+    this.group.position.y = nextPositionY;
+
+    // アニメーション終了判定
+    if (progress >= 1) {
+      this.isRun = false;
+    }
   };
 
   // 終了処理
