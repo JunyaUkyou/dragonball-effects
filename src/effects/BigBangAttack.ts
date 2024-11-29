@@ -14,6 +14,7 @@ export class BigBangAttack extends BaseEffect {
   protected _sphere: Sphere | null = null;
   private readonly liveCommentary: LiveCommentary;
   private lastUpdateTime = performance.now();
+  private startTime: number | null = null; // アニメーションの開始時間
 
   // スケール拡大用の係数
   private scaleIncrement: number = 0.25;
@@ -81,7 +82,7 @@ export class BigBangAttack extends BaseEffect {
     this.initSphere(x, y, z);
   }
 
-  private updateSphere(scaleDelta: number) {
+  private updateSphere(scaleDelta: number = 0.01) {
     if (this.scaleIncrement === 0) return;
     this.sphere.mesh.scale.x += scaleDelta;
     this.sphere.mesh.scale.y += scaleDelta;
@@ -156,6 +157,11 @@ export class BigBangAttack extends BaseEffect {
       return;
     }
     const now = performance.now();
+    if (this.startTime === null) {
+      this.startTime = now;
+    }
+    const elapsedTime = now - this.startTime;
+
     const delta = getDelta(this.lastUpdateTime);
     this.lastUpdateTime = now;
 
@@ -165,27 +171,63 @@ export class BigBangAttack extends BaseEffect {
     // エネルギー弾の回転
     this.updateRotate(delta);
     // エネルギー弾の大きさ
-    this.updateSphere(scaleDelta);
+    //this.updateSphere(scaleDelta);
 
     // エネルギー弾の大きさに応じて色や透明度を調整
     const scaleX = this.sphere.mesh.scale.x;
 
-    if (scaleX > 4) {
+    if (elapsedTime < 10000) {
+    } else {
       // 色の変更
       this.updateColor(scaleX);
       // 球体の透明度を調整（スケールが大きくなると透明度が増す）
       this.updateOpacity(scaleX);
     }
 
-    if (scaleX > 4 && scaleX < 6) {
-      //this.scaleIncrement = 0.03;
-    } else if (scaleX > 6 && scaleX < 8) {
+    if (elapsedTime < 1000) {
+    } else if (elapsedTime > 1000 && elapsedTime < 2000) {
+      if (this.sphere.mesh.scale.x <= 2) {
+        this.updateSphere();
+      }
+    } else if (elapsedTime > 2000 && elapsedTime < 4000) {
+      if (this.sphere.mesh.scale.x <= 3) {
+        this.updateSphere();
+      }
+    } else if (elapsedTime > 4000 && elapsedTime < 6000) {
+      if (this.sphere.mesh.scale.x <= 4) {
+        this.updateSphere();
+      }
+    } else if (elapsedTime > 6000 && elapsedTime < 8000) {
+      if (this.sphere.mesh.scale.x <= 5) {
+        this.updateSphere();
+      }
+    } else if (elapsedTime > 8000 && elapsedTime < 10000) {
+      if (this.sphere.mesh.scale.x <= 6) {
+        this.updateSphere();
+      }
+    } else if (elapsedTime > 10000 && elapsedTime < 15000) {
+      if (this.sphere.mesh.scale.x <= 7) {
+        this.updateSphere();
+      }
+    } else if (elapsedTime > 15000 && elapsedTime < 21000) {
       this.liveCommentary.updateMessage("天さん！僕の超能力が効かない！");
-    } else if (scaleX > 8 && scaleX < 10) {
+      if (this.sphere.mesh.scale.x <= 8) {
+        this.updateSphere();
+      }
+    } else if (elapsedTime > 21000 && elapsedTime < 27000) {
+      if (this.sphere.mesh.scale.x <= 9) {
+        this.updateSphere();
+      }
       this.liveCommentary.updateMessage("地球もろとも消すつもりか!!!!");
-    } else if (scaleX > 10 && scaleX < 11) {
+    } else if (elapsedTime > 27000 && elapsedTime < 33000) {
+      if (this.sphere.mesh.scale.x <= 11) {
+        this.updateSphere();
+      }
       this.liveCommentary.updateMessage("うわぁぁぁぁ!!!!");
-    } else if (scaleX > 11) {
+    } else if (elapsedTime > 33000) {
+      // if (this.sphere.mesh.scale.x <= 10) {
+      //   this.updateSphere();
+      // }
       this.liveCommentary.updateMessage("さよなら天さん、、");
 
       this.scaleIncrement = 0;
