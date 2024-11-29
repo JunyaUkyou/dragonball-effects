@@ -56,6 +56,14 @@ function setupEventListeners() {
       : "ポーズ検出を開始してください";
     state.liveCommentary.updateMessage(commentaryMessage);
   });
+
+  // エフェクト完了イベント
+  document.addEventListener("completeEffect", (event) => {
+    const customEvent = event as CustomEvent;
+    console.log("受信したデータ:", customEvent.detail);
+    state.mainInstance!.heavenStart();
+  });
+
   document.getElementById("test_kamehameha")?.addEventListener("click", () => {
     state.mainInstance?.runKamehameha(0, 0, 0);
   });
@@ -64,6 +72,14 @@ function setupEventListeners() {
     state.mainInstance?.runBigBangAttack(0, 0, 0);
     state.mainInstance?.runMajinBuu(0, 0, 0);
   });
+
+  document.getElementById("test_heaven")?.addEventListener("click", () => {
+    const onEventComplete = () => {
+      console.log("onEventComplete");
+    };
+    state.mainInstance!.showEvent();
+  });
+
   document.getElementById("test_oura")?.addEventListener("click", () => {
     const landmark = {
       x: 0,
@@ -287,6 +303,13 @@ async function predictGesture() {
     console.log(results.landmarks[0]);
     state.isEffectInProgress = true;
     const onEffectComplete = () => {
+      // // ビッグバンアタック終了後はヘブンイベント発生
+      // if (label === LABELS.BIGBANG_ATTACK) {
+      //   const onEventComplete = () => {
+      //     console.log("onEventComplete");
+      //   };
+      //   state.mainInstance!.showEvent(onEventComplete);
+      // }
       console.log("onEffectComplete");
       resetDetectionCounts(); // カウントをリセット
       state.isEffectInProgress = false;

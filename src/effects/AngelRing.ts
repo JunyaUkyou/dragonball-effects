@@ -5,19 +5,20 @@ import { NormalizedLandmark } from "@mediapipe/tasks-vision";
 import { LANDMARK } from "../core/constants";
 import { convertThreejsPosition } from "../core/Utilities";
 
-type AngelRingNormalizedLandmark = {
+export type AngelRingNormalizedLandmark = {
   nose: NormalizedLandmark;
   leftEar: NormalizedLandmark;
   rightEar: NormalizedLandmark;
 };
 
-export class AngelRing extends BaseEffect {
+export class AngelRing {
+  private readonly scene: THREE.Scene;
   private readonly texture: THREE.Texture;
   private readonly mesh: THREE.Sprite;
-  private landmarks: AngelRingNormalizedLandmark | null = null;
+  // private landmarks: AngelRingNormalizedLandmark | null = null;
   private readonly baseDistance = 1.2;
   constructor(scene: THREE.Scene) {
-    super(scene);
+    this.scene = scene;
     // テクスチャー
     this.texture = new THREE.TextureLoader().load("/texture/angel_ring.png");
 
@@ -30,32 +31,34 @@ export class AngelRing extends BaseEffect {
     this.mesh = new THREE.Sprite(spriteMaterial);
     // 下端を基準点に設定
     this.mesh.center.set(0.5, 0);
+
+    console.log("AngelRing constructor");
   }
 
-  /**ランドマーク情報を設定する */
-  setLandmarks(landmarks: NormalizedLandmark[]) {
-    const angleRingLandmarks = {
-      nose: landmarks[LANDMARK.NOSE],
-      leftEar: landmarks[LANDMARK.LEFT_EAR],
-      rightEar: landmarks[LANDMARK.RIGHT_EAR],
-    };
-    this.landmarks = angleRingLandmarks;
-  }
+  // /**ランドマーク情報を設定する */
+  // setLandmarks(landmarks: NormalizedLandmark[]) {
+  //   const angleRingLandmarks = {
+  //     nose: landmarks[LANDMARK.NOSE],
+  //     leftEar: landmarks[LANDMARK.LEFT_EAR],
+  //     rightEar: landmarks[LANDMARK.RIGHT_EAR],
+  //   };
+  //   this.landmarks = angleRingLandmarks;
+  // }
 
-  /**ランドマーク情報を取得する */
-  getLandmarks() {
-    if (!this.landmarks) {
-      return null;
-    }
+  // /**ランドマーク情報を取得する */
+  // getLandmarks() {
+  //   if (!this.landmarks) {
+  //     return null;
+  //   }
 
-    const nose = this.landmarks.nose;
-    const leftEar = this.landmarks.leftEar;
-    const rightEar = this.landmarks.rightEar;
+  //   const nose = this.landmarks.nose;
+  //   const leftEar = this.landmarks.leftEar;
+  //   const rightEar = this.landmarks.rightEar;
 
-    return { nose, leftEar, rightEar };
-  }
+  //   return { nose, leftEar, rightEar };
+  // }
 
-  private getPosition(noseLandmark: NormalizedLandmark) {
+  private getPosition(noseLandmark: NormalizedLandmark, defaultZ: number) {
     const landmark = convertThreejsPosition(noseLandmark);
     const scaleFactor = this.getScaleFactor(noseLandmark.z);
     console.log({ scaleFactor, noseLandmark });
@@ -63,7 +66,7 @@ export class AngelRing extends BaseEffect {
     return {
       positionX: landmark.x,
       positionY: landmark.y + Math.abs(noseLandmark.z) * 110,
-      positionZ: 1,
+      positionZ: defaultZ,
     };
   }
 
@@ -92,15 +95,17 @@ export class AngelRing extends BaseEffect {
     return this.baseDistance / (this.baseDistance - z);
   }
 
-  start() {
-    const landmarks = this.getLandmarks();
+  start(landmarks: AngelRingNormalizedLandmark | null, potistionZ: number = 1) {
+    console.log({ landmarks });
     if (!landmarks) {
       return; // landmarksが取得できない場合は終了
     }
-    this.isRun = true;
+
+    console.log({ landmarks });
     // ランドマーク情報からビッグバンアタック開始位置を取得
     const { positionX, positionY, positionZ } = this.getPosition(
-      landmarks.nose
+      landmarks.nose,
+      potistionZ
     );
     this.mesh.position.set(positionX, positionY, positionZ);
 
@@ -111,6 +116,8 @@ export class AngelRing extends BaseEffect {
     this.mesh.scale.set(scaleX, scaleY, scaleZ);
 
     this.scene.add(this.mesh);
+
+    console.log("シーン追加");
 
     const guiObject = {
       color: new THREE.Color(0xffff00),
@@ -162,11 +169,7 @@ export class AngelRing extends BaseEffect {
       .name("AngelRingRotationX");
   }
 
-  animate = () => {
-    if (!this.isRun) {
-      return;
-    }
-    const landmarks = this.getLandmarks();
+  animate = (landmarks: AngelRingNormalizedLandmark | null) => {
     // landmarksが取得できない場合は終了
     if (!landmarks) {
       return;
@@ -174,7 +177,8 @@ export class AngelRing extends BaseEffect {
 
     // ランドマーク情報からビッグバンアタック開始位置を取得
     const { positionX, positionY, positionZ } = this.getPosition(
-      landmarks.nose
+      landmarks.nose,
+      1
     );
     this.mesh.position.set(positionX, positionY, positionZ);
 
@@ -186,7 +190,6 @@ export class AngelRing extends BaseEffect {
   };
 
   stop() {
-    this.isRun = false;
     if (this.mesh) {
       this.scene.remove(this.mesh);
       // リソースの解放

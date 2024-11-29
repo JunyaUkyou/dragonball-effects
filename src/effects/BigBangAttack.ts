@@ -4,7 +4,7 @@ import { BaseEffect } from "./BaseEffect";
 import { RENDERING_HALF_SIZE } from "../core/constants";
 import { LiveCommentary } from "../core/LiveCommentary";
 import { NormalizedLandmark } from "@mediapipe/tasks-vision";
-import { LANDMARK } from "../core/constants";
+import { LANDMARK, LABELS } from "../core/constants";
 import { convertThreejsPosition, getDelta } from "../core/Utilities";
 
 const DEFAULT_SIZE = 32;
@@ -107,6 +107,9 @@ export class BigBangAttack extends BaseEffect {
 
       // シーンから削除
       this.removeMesh();
+
+      // 終了イベント発火
+      this.completeEffect(LABELS.BIGBANG_ATTACK);
 
       return; // アニメーション終了
     }
