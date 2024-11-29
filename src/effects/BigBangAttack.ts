@@ -4,7 +4,7 @@ import { BaseEffect } from "./BaseEffect";
 import { RENDERING_HALF_SIZE } from "../core/constants";
 import { LiveCommentary } from "../core/LiveCommentary";
 import { NormalizedLandmark } from "@mediapipe/tasks-vision";
-import { LANDMARK } from "../core/constants";
+import { LANDMARK, LABELS } from "../core/constants";
 import { convertThreejsPosition, getDelta } from "../core/Utilities";
 
 const DEFAULT_SIZE = 32;
@@ -14,6 +14,7 @@ export class BigBangAttack extends BaseEffect {
   protected _sphere: Sphere | null = null;
   private readonly liveCommentary: LiveCommentary;
   private lastUpdateTime = performance.now();
+  private startTime: number | null = null; // アニメーションの開始時間
 
   // スケール拡大用の係数
   private scaleIncrement: number = 0.25;
@@ -81,7 +82,7 @@ export class BigBangAttack extends BaseEffect {
     this.initSphere(x, y, z);
   }
 
-  private updateSphere(scaleDelta: number) {
+  private updateSphere(scaleDelta: number = 0.01) {
     if (this.scaleIncrement === 0) return;
     this.sphere.mesh.scale.x += scaleDelta;
     this.sphere.mesh.scale.y += scaleDelta;
@@ -107,6 +108,9 @@ export class BigBangAttack extends BaseEffect {
 
       // シーンから削除
       this.removeMesh();
+
+      // 終了イベント発火
+      this.completeEffect(LABELS.BIGBANG_ATTACK);
 
       return; // アニメーション終了
     }
@@ -153,41 +157,106 @@ export class BigBangAttack extends BaseEffect {
       return;
     }
     const now = performance.now();
-    const delta = getDelta(this.lastUpdateTime);
-    this.lastUpdateTime = now;
-
-    // スケールを経過時間に基づいて増加
-    const scaleDelta = this.scaleIncrement * delta; // 例: 0.1（毎秒）× 経過秒数
+    if (this.startTime === null) {
+      this.startTime = now;
+    }
 
     // エネルギー弾の回転
+    const delta = getDelta(this.lastUpdateTime);
+    this.lastUpdateTime = now;
     this.updateRotate(delta);
-    // エネルギー弾の大きさ
-    this.updateSphere(scaleDelta);
+
+    // 経過時間取得
+    const elapsedTime = now - this.startTime;
 
     // エネルギー弾の大きさに応じて色や透明度を調整
     const scaleX = this.sphere.mesh.scale.x;
 
-    if (scaleX > 4) {
+    if (elapsedTime > 10000) {
       // 色の変更
       this.updateColor(scaleX);
       // 球体の透明度を調整（スケールが大きくなると透明度が増す）
       this.updateOpacity(scaleX);
     }
 
-    if (scaleX > 4 && scaleX < 6) {
-      //this.scaleIncrement = 0.03;
-    } else if (scaleX > 6 && scaleX < 8) {
-      this.liveCommentary.updateMessage("天さん！僕の超能力が効かない！");
-    } else if (scaleX > 8 && scaleX < 10) {
-      this.liveCommentary.updateMessage("地球もろとも消すつもりか!!!!");
-    } else if (scaleX > 10 && scaleX < 11) {
-      this.liveCommentary.updateMessage("うわぁぁぁぁ!!!!");
-    } else if (scaleX > 11) {
-      this.liveCommentary.updateMessage("さよなら天さん、、");
+    // 条件定義：時間範囲、スケール上限、メッセージ
+    const conditions = [
+      { start: 0, end: 1000, maxScale: 1, message: null },
+      {
+        start: 1000,
+        end: 2000,
+        maxScale: 2,
+        message: null,
+      },
+      {
+        start: 2000,
+        end: 4000,
+        maxScale: 3,
+        message: "みんな魔人ブウにやられて、地球を救えるのは君しかいないんだ！",
+      },
+      { start: 4000, end: 6000, maxScale: 4, message: null },
+      {
+        start: 6000,
+        end: 10000,
+        maxScale: 5,
+        message: null,
+      },
+      {
+        start: 10000,
+        end: 12000,
+        maxScale: 6,
+        message: "仙豆もヤムチャが30個使ったから在庫がないんだ！",
+      },
+      { start: 12000, end: 15000, maxScale: 7, message: null },
+      {
+        start: 15000,
+        end: 21000,
+        maxScale: 8,
+        message: null,
+      },
+      {
+        start: 21000,
+        end: 27000,
+        maxScale: 9,
+        message: "くらえーーー！！！",
+      },
+      {
+        start: 27000,
+        end: 33000,
+        maxScale: 11,
+        message: "超ビッグバンアタック！！！！",
+      },
+      {
+        start: 33000,
+        end: Infinity,
+        maxScale: null,
+        message: null,
+        final: true,
+      },
+    ];
 
-      this.scaleIncrement = 0;
-      // エネルギー弾の移動
-      this.startMovingSphere(delta);
+    // 全ての条件を評価
+    for (const condition of conditions) {
+      if (elapsedTime > condition.start && elapsedTime <= condition.end) {
+        // メッセージ更新
+        if (condition.message) {
+          this.liveCommentary.updateMessage(condition.message);
+        }
+
+        // スケール更新
+        if (
+          condition.maxScale &&
+          this.sphere.mesh.scale.x <= condition.maxScale
+        ) {
+          this.updateSphere(0.01); // ここは少しずつ増やす
+        }
+
+        // 特別な処理が必要な最終フレーム
+        if (condition.final) {
+          this.scaleIncrement = 0;
+          this.startMovingSphere(delta);
+        }
+      }
     }
   };
 }

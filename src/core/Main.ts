@@ -10,6 +10,7 @@ import { NormalizedLandmark } from "@mediapipe/tasks-vision";
 import { LabelActionType } from "../types";
 import { LABELS, LANDMARK } from "../core/constants";
 import { convertThreejsPosition } from "../core/Utilities";
+import { Heaven } from "../effects/Heaven";
 
 export class Main {
   private videoRenderer: VideoRenderer;
@@ -19,7 +20,7 @@ export class Main {
   private _superSaiyajinOura: SuperSaiyajinOura | null = null;
   private _majinBuu: MajinBuu | null = null;
   private _teleportation: Teleportation | null = null;
-  private _angelRing: AngelRing | null = null;
+  private _heaven: Heaven | null = null;
   private heavenFlag = false;
   private lastFrameTime = performance.now();
   private targetFPS = 60;
@@ -78,13 +79,13 @@ export class Main {
     }
     return this._teleportation;
   }
-  // ビッグバンアタック
-  get angelRing(): AngelRing {
-    if (this._angelRing === null) {
+  // ヘブンイベント
+  get heaven(): Heaven {
+    if (this._heaven === null) {
       const scene = this.videoRenderer.getScene();
-      this._angelRing = new AngelRing(scene);
+      this._heaven = new Heaven(scene);
     }
-    return this._angelRing;
+    return this._heaven;
   }
 
   isSuperSaiyajinRunning() {
@@ -95,10 +96,11 @@ export class Main {
     return (
       this.bigBangAttack.getIsRun() ||
       this.teleportation.getIsRun() ||
-      this.kamehameha.getIsRun()
+      this.kamehameha.getIsRun() ||
+      this.heaven.getIsRun()
     );
   }
-
+  endEffect = () => {};
   runKamehameha(x: number, y: number, z: number) {
     console.log({ x, y, z });
     //this.kamehameha.start(x, y, z);
@@ -108,6 +110,16 @@ export class Main {
     const scene = this.videoRenderer.getScene();
     this.superSaiyajinOura.run();
     console.log("runOura");
+  }
+
+  heavenDarkProcess() {
+    this.superSaiyajin.stop();
+    this.superSaiyajinOura.stop();
+    this.majinBuu.stop();
+  }
+
+  heavenStart() {
+    this.heaven.start();
   }
 
   showEffect(
@@ -120,29 +132,28 @@ export class Main {
       this.bigBangAttack.start(landmarks);
       // 魔人ブウも起動する
       this.majinBuu.start(landmarks);
-      onComplete();
+      //onComplete();
     } else if (label === LABELS.SUPERSAIYAJIN) {
       this.superSaiyajin.run();
       this.superSaiyajinOura.run();
-      onComplete();
+      //onComplete();
     } else if (label === LABELS.SYUNKANIDOU) {
       this.teleportation.run();
-      onComplete();
+      //onComplete();
     } else if (label === LABELS.KAMEHAMEHA_POSE) {
-      this.kamehameha.start(landmarks);
+      this.kamehameha.start();
     } else if (label === LABELS.ANGEL_RING && this.heavenFlag) {
-      this.angelRing.start();
+      // this.angelRing.start();
     }
-    this.angelRing.start();
+    // this.angelRing.start();
     onComplete();
   }
 
   updateSuperSaiyajinLandmarks(landmarks: NormalizedLandmark[]) {
     this.superSaiyajin.setLandmarks(landmarks);
     this.superSaiyajinOura.setLandmarks(landmarks);
-    if (this.heavenFlag) {
-      this.angelRing.setLandmarks(landmarks);
-    }
+    this.heaven.setLandmarks(landmarks);
+    this.kamehameha.setLandmarks(landmarks);
   }
 
   // run(x: number, y: number, z: number) {
@@ -179,8 +190,8 @@ export class Main {
         this.kamehameha.animate();
       }
 
-      if (this.angelRing.getIsRun() && this.heavenFlag) {
-        this.angelRing.animate();
+      if (this.heaven.getIsRun()) {
+        this.heaven.animate();
       }
     }
     requestAnimationFrame(this.animate);
