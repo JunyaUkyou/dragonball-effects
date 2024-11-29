@@ -90,6 +90,24 @@ export class SuperSaiyajin extends BaseEffect {
     return this.baseDistance / (this.baseDistance - z);
   }
 
+  stop() {
+    this.isRun = false;
+    if (this.hairMesh) {
+      this.scene.remove(this.hairMesh);
+    }
+    // リソースの解放
+    if (this.hairMesh.geometry) {
+      this.hairMesh.geometry.dispose();
+    }
+    if (this.hairMesh.material) {
+      if (Array.isArray(this.hairMesh.material)) {
+        this.hairMesh.material.forEach((material) => material.dispose());
+      } else {
+        this.hairMesh.material.dispose();
+      }
+    }
+  }
+
   run() {
     const landmarks = this.getLandmarks();
     if (!landmarks) {

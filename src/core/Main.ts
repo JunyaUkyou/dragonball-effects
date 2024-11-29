@@ -112,6 +112,12 @@ export class Main {
     console.log("runOura");
   }
 
+  heavenDarkProcess() {
+    this.superSaiyajin.stop();
+    this.superSaiyajinOura.stop();
+    this.majinBuu.stop();
+  }
+
   heavenStart() {
     this.heaven.start();
   }

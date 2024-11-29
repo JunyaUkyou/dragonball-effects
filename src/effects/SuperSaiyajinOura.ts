@@ -209,6 +209,24 @@ export class SuperSaiyajinOura extends BaseEffect {
     return this.baseDistance / (this.baseDistance - z);
   }
 
+  stop() {
+    this.isRun = false;
+    if (this.auraSprite) {
+      this.scene.remove(this.auraSprite);
+    }
+    // リソースの解放
+    if (this.auraSprite.geometry) {
+      this.auraSprite.geometry.dispose();
+    }
+    if (this.auraSprite.material) {
+      if (Array.isArray(this.auraSprite.material)) {
+        this.auraSprite.material.forEach((material) => material.dispose());
+      } else {
+        this.auraSprite.material.dispose();
+      }
+    }
+  }
+
   animate = () => {
     if (!this.isRun) {
       return;

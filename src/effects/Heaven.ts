@@ -125,6 +125,12 @@ export class Heaven extends BaseEffect {
         break;
       case 3:
         // 暗転
+        console.log("暗転時の処理");
+
+        // イベントを発行
+        const event = new CustomEvent("heaven-dark-window");
+        document.dispatchEvent(event);
+
         (this.mesh.material as THREE.Material).opacity = 1;
         this.mesh.position.z = 2;
         this.liveCommentary.updateMessage("全員しんだ");

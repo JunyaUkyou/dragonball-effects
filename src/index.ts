@@ -64,6 +64,12 @@ function setupEventListeners() {
     state.mainInstance!.heavenStart();
   });
 
+  // エフェクト完了イベント
+  document.addEventListener("heaven-dark-window", (event) => {
+    console.log("heaven-dark-window:");
+    state.mainInstance!.heavenDarkProcess();
+  });
+
   document.getElementById("test_kamehameha")?.addEventListener("click", () => {
     state.mainInstance?.runKamehameha(0, 0, 0);
   });
