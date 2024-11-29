@@ -141,7 +141,7 @@ export class Main {
       this.teleportation.run();
       //onComplete();
     } else if (label === LABELS.KAMEHAMEHA_POSE) {
-      this.kamehameha.start(landmarks);
+      this.kamehameha.start();
     } else if (label === LABELS.ANGEL_RING && this.heavenFlag) {
       // this.angelRing.start();
     }
@@ -150,10 +150,10 @@ export class Main {
   }
 
   updateSuperSaiyajinLandmarks(landmarks: NormalizedLandmark[]) {
-    console.log("updateSuperSaiyajinLandmarks");
     this.superSaiyajin.setLandmarks(landmarks);
     this.superSaiyajinOura.setLandmarks(landmarks);
     this.heaven.setLandmarks(landmarks);
+    this.kamehameha.setLandmarks(landmarks);
   }
 
   // run(x: number, y: number, z: number) {

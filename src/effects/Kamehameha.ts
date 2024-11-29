@@ -7,6 +7,10 @@ import { NormalizedLandmark } from "@mediapipe/tasks-vision";
 import { LANDMARK } from "../core/constants";
 import { convertThreejsPosition, getDelta } from "../core/Utilities";
 
+export type KamehamehaLandmark = {
+  leftIndex: NormalizedLandmark;
+};
+
 const DEFAULT_SIZE = 32;
 const START_COLOR = new THREE.Color("#ffd700");
 
@@ -15,6 +19,8 @@ export class Kamehameha extends BaseEffect {
   protected _sphere: Sphere | null = null;
   private readonly liveCommentary: LiveCommentary;
   private lastUpdateTime = performance.now();
+  private startTime: number | null = null; // アニメーションの開始時間
+  private landmarks: KamehamehaLandmark | null = null;
 
   constructor(
     scene: THREE.Scene,
@@ -23,7 +29,26 @@ export class Kamehameha extends BaseEffect {
     super(scene);
     this.liveCommentary = liveCommentary;
 
-    this.texture = new THREE.TextureLoader().load("/texture/3658520_s.jpg");
+    this.texture = new THREE.TextureLoader().load("/texture/kamehameha.jpg");
+  }
+
+  /**ランドマーク情報を設定する */
+  setLandmarks(landmarks: NormalizedLandmark[]) {
+    const Landmark = {
+      leftIndex: landmarks[LANDMARK.LEFT_INDEX],
+    };
+    this.landmarks = Landmark;
+  }
+
+  /**ランドマーク情報を取得する */
+  getLandmarks() {
+    if (!this.landmarks) {
+      return null;
+    }
+
+    const leftIndex = this.landmarks.leftIndex;
+
+    return { leftIndex };
   }
 
   get sphere(): Sphere {
@@ -56,9 +81,12 @@ export class Kamehameha extends BaseEffect {
     this.scene.add(this.sphere.mesh);
   }
 
-  private getStartPosition(landmarks: NormalizedLandmark[]) {
-    const middleFingerMcp = landmarks[LANDMARK.LEFT_INDEX];
-    const { x, y, z } = convertThreejsPosition(middleFingerMcp);
+  private getStartPosition() {
+    const landmarks = this.getLandmarks();
+    if (!landmarks) {
+      return;
+    }
+    const { x, y, z } = convertThreejsPosition(landmarks.leftIndex);
 
     return {
       x,
@@ -67,10 +95,13 @@ export class Kamehameha extends BaseEffect {
     };
   }
 
-  start(landmarks: NormalizedLandmark[]) {
+  start() {
     // ランドマーク情報からビッグバンアタック開始位置を取得
-    const { x, y, z } = this.getStartPosition(landmarks);
-
+    const landmark = this.getStartPosition();
+    if (!landmark) {
+      return;
+    }
+    const { x, y, z } = landmark;
     // エフェクト開始処理
     this.startEffect();
 
@@ -113,38 +144,70 @@ export class Kamehameha extends BaseEffect {
     if (!this.isRun) {
       return;
     }
-    const now = performance.now();
-    const delta = getDelta(this.lastUpdateTime);
-    const poseOffset = 10;
-    const offsetData = delta / poseOffset;
 
-    console.log({ delta, offsetData });
-    this.lastUpdateTime = now;
+    // ランドマーク情報からビッグバンアタック開始位置を取得
+    const landmark = this.getStartPosition();
+    if (landmark) {
+      const { x, y, z } = landmark;
+      // エネルギー弾のポジション
+      this.sphere.mesh.position.set(x, y, z);
+    }
 
     this.updateRotate();
-    if (this.sphere.mesh.scale.x < 7) {
-      console.log();
-      this.sphere.mesh.scale.x += 0.003 + offsetData;
-      this.sphere.mesh.scale.y += 0.003 + offsetData;
+    const now = performance.now();
+    if (this.startTime === null) {
+      this.startTime = now;
+    }
+    // 経過時間取得
+    const elapsedTime = now - this.startTime;
 
-      if (this.sphere.mesh.scale.x < 3) {
-        this.liveCommentary.updateMessage("くらえーーー！！！");
-      } else if (this.sphere.mesh.scale.x > 3 && this.sphere.mesh.scale.x < 4) {
-        this.liveCommentary.updateMessage("か〜");
-      } else if (this.sphere.mesh.scale.x > 4 && this.sphere.mesh.scale.x < 5) {
-        this.liveCommentary.updateMessage("め〜");
-      } else if (this.sphere.mesh.scale.x > 5 && this.sphere.mesh.scale.x < 6) {
-        this.liveCommentary.updateMessage("は〜");
-      } else if (this.sphere.mesh.scale.x > 6 && this.sphere.mesh.scale.x < 7) {
-        this.liveCommentary.updateMessage("め〜");
-      }
-    } else {
-      this.liveCommentary.updateMessage("は〜");
-      this.sphere.mesh.scale.x += 1 + offsetData;
-      this.sphere.mesh.scale.y += 1 + offsetData;
-      if (this.sphere.mesh.scale.x > 130 || this.sphere.mesh.scale.y > 130) {
-        this.removeMesh();
-        this.isRun = false;
+    // 条件定義：時間範囲、スケール上限、メッセージ
+    const conditions = [
+      { start: 0, end: 2000, maxScale: null, message: "くらえーーー！！！" },
+      { start: 2000, end: 5000, maxScale: 4, message: "か〜" },
+      { start: 5000, end: 8000, maxScale: 6, message: "め〜" },
+      { start: 8000, end: 11000, maxScale: 8, message: "は〜" },
+      { start: 11000, end: 14000, maxScale: 10, message: "め〜" },
+      {
+        start: 14000,
+        end: Infinity,
+        maxScale: null,
+        message: "波----！！！！！！",
+        final: true,
+      },
+    ];
+
+    // 全ての条件を評価
+    for (const condition of conditions) {
+      if (elapsedTime > condition.start && elapsedTime <= condition.end) {
+        // メッセージ更新
+        if (condition.message) {
+          this.liveCommentary.updateMessage(condition.message);
+        }
+
+        // スケール更新
+        if (
+          condition.maxScale &&
+          this.sphere.mesh.scale.x <= condition.maxScale
+        ) {
+          this.sphere.mesh.scale.x += 0.01;
+          this.sphere.mesh.scale.y += 0.01;
+        }
+
+        // 特別な処理が必要な最終フレーム
+        if (condition.final) {
+          this.sphere.mesh.scale.x += 3;
+          this.sphere.mesh.scale.y += 3;
+          if (
+            this.sphere.mesh.scale.x > 130 ||
+            this.sphere.mesh.scale.y > 130
+          ) {
+            setTimeout(() => {
+              this.removeMesh();
+              this.isRun = false;
+            }, 2000);
+          }
+        }
       }
     }
   };
